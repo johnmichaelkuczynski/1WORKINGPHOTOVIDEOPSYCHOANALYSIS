@@ -583,9 +583,9 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 <SelectValue placeholder="Select AI Model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="openai">OpenAI GPT-4o</SelectItem>
-                <SelectItem value="anthropic">Anthropic Claude</SelectItem>
-                <SelectItem value="perplexity">Perplexity</SelectItem>
+                <SelectItem value="openai">ZHI 2</SelectItem>
+                <SelectItem value="anthropic">ZHI 1</SelectItem>
+                <SelectItem value="perplexity">ZHI 4</SelectItem>
               </SelectContent>
             </Select>
           </Card>
