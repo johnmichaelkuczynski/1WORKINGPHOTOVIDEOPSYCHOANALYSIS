@@ -585,6 +585,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               <SelectContent>
                 <SelectItem value="openai">ZHI 2</SelectItem>
                 <SelectItem value="anthropic">ZHI 1</SelectItem>
+                <SelectItem value="deepseek">ZHI 3</SelectItem>
                 <SelectItem value="perplexity">ZHI 4</SelectItem>
               </SelectContent>
             </Select>

@@ -352,7 +352,32 @@ Format your analysis as detailed JSON with the following structure:
           messages: [{ role: "user", content: textAnalysisPrompt }],
         });
         
-        analysisResult = JSON.parse(response.content[0].text);
+        // Extract JSON from markdown code blocks if present
+        let responseText = '';
+        if (response.content[0].type === 'text') {
+          responseText = response.content[0].text;
+        }
+        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          responseText = jsonMatch[1];
+        }
+        
+        analysisResult = JSON.parse(responseText);
+      }
+      else if (aiModel === "deepseek") {
+        // DeepSeek is not currently configured
+        analysisResult = {
+          summary: "DeepSeek analysis is not currently available. Please use ZHI 1, ZHI 2, or ZHI 4 for analysis.",
+          detailed_analysis: {
+            personality_core: "DeepSeek API integration is not currently configured",
+            thought_patterns: "Please select a different AI model for analysis",
+            emotional_tendencies: "Analysis unavailable",
+            communication_style: "Analysis unavailable", 
+            professional_insights: "Analysis unavailable",
+            decision_making: "Analysis unavailable",
+            relationships: {}
+          }
+        };
       }
       else if (aiModel === "perplexity") {
         const response = await perplexity.query({
@@ -530,7 +555,30 @@ Format your analysis as detailed JSON with the following structure:
           messages: [{ role: "user", content: documentAnalysisPrompt }],
         });
         
-        analysisResult = JSON.parse(response.content[0].text);
+        // Extract JSON from markdown code blocks if present
+        let responseText = '';
+        if (response.content[0].type === 'text') {
+          responseText = response.content[0].text;
+        }
+        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          responseText = jsonMatch[1];
+        }
+        
+        analysisResult = JSON.parse(responseText);
+      }
+      else if (aiModel === "deepseek") {
+        // DeepSeek is not currently configured
+        analysisResult = {
+          summary: "DeepSeek analysis is not currently available. Please use ZHI 1, ZHI 2, or ZHI 4 for analysis.",
+          detailed_analysis: {
+            document_overview: "DeepSeek API integration is not currently configured",
+            main_themes: "Please select a different AI model for analysis",
+            emotional_tone: "Analysis unavailable",
+            writing_style: "Analysis unavailable",
+            author_personality: "Analysis unavailable"
+          }
+        };
       }
       else if (aiModel === "perplexity") {
         const response = await perplexity.query({
