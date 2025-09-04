@@ -422,19 +422,19 @@ ${analysisResult.summary}
 Detailed Analysis
 
 Personality Core
-${analysisResult.detailed_analysis.personality_core}
+${typeof analysisResult.detailed_analysis.personality_core === 'object' ? JSON.stringify(analysisResult.detailed_analysis.personality_core, null, 2) : analysisResult.detailed_analysis.personality_core}
 
 Thought Patterns
-${analysisResult.detailed_analysis.thought_patterns}
+${typeof analysisResult.detailed_analysis.thought_patterns === 'object' ? JSON.stringify(analysisResult.detailed_analysis.thought_patterns, null, 2) : analysisResult.detailed_analysis.thought_patterns}
 
 Emotional Tendencies
-${analysisResult.detailed_analysis.emotional_tendencies || ""}
+${typeof analysisResult.detailed_analysis.emotional_tendencies === 'object' ? JSON.stringify(analysisResult.detailed_analysis.emotional_tendencies, null, 2) : (analysisResult.detailed_analysis.emotional_tendencies || "")}
 
 Communication Style
-${analysisResult.detailed_analysis.communication_style || ""}
+${typeof analysisResult.detailed_analysis.communication_style === 'object' ? JSON.stringify(analysisResult.detailed_analysis.communication_style, null, 2) : (analysisResult.detailed_analysis.communication_style || "")}
 
 Professional Insights
-${analysisResult.detailed_analysis.professional_insights || ""}
+${typeof analysisResult.detailed_analysis.professional_insights === 'object' ? JSON.stringify(analysisResult.detailed_analysis.professional_insights, null, 2) : (analysisResult.detailed_analysis.professional_insights || "")}
 
 You can ask follow-up questions about this analysis.
 `;
