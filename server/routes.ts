@@ -414,6 +414,26 @@ Format your analysis as detailed JSON with the following structure:
         title: title || "Text Analysis"
       });
       
+      // Helper function to format objects into readable text
+      const formatAnalysisSection = (data: any): string => {
+        if (typeof data === 'string') {
+          return data;
+        }
+        if (typeof data === 'object' && data !== null) {
+          const lines: string[] = [];
+          for (const [key, value] of Object.entries(data)) {
+            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            if (typeof value === 'string') {
+              lines.push(`${formattedKey}: ${value}`);
+            } else {
+              lines.push(`${formattedKey}: ${String(value)}`);
+            }
+          }
+          return lines.join('\n');
+        }
+        return String(data);
+      };
+
       // Format message for response
       const formattedContent = `Personality Analysis Based on Text
 
@@ -422,19 +442,19 @@ ${analysisResult.summary}
 Detailed Analysis
 
 Personality Core
-${typeof analysisResult.detailed_analysis.personality_core === 'object' ? JSON.stringify(analysisResult.detailed_analysis.personality_core, null, 2) : analysisResult.detailed_analysis.personality_core}
+${formatAnalysisSection(analysisResult.detailed_analysis.personality_core)}
 
 Thought Patterns
-${typeof analysisResult.detailed_analysis.thought_patterns === 'object' ? JSON.stringify(analysisResult.detailed_analysis.thought_patterns, null, 2) : analysisResult.detailed_analysis.thought_patterns}
+${formatAnalysisSection(analysisResult.detailed_analysis.thought_patterns)}
 
 Emotional Tendencies
-${typeof analysisResult.detailed_analysis.emotional_tendencies === 'object' ? JSON.stringify(analysisResult.detailed_analysis.emotional_tendencies, null, 2) : (analysisResult.detailed_analysis.emotional_tendencies || "")}
+${formatAnalysisSection(analysisResult.detailed_analysis.emotional_tendencies || "")}
 
 Communication Style
-${typeof analysisResult.detailed_analysis.communication_style === 'object' ? JSON.stringify(analysisResult.detailed_analysis.communication_style, null, 2) : (analysisResult.detailed_analysis.communication_style || "")}
+${formatAnalysisSection(analysisResult.detailed_analysis.communication_style || "")}
 
 Professional Insights
-${typeof analysisResult.detailed_analysis.professional_insights === 'object' ? JSON.stringify(analysisResult.detailed_analysis.professional_insights, null, 2) : (analysisResult.detailed_analysis.professional_insights || "")}
+${formatAnalysisSection(analysisResult.detailed_analysis.professional_insights || "")}
 
 You can ask follow-up questions about this analysis.
 `;
