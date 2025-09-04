@@ -415,26 +415,25 @@ Format your analysis as detailed JSON with the following structure:
       });
       
       // Format message for response
-      const formattedContent = `
-# Personality Analysis Based on Text
+      const formattedContent = `Personality Analysis Based on Text
 
 ${analysisResult.summary}
 
-## Detailed Analysis
+Detailed Analysis
 
-### Personality Core
+Personality Core
 ${analysisResult.detailed_analysis.personality_core}
 
-### Thought Patterns
+Thought Patterns
 ${analysisResult.detailed_analysis.thought_patterns}
 
-### Emotional Tendencies
+Emotional Tendencies
 ${analysisResult.detailed_analysis.emotional_tendencies || ""}
 
-### Communication Style
+Communication Style
 ${analysisResult.detailed_analysis.communication_style || ""}
 
-### Professional Insights
+Professional Insights
 ${analysisResult.detailed_analysis.professional_insights || ""}
 
 You can ask follow-up questions about this analysis.
@@ -631,24 +630,23 @@ Format your analysis as detailed JSON with the following structure:
       });
       
       // Format message for response
-      const formattedContent = `
-# Document Analysis: ${fileName}
+      const formattedContent = `Document Analysis: ${fileName}
 
 ${analysisResult.summary}
 
-## Document Overview
+Document Overview
 ${analysisResult.detailed_analysis.document_overview}
 
-## Main Themes
+Main Themes
 ${analysisResult.detailed_analysis.main_themes}
 
-## Emotional Tone
+Emotional Tone
 ${analysisResult.detailed_analysis.emotional_tone}
 
-## Writing Style
+Writing Style
 ${analysisResult.detailed_analysis.writing_style}
 
-## Author Personality Assessment
+Author Personality Assessment
 ${analysisResult.detailed_analysis.author_personality}
 
 You can ask follow-up questions about this analysis.
@@ -1248,9 +1246,9 @@ Provide a comprehensive analysis of this document, including:
       if (personalityInsights.individualProfiles?.length > 1) {
         // Multi-person message format with improved visual structure
         const peopleCount = personalityInsights.individualProfiles.length;
-        formattedContent = `🧠 AI-Powered Psychological Profile Report\n`;
-        formattedContent += `🖼️ Subjects Detected: ${peopleCount} Individuals\n`;
-        formattedContent += `📷 Mode: Group Analysis\n\n`;
+        formattedContent = `AI-Powered Psychological Profile Report\n`;
+        formattedContent += `Subjects Detected: ${peopleCount} Individuals\n`;
+        formattedContent += `Mode: Group Analysis\n\n`;
         
         // Add each individual profile first
         personalityInsights.individualProfiles.forEach((profile, index) => {
@@ -1261,27 +1259,27 @@ Provide a comprehensive analysis of this document, including:
           const genderAge = [gender, ageRange].filter(Boolean).join(', ');
           
           formattedContent += `${'─'.repeat(65)}\n`;
-          formattedContent += `👤 Subject ${index + 1}${genderAge ? ` (${genderAge})` : ''}\n`;
+          formattedContent += `Subject ${index + 1}${genderAge ? ` (${genderAge})` : ''}\n`;
           formattedContent += `${'─'.repeat(65)}\n\n`;
           
           const detailedAnalysis = profile.detailed_analysis || {};
           
-          formattedContent += `🧾 Summary:\n${profile.summary || 'No summary available'}\n\n`;
+          formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
           
           if (detailedAnalysis.personality_core) {
-            formattedContent += `🧬 Core Personality:\n${detailedAnalysis.personality_core}\n\n`;
+            formattedContent += `Core Personality:\n${detailedAnalysis.personality_core}\n\n`;
           }
           
           if (detailedAnalysis.cognitive_style) {
-            formattedContent += `🧠 Cognitive Style:\n${detailedAnalysis.cognitive_style}\n\n`;
+            formattedContent += `Cognitive Style:\n${detailedAnalysis.cognitive_style}\n\n`;
           }
           
           if (detailedAnalysis.professional_insights) {
-            formattedContent += `💼 Professional Fit:\n${detailedAnalysis.professional_insights}\n\n`;
+            formattedContent += `Professional Fit:\n${detailedAnalysis.professional_insights}\n\n`;
           }
           
           if (detailedAnalysis.relationships) {
-            formattedContent += `❤️ Relationships:\n`;
+            formattedContent += `Relationships:\n`;
             const relationshipParts = [];
             
             if (detailedAnalysis.relationships.current_status && 
@@ -1307,7 +1305,7 @@ Provide a comprehensive analysis of this document, including:
           }
           
           if (detailedAnalysis.growth_areas) {
-            formattedContent += `📈 Growth Areas:\n`;
+            formattedContent += `Growth Areas:\n`;
             
             if (Array.isArray(detailedAnalysis.growth_areas.strengths) && 
                 detailedAnalysis.growth_areas.strengths.length > 0) {
@@ -1328,7 +1326,7 @@ Provide a comprehensive analysis of this document, including:
         // Add group dynamics at the end
         if (personalityInsights.groupDynamics) {
           formattedContent += `${'─'.repeat(65)}\n`;
-          formattedContent += `🤝 Group Dynamics (${peopleCount}-Person Analysis)\n`;
+          formattedContent += `Group Dynamics (${peopleCount}-Person Analysis)\n`;
           formattedContent += `${'─'.repeat(65)}\n\n`;
           formattedContent += `${personalityInsights.groupDynamics}\n`;
         }
@@ -1344,30 +1342,30 @@ Provide a comprehensive analysis of this document, including:
         const ageRange = ageMatch ? `~${ageMatch[1]}–${ageMatch[2]} years` : '';
         const genderAge = [gender, ageRange].filter(Boolean).join(', ');
         
-        formattedContent = `🧠 AI-Powered Psychological Profile Report\n`;
-        formattedContent += `🖼️ Subject Detected: 1 Individual\n`;
-        formattedContent += `📷 Mode: Individual Analysis\n\n`;
+        formattedContent = `AI-Powered Psychological Profile Report\n`;
+        formattedContent += `Subject Detected: 1 Individual\n`;
+        formattedContent += `Mode: Individual Analysis\n\n`;
         
         formattedContent += `${'─'.repeat(65)}\n`;
-        formattedContent += `👤 Subject 1${genderAge ? ` (${genderAge})` : ''}\n`;
+        formattedContent += `Subject 1${genderAge ? ` (${genderAge})` : ''}\n`;
         formattedContent += `${'─'.repeat(65)}\n\n`;
         
-        formattedContent += `🧾 Summary:\n${profile.summary || 'No summary available'}\n\n`;
+        formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
         
         if (detailedAnalysis.personality_core) {
-          formattedContent += `🧬 Core Personality:\n${detailedAnalysis.personality_core || 'Not available'}\n\n`;
+          formattedContent += `Core Personality:\n${detailedAnalysis.personality_core || 'Not available'}\n\n`;
         }
         
         if (detailedAnalysis.cognitive_style) {
-          formattedContent += `🧠 Cognitive Style:\n${detailedAnalysis.cognitive_style || 'Not available'}\n\n`;
+          formattedContent += `Cognitive Style:\n${detailedAnalysis.cognitive_style || 'Not available'}\n\n`;
         }
         
         if (detailedAnalysis.professional_insights) {
-          formattedContent += `💼 Professional Fit:\n${detailedAnalysis.professional_insights || 'Not available'}\n\n`;
+          formattedContent += `Professional Fit:\n${detailedAnalysis.professional_insights || 'Not available'}\n\n`;
         }
         
         if (detailedAnalysis.relationships) {
-          formattedContent += `❤️ Relationships:\n`;
+          formattedContent += `Relationships:\n`;
           const relationshipParts = [];
           
           if (detailedAnalysis.relationships.current_status && 
@@ -1393,7 +1391,7 @@ Provide a comprehensive analysis of this document, including:
         }
         
         if (detailedAnalysis.growth_areas) {
-          formattedContent += `📈 Growth Areas:\n`;
+          formattedContent += `Growth Areas:\n`;
           
           if (Array.isArray(detailedAnalysis.growth_areas.strengths) && 
               detailedAnalysis.growth_areas.strengths.length > 0) {
