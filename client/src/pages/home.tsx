@@ -726,7 +726,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         toast({
                           title: "Analysis Complete",
                           description: "Your image has been re-analyzed with " + 
-                            (selectedModel === "openai" ? "OpenAI" : selectedModel === "anthropic" ? "Anthropic" : "Perplexity"),
+                            (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                         });
                       }).catch(error => {
                         toast({
@@ -742,7 +742,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "OpenAI" : selectedModel === "anthropic" ? "Anthropic" : "Perplexity"}
+                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
               </div>
             )}
@@ -791,7 +791,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         toast({
                           title: "Analysis Complete",
                           description: "Your video has been re-analyzed with " + 
-                            (selectedModel === "openai" ? "OpenAI" : selectedModel === "anthropic" ? "Anthropic" : "Perplexity"),
+                            (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                         });
                       }).catch(error => {
                         toast({
@@ -807,7 +807,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "OpenAI" : selectedModel === "anthropic" ? "Anthropic" : "Perplexity"}
+                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
               </div>
             )}
@@ -841,7 +841,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "OpenAI" : selectedModel === "anthropic" ? "Anthropic" : "Perplexity"}
+                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
               </div>
             )}
