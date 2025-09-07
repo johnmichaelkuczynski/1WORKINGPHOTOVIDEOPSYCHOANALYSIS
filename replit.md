@@ -46,6 +46,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - **Fixed dropdown order**: Models now display in correct 知 1-4 sequence
 - **Implemented Chinese character**: Used authentic "知" character for elegant model naming
 - **Fixed text analysis formatting**: Removed raw JSON code display, now shows clean readable text output
+- **Fixed DeepSeek validation**: Added "deepseek" to backend validation schemas to enable 知 3 for all analysis types
 
 ## API Keys Required
 - `OPENAI_API_KEY` - For GPT-4o analysis and Whisper transcription
@@ -68,6 +69,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - All analysis outputs clean without markdown formatting
 - AI model names elegantly displayed as 知 1-4 using Chinese character for knowledge
 - Text analysis output now clean and professional without raw code or JSON formatting
+- DeepSeek (知 3) now working properly for video, image, text, and document analysis
 
 ## Next Steps
 Ready for user's next request or feature enhancement.
