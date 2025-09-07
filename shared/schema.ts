@@ -102,7 +102,7 @@ export const uploadMediaSchema = z.object({
   mediaType: z.enum(["image", "video", "document", "text"]),
   sessionId: z.string(),
   maxPeople: z.number().min(1).max(5).optional().default(5), // Optional parameter to limit people count for image/video
-  selectedModel: z.enum(["openai", "anthropic", "perplexity"]).optional().default("openai"), // Model selection
+  selectedModel: z.enum(["openai", "anthropic", "perplexity", "deepseek"]).optional().default("openai"), // Model selection
   documentType: z.enum(["pdf", "docx", "other"]).optional(), // For document uploads
   title: z.string().optional(), // For naming the analysis in history
 });
@@ -116,7 +116,7 @@ export const getSharedAnalysisSchema = z.object({
 export const textInputSchema = z.object({
   content: z.string().min(1).max(500000), // Up to 500,000 characters
   sessionId: z.string(),
-  selectedModel: z.enum(["openai", "anthropic", "perplexity"]).optional().default("openai"),
+  selectedModel: z.enum(["openai", "anthropic", "perplexity", "deepseek"]).optional().default("openai"),
   title: z.string().optional(),
 });
 
@@ -126,7 +126,7 @@ export const documentAnalysisSchema = z.object({
   fileName: z.string(),
   fileType: z.enum(["pdf", "docx"]),
   sessionId: z.string(),
-  selectedModel: z.enum(["openai", "anthropic", "perplexity"]).optional().default("openai"),
+  selectedModel: z.enum(["openai", "anthropic", "perplexity", "deepseek"]).optional().default("openai"),
   title: z.string().optional(),
 });
 
