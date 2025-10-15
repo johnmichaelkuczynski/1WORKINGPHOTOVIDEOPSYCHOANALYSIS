@@ -711,50 +711,123 @@ You can ask follow-up questions about this analysis.
       
       console.log(`Processing text analysis with model: ${selectedModel}`);
       
-      // Get personality insights based on text content
-      const textAnalysisPrompt = `
-Please analyze the following text to provide comprehensive personality insights about the author:
+      // Get comprehensive personality insights based on text content with 50-question framework
+      const textAnalysisPrompt = `You are an expert literary psychologist. Analyze this text comprehensively, providing specific evidence-based answers to ALL questions below WITH DIRECT QUOTES.
+
+CRITICAL: Every answer must reference SPECIFIC QUOTES or PHRASES from the text. Do not use generic descriptions.
 
 TEXT:
 ${content}
 
-Provide a detailed psychological, emotional, and behavioral analysis of the author based on their writing style, tone, word choice, and content. Include:
+I. LANGUAGE & STYLE
+1. What is the dominant sentence rhythm — clipped, flowing, erratic — and what personality trait does it reveal?
+2. Which adjectives recur, and what emotional bias do they show?
+3. How does pronoun use ("I," "you," "we," "they") shift across the text, and what identity stance does that reflect?
+4. What level of abstraction vs. concreteness dominates the writing?
+5. Identify one passage where diction becomes suddenly elevated or deflated — what triggers it?
+6. Are there unfinished or fragmentary sentences, and what might that signal psychologically?
+7. How consistent is the tense? Does the writer slip between past and present, and why?
+8. What metaphors or analogies recur, and what unconscious associations do they expose?
+9. Is the author's tone self-assured, tentative, ironic, or performative? Cite phrasing.
+10. What linguistic register (formal, colloquial, technical) dominates, and how does it align with self-image?
 
-1. Personality core traits (Big Five traits, strengths, challenges)
-2. Thought patterns and cognitive style
-3. Emotional tendencies and expression
-4. Communication style and social dynamics
-5. Professional insights and work style
-6. Decision-making process
-7. Relationship approach
-8. Areas for growth or self-awareness
-`;
+II. EMOTIONAL INDICATORS
+11. What emotion seems primary (anger, melancholy, pride, longing), and where is it linguistically concentrated?
+12. Which emotions appear repressed or displaced — hinted at but never named?
+13. Does emotional intensity rise or fall as the text progresses?
+14. Identify one sentence where affect "leaks through" despite apparent control.
+15. Are there moments of sentimental overstatement or cold detachment?
+16. What bodily or sensory words appear, and what do they suggest about embodiment or repression?
+17. Is there ambivalence toward the subject matter? Cite a line where tone wavers.
+18. Does humor appear, and if so, is it self-directed, aggressive, or defensive?
+19. What words betray anxiety or guilt?
+20. How is desire represented — directly, symbolically, or through avoidance?
+
+III. COGNITIVE & STRUCTURAL PATTERNS
+21. How logically coherent are transitions between ideas?
+22. Does the writer prefer enumeration, narrative, or digression? What does that indicate about thought style?
+23. What syntactic habits dominate (parallelism, repetition, parenthesis), and what mental rhythms do they mirror?
+24. Are there contradictions the author fails to notice? Quote one.
+25. How does the author handle uncertainty — through hedging, assertion, or silence?
+26. Does the argument or story circle back on itself?
+27. Are there abrupt topic shifts, and what emotional events coincide with them?
+28. What elements of the text seem compulsive or ritualistic in repetition?
+29. Where does the writer show real insight versus mechanical reasoning?
+30. How does closure occur (resolution, withdrawal, collapse), and what does it signify psychologically?
+
+IV. SELF-REPRESENTATION & IDENTITY
+31. How does the writer portray the self — victim, hero, observer, analyst?
+32. Is there a split between narrating voice and lived experience?
+33. What form of authority or validation does the author seek (moral, intellectual, emotional)?
+34. How consistent is the self-image across paragraphs?
+35. Identify one phrase that reveals unconscious self-evaluation (admiration, contempt, shame).
+36. Does the author reveal dependency on external approval or autonomy from it?
+37. What form of vulnerability does the writer allow?
+38. How does the author talk about others — with empathy, rivalry, indifference?
+39. What implicit audience is being addressed?
+40. Does the writer's stance shift from confession to performance? Cite turning point.
+
+V. SYMBOLIC & UNCONSCIOUS MATERIAL
+41. Which images or motifs recur (light/dark, ascent/descent, enclosure, mirrors), and what do they symbolize?
+42. Are there dream-like or surreal elements?
+43. What oppositions structure the text (order/chaos, love/power, mind/body)?
+44. What wish or fear seems to animate the text beneath the surface argument?
+45. Identify one metaphor that reads like a disguised confession.
+46. How does the author relate to time — nostalgic, future-oriented, frozen?
+47. Does the text express conflict between intellect and emotion?
+48. What shadow aspect of personality is hinted at through hostile or taboo imagery?
+49. Is there evidence of projection — attributing inner states to others or to abstractions?
+50. What central psychological drama (loss, control, recognition, transformation) structures the entire piece?
+
+Return JSON:
+{
+  "summary": "2-3 sentence overview with specific details from the text",
+  "detailed_analysis": {
+    "language_style": "Answers to questions 1-10 with specific quotes and linguistic evidence",
+    "emotional_indicators": "Answers to questions 11-20 with specific quotes showing emotion",
+    "cognitive_structural": "Answers to questions 21-30 with quotes showing thought patterns",
+    "self_representation": "Answers to questions 31-40 with quotes revealing identity",
+    "symbolic_unconscious": "Answers to questions 41-50 with quotes and symbolic analysis"
+  }
+}`;
 
       // Get personality analysis from selected AI model
-      let analysisText: string;
+      let analysisResult: any;
       
       if (selectedModel === "openai" && openai) {
         console.log('Using OpenAI for text analysis');
         const completion = await openai.chat.completions.create({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+          model: "gpt-4o",
           messages: [
-            { role: "system", content: "You are an expert in personality analysis and psychological assessment." },
+            { role: "system", content: "You are an expert literary psychologist and personality analyst." },
             { role: "user", content: textAnalysisPrompt }
-          ]
+          ],
+          response_format: { type: "json_object" }
         });
         
-        analysisText = completion.choices[0].message.content || "";
+        analysisResult = JSON.parse(completion.choices[0].message.content || "{}");
       } 
       else if (selectedModel === "anthropic" && anthropic) {
         console.log('Using Anthropic for text analysis');
         const response = await anthropic.messages.create({
-          model: "claude-3-7-sonnet-20250219", // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+          model: "claude-3-7-sonnet-20250219",
           max_tokens: 4000,
-          system: "You are an expert in personality analysis and psychological assessment.",
+          system: "You are an expert literary psychologist and personality analyst. Always return valid JSON.",
           messages: [{ role: "user", content: textAnalysisPrompt }],
         });
         
-        analysisText = response.content[0].text;
+        const textContent = response.content[0].text;
+        // Try to parse JSON, fallback to wrapping in analysis object
+        try {
+          analysisResult = JSON.parse(textContent);
+        } catch {
+          analysisResult = {
+            summary: "Text analysis completed",
+            detailed_analysis: {
+              language_style: textContent
+            }
+          };
+        }
       }
       else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
         console.log('Using Perplexity for text analysis');
@@ -763,12 +836,52 @@ Provide a detailed psychological, emotional, and behavioral analysis of the auth
           query: textAnalysisPrompt
         });
         
-        analysisText = response.text;
+        // Try to parse JSON, fallback to wrapping
+        try {
+          analysisResult = JSON.parse(response.text);
+        } catch {
+          analysisResult = {
+            summary: "Text analysis completed",
+            detailed_analysis: {
+              language_style: response.text
+            }
+          };
+        }
       }
       else {
         return res.status(503).json({ 
           error: "Selected AI model is not available. Please try again with a different model." 
         });
+      }
+      
+      // Format the analysis for display
+      let formattedContent = `AI-Powered Text Analysis\nMode: Comprehensive Literary & Psychological Analysis\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      if (detailedAnalysis.language_style) {
+        formattedContent += `I. Language & Style:\n${detailedAnalysis.language_style}\n\n`;
+      }
+      
+      if (detailedAnalysis.emotional_indicators) {
+        formattedContent += `II. Emotional Indicators:\n${detailedAnalysis.emotional_indicators}\n\n`;
+      }
+      
+      if (detailedAnalysis.cognitive_structural) {
+        formattedContent += `III. Cognitive & Structural Patterns:\n${detailedAnalysis.cognitive_structural}\n\n`;
+      }
+      
+      if (detailedAnalysis.self_representation) {
+        formattedContent += `IV. Self-Representation & Identity:\n${detailedAnalysis.self_representation}\n\n`;
+      }
+      
+      if (detailedAnalysis.symbolic_unconscious) {
+        formattedContent += `V. Symbolic & Unconscious Material:\n${detailedAnalysis.symbolic_unconscious}\n\n`;
       }
       
       // Create an analysis with a dummy mediaUrl since the schema requires it but we don't have
@@ -780,7 +893,7 @@ Provide a detailed psychological, emotional, and behavioral analysis of the auth
         sessionId,
         mediaUrl: dummyMediaUrl,
         mediaType: "text",
-        personalityInsights: { analysis: analysisText },
+        personalityInsights: analysisResult,
         title: title || "Text Analysis"
       });
       
@@ -789,7 +902,7 @@ Provide a detailed psychological, emotional, and behavioral analysis of the auth
         sessionId,
         analysisId: analysis.id,
         role: "assistant",
-        content: analysisText
+        content: formattedContent
       });
       
       // Return data to client

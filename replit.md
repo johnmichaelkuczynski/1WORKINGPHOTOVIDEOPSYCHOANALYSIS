@@ -65,7 +65,13 @@ An advanced AI-powered personality insights platform that provides sophisticated
   * IV. Context, Environment & Interaction (10 questions) - environmental cues, camera angles, off-screen presence, object use, background
   * V. Personality & Psychological Inference (10 questions) - temperament, defense mechanisms, anxiety markers, unguarded moments, transformation
 - **VIDEO VISION API**: Extracts multiple frames from videos and sends them to GPT-4o Vision API for temporal analysis
-- **EVIDENCE-BASED RESULTS**: All analysis answers anchored in specific visual/audio evidence with timestamps from actual media
+- **COMPREHENSIVE TEXT ANALYSIS - 50-Question Framework**: Implemented detailed text analysis with quotes covering:
+  * I. Language & Style (10 questions) - sentence rhythm, adjectives, pronoun use, abstraction, diction shifts, fragments, tense, metaphors, tone, register
+  * II. Emotional Indicators (10 questions) - primary emotion, repressed emotions, intensity progression, affect leakage, detachment, sensory words, ambivalence, humor
+  * III. Cognitive & Structural Patterns (10 questions) - coherence, thought style, syntactic habits, contradictions, uncertainty handling, circularity, topic shifts, repetition, insight
+  * IV. Self-Representation & Identity (10 questions) - self-portrayal, voice splits, authority seeking, self-image consistency, self-evaluation, vulnerability, relationship to others, audience
+  * V. Symbolic & Unconscious Material (10 questions) - recurring motifs, surreal elements, oppositions, wishes/fears, metaphors, time relation, intellect vs emotion, shadow aspects, projection
+- **EVIDENCE-BASED RESULTS**: All analysis answers anchored in specific visual/audio evidence with timestamps from actual media, or direct quotes from text
 
 ## API Keys Required
 - `OPENAI_API_KEY` - For GPT-4o analysis and Whisper transcription
