@@ -33,6 +33,15 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - Wants clean state management (no stacking of old analyses)
 
 ## Recent Changes
+### October 2025
+- **COMPREHENSIVE TEXT ANALYSIS UPGRADE**: Fully implemented 50-question framework for text analysis
+  * All 50 questions across 5 categories (Language & Style, Emotional Indicators, Cognitive & Structural Patterns, Self-Representation & Identity, Symbolic & Unconscious Material)
+  * Evidence-based analysis requiring direct quotes and specific phrases from text
+  * Robust JSON parsing for OpenAI, Anthropic, and Perplexity with code fence extraction
+  * Comprehensive fallback structure maintaining all 5 sections if parsing fails
+  * Display formatting with Roman numeral section headers matching framework
+  * Removed duplicate handlers for cleaner codebase
+
 ### January 2025
 - **Fixed session clearing**: Added server-side session clearing to prevent analyses from stacking up when using "New Analysis" button
 - **Enhanced "New Analysis" functionality**: Button now properly creates fresh sessions with clean state
