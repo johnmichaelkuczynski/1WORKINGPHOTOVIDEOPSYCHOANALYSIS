@@ -1254,7 +1254,9 @@ Provide a comprehensive analysis of this document, including:
         faceAnalysis, 
         videoAnalysis, 
         audioTranscription,
-        sceneContext
+        sceneContext,
+        mediaData,
+        mediaType
       );
 
       // Determine how many people were detected
@@ -1295,60 +1297,24 @@ Provide a comprehensive analysis of this document, including:
           
           formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
           
-          if (detailedAnalysis.personality_core) {
-            formattedContent += `Core Personality:\n${detailedAnalysis.personality_core}\n\n`;
+          if (detailedAnalysis.physical_cues) {
+            formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
           }
           
-          if (detailedAnalysis.cognitive_style) {
-            formattedContent += `Cognitive Style:\n${detailedAnalysis.cognitive_style}\n\n`;
+          if (detailedAnalysis.expression_emotion) {
+            formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
           }
           
-          if (detailedAnalysis.professional_insights) {
-            formattedContent += `Professional Fit:\n${detailedAnalysis.professional_insights}\n\n`;
+          if (detailedAnalysis.composition_context) {
+            formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
           }
           
-          if (detailedAnalysis.relationships) {
-            formattedContent += `Relationships:\n`;
-            const relationshipParts = [];
-            
-            if (detailedAnalysis.relationships.current_status && 
-                detailedAnalysis.relationships.current_status !== 'Not available') {
-              relationshipParts.push(detailedAnalysis.relationships.current_status);
-            }
-            
-            if (detailedAnalysis.relationships.parental_status && 
-                detailedAnalysis.relationships.parental_status !== 'Not available') {
-              relationshipParts.push(detailedAnalysis.relationships.parental_status);
-            }
-            
-            if (detailedAnalysis.relationships.ideal_partner && 
-                detailedAnalysis.relationships.ideal_partner !== 'Not available') {
-              relationshipParts.push(`Ideal match: ${detailedAnalysis.relationships.ideal_partner}`);
-            }
-            
-            formattedContent += relationshipParts.length > 0 
-              ? relationshipParts.join(' ') 
-              : 'No relationship data available';
-            
-            formattedContent += `\n\n`;
+          if (detailedAnalysis.personality_inference) {
+            formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
           }
           
-          if (detailedAnalysis.growth_areas) {
-            formattedContent += `Growth Areas:\n`;
-            
-            if (Array.isArray(detailedAnalysis.growth_areas.strengths) && 
-                detailedAnalysis.growth_areas.strengths.length > 0) {
-              formattedContent += `Strengths:\n${detailedAnalysis.growth_areas.strengths.map((s: string) => `• ${s}`).join('\n')}\n\n`;
-            }
-            
-            if (Array.isArray(detailedAnalysis.growth_areas.challenges) && 
-                detailedAnalysis.growth_areas.challenges.length > 0) {
-              formattedContent += `Challenges:\n${detailedAnalysis.growth_areas.challenges.map((c: string) => `• ${c}`).join('\n')}\n\n`;
-            }
-            
-            if (detailedAnalysis.growth_areas.development_path) {
-              formattedContent += `Development Path:\n${detailedAnalysis.growth_areas.development_path}\n\n`;
-            }
+          if (detailedAnalysis.symbolic_analysis) {
+            formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
           }
         });
         
@@ -1381,60 +1347,24 @@ Provide a comprehensive analysis of this document, including:
         
         formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
         
-        if (detailedAnalysis.personality_core) {
-          formattedContent += `Core Personality:\n${detailedAnalysis.personality_core || 'Not available'}\n\n`;
+        if (detailedAnalysis.physical_cues) {
+          formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
         }
         
-        if (detailedAnalysis.cognitive_style) {
-          formattedContent += `Cognitive Style:\n${detailedAnalysis.cognitive_style || 'Not available'}\n\n`;
+        if (detailedAnalysis.expression_emotion) {
+          formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
         }
         
-        if (detailedAnalysis.professional_insights) {
-          formattedContent += `Professional Fit:\n${detailedAnalysis.professional_insights || 'Not available'}\n\n`;
+        if (detailedAnalysis.composition_context) {
+          formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
         }
         
-        if (detailedAnalysis.relationships) {
-          formattedContent += `Relationships:\n`;
-          const relationshipParts = [];
-          
-          if (detailedAnalysis.relationships.current_status && 
-              detailedAnalysis.relationships.current_status !== 'Not available') {
-            relationshipParts.push(detailedAnalysis.relationships.current_status);
-          }
-          
-          if (detailedAnalysis.relationships.parental_status && 
-              detailedAnalysis.relationships.parental_status !== 'Not available') {
-            relationshipParts.push(detailedAnalysis.relationships.parental_status);
-          }
-          
-          if (detailedAnalysis.relationships.ideal_partner && 
-              detailedAnalysis.relationships.ideal_partner !== 'Not available') {
-            relationshipParts.push(`Ideal match: ${detailedAnalysis.relationships.ideal_partner}`);
-          }
-          
-          formattedContent += relationshipParts.length > 0 
-            ? relationshipParts.join(' ') 
-            : 'No relationship data available';
-          
-          formattedContent += `\n\n`;
+        if (detailedAnalysis.personality_inference) {
+          formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
         }
         
-        if (detailedAnalysis.growth_areas) {
-          formattedContent += `Growth Areas:\n`;
-          
-          if (Array.isArray(detailedAnalysis.growth_areas.strengths) && 
-              detailedAnalysis.growth_areas.strengths.length > 0) {
-            formattedContent += `Strengths:\n${detailedAnalysis.growth_areas.strengths.map((s: string) => `• ${s}`).join('\n')}\n\n`;
-          }
-          
-          if (Array.isArray(detailedAnalysis.growth_areas.challenges) && 
-              detailedAnalysis.growth_areas.challenges.length > 0) {
-            formattedContent += `Challenges:\n${detailedAnalysis.growth_areas.challenges.map((c: string) => `• ${c}`).join('\n')}\n\n`;
-          }
-          
-          if (detailedAnalysis.growth_areas.development_path) {
-            formattedContent += `Development Path:\n${detailedAnalysis.growth_areas.development_path}\n\n`;
-          }
+        if (detailedAnalysis.symbolic_analysis) {
+          formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
         }
       } else {
         // Fallback if no profiles
@@ -1977,7 +1907,7 @@ async function detectImageLabels(imageBuffer: Buffer) {
   }
 }
 
-async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = null, audioTranscription: any = null, sceneContext: string = '') {
+async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = null, audioTranscription: any = null, sceneContext: string = '', mediaData: string = '', mediaType: string = 'image') {
   // Check if any API clients are available, display warning if not
   if (!openai && !anthropic && !process.env.PERPLEXITY_API_KEY) {
     console.warn("No AI model API clients are available. Using fallback analysis.");
@@ -2040,53 +1970,85 @@ async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = nu
           .map(([emotion, confidence]) => `${emotion}: ${(confidence * 100).toFixed(1)}%`)
           .join(', ');
         
-        const visualContext = `
-VISUAL DATA FOR ${personLabel}:
-- Age Range: ${faceData.age?.low || 'unknown'}-${faceData.age?.high || 'unknown'} years
-- Gender: ${faceData.gender || 'unknown'}
-- Emotional Expression: ${emotionList || 'neutral'}
-- Facial Features:
-  * Smile: ${faceData.faceAttributes?.smile ? (faceData.faceAttributes.smile * 100).toFixed(1) + '%' : 'No'}
-  * Eyeglasses: ${faceData.faceAttributes?.eyeglasses || 'No'}
-  * Beard: ${faceData.faceAttributes?.beard || 'No'}
-  * Mustache: ${faceData.faceAttributes?.mustache || 'No'}
-  * Eyes Open: ${faceData.faceAttributes?.eyesOpen || 'Unknown'}
-  * Mouth Open: ${faceData.faceAttributes?.mouthOpen || 'Unknown'}
-${sceneContext ? `- Scene/Objects Detected: ${sceneContext}` : ''}
-${videoAnalysis ? '- Video Context: Gestures, body language, and movement patterns observed' : ''}
-${audioTranscription ? `- Speech Content: "${audioTranscription.transcription || 'No transcription'}"` : ''}
-`;
+        const analysisPrompt = `You are an expert personality analyst. Analyze this photo in comprehensive detail, providing specific evidence-based answers to ALL questions below.
 
-        const analysisPrompt = `You are an expert personality analyst. Analyze the VISUAL DATA provided to generate a personality profile for ${personLabel}.
+CRITICAL: Every answer must reference SPECIFIC VISUAL EVIDENCE from the photo. Do not use generic descriptions.
 
-CRITICAL INSTRUCTIONS:
-1. Base your analysis ONLY on the actual visual data provided above
-2. DO NOT fabricate details not present in the data
-3. Reference specific observations (emotions, facial features, age, gender) in your analysis
-4. If the data is limited, acknowledge this and provide tentative insights
+I. PHYSICAL CUES
+1. What is the person's approximate age range, and what visual evidence supports this?
+2. What is their likely dominant hand, based on body posture or hand use?
+3. What kind of lighting was used (natural, fluorescent, LED), and how does it shape facial tone or mood?
+4. How symmetrical is the person's face, and what asymmetries are visible?
+5. Describe the color and apparent texture of the person's skin in objective terms.
+6. Identify one visible physical trait (scar, mole, wrinkle pattern) and infer its probable significance.
+7. What can be inferred about the person's sleep habits from the eyes and skin tone?
+8. Describe the person's hair (color, grooming, direction, style) and what it indicates.
+9. What kind of lighting shadow falls across the eyes or nose, and what mood does that convey?
+10. Is there evidence of cosmetic enhancement (makeup, filters, retouching)?
 
-Return a JSON object with the following structure:
+II. EXPRESSION & EMOTION
+11. Describe the dominant facial expression in granular terms (eyebrow position, lip tension, gaze angle).
+12. Does the expression look posed or spontaneous? Why?
+13. Identify micro-expressions suggesting secondary emotions.
+14. Does the smile (if any) engage the eyes? What does that reveal psychologically?
+15. Compare upper-face emotion vs. lower-face emotion; do they match?
+16. What emotional tone is conveyed by the person's gaze direction?
+17. Does the person appear guarded, open, or performative? Cite visible evidence.
+18. Are there tension points in the jaw or neck suggesting repressed emotion?
+19. Estimate how long the expression was held for the photo.
+20. Does the emotion appear congruent with the setting or mismatched?
+
+III. COMPOSITION & CONTEXT
+21. Describe the setting (indoor/outdoor, professional/personal).
+22. What objects or background details signal aspects of lifestyle or occupation?
+23. How does clothing color palette interact with lighting to create emotional tone?
+24. What focal length or camera distance was likely used?
+25. Is there visible clutter or minimalism, and what does that suggest?
+26. Are there reflections, windows, or mirrors in frame?
+27. How does body posture interact with spatial framing?
+28. What portion of the frame does the subject occupy?
+29. Is there visible symmetry or imbalance in composition?
+30. Identify one hidden or easily overlooked element.
+
+IV. PERSONALITY & PSYCHOLOGICAL INFERENCE
+31. Based on facial micro-cues, what is the person's baseline affect?
+32. What defense mechanism seems most active?
+33. Describe the likely self-image being projected.
+34. What aspects seem unconsciously revealing versus deliberately controlled?
+35. How would the person handle confrontation?
+36. Does the person exhibit signs of narcissism or self-doubt?
+37. What cognitive style is implied?
+38. What is the person's apparent relationship to vulnerability?
+39. Does the photo suggest recent emotional hardship or resilience?
+40. How does the person want to be seen vs. how they actually appear?
+
+V. SYMBOLIC & METAPSYCHOLOGICAL ANALYSIS
+41. What emotional temperature dominates the photo's color space?
+42. If this were a dream image, what would each major element symbolize?
+43. What mythic or cinematic archetype does the person most resemble?
+44. Which aspect of the psyche is most visible?
+45. What unconscious conflict seems dramatized in the composition?
+46. How does clothing or accessories function as psychological armor?
+47. What is the implied relationship between photographer and subject?
+48. If this were part of a sequence, what emotional narrative would it tell?
+49. What single object or feature best symbolizes the person's life stance?
+50. What inner contradiction or paradox defines the subject?
+
+METADATA: Age ${faceData.age?.low || 'unknown'}-${faceData.age?.high || 'unknown'}, Gender ${faceData.gender || 'unknown'}, Emotions detected: ${emotionList}${sceneContext ? `, Objects: ${sceneContext}` : ''}
+
+Return JSON:
 {
-  "summary": "Brief overview based on actual visual observations",
+  "summary": "2-3 sentence overview with specific details from photo",
   "detailed_analysis": {
-    "personality_core": "Analysis based on observable emotional patterns and facial expressions",
-    "thought_patterns": "Insights derived from facial cues and expressions observed",
-    "cognitive_style": "Inferences from visual presentation and demeanor",
-    "professional_insights": "Career suggestions based on visible traits",
-    "relationships": {
-      "current_status": "Tentative insights based on emotional indicators",
-      "parental_status": "Age-appropriate observations only",
-      "ideal_partner": "Compatibility suggestions based on observed traits"
-    },
-    "growth_areas": {
-      "strengths": ["Observable positive traits"],
-      "challenges": ["Areas suggested by emotional/visual cues"],
-      "development_path": "Growth direction based on analysis"
-    }
+    "physical_cues": "Answers to questions 1-10 with specific evidence",
+    "expression_emotion": "Answers to questions 11-20 with specific evidence",
+    "composition_context": "Answers to questions 21-30 with specific evidence",
+    "personality_inference": "Answers to questions 31-40 with specific evidence",
+    "symbolic_analysis": "Answers to questions 41-50 with specific evidence"
   }
 }`;
 
-        // Use OpenAI as primary source for consistency across multiple analyses
+        // Use OpenAI Vision API with actual image
         try {
           if (!openai) {
             throw new Error("OpenAI client not available");
@@ -2096,15 +2058,23 @@ Return a JSON object with the following structure:
             model: "gpt-4o",
             messages: [
               {
-                role: "system",
-                content: analysisPrompt,
-              },
-              {
                 role: "user",
-                content: visualContext,
+                content: [
+                  {
+                    type: "text",
+                    text: analysisPrompt
+                  },
+                  {
+                    type: "image_url",
+                    image_url: {
+                      url: mediaData
+                    }
+                  }
+                ],
               },
             ],
             response_format: { type: "json_object" },
+            max_tokens: 4096,
           });
           
           // Parse and add person identifier
