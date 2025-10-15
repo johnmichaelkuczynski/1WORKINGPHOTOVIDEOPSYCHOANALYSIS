@@ -52,13 +52,20 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - **CRITICAL FIX - Scene context**: Added AWS DetectLabels to identify objects/scenes in photos (e.g., piano, musical instrument) for contextual analysis
 - **CRITICAL FIX - Fabrication prevention**: AI explicitly instructed to base analysis only on actual visual data, not fabricate details
 - **REVOLUTIONARY UPGRADE - GPT-4o Vision Integration**: Now sends actual images to GPT-4o Vision API instead of just metadata
-- **COMPREHENSIVE ANALYSIS - 50-Question Framework**: Implemented detailed analysis covering:
+- **COMPREHENSIVE IMAGE ANALYSIS - 50-Question Framework**: Implemented detailed photo analysis covering:
   * I. Physical Cues (10 questions) - age, lighting, skin, hair, symmetry, cosmetics
   * II. Expression & Emotion (10 questions) - facial expression, micro-expressions, gaze, posed vs spontaneous
   * III. Composition & Context (10 questions) - setting, objects, clothing, camera distance, spatial framing
   * IV. Personality & Psychological Inference (10 questions) - baseline affect, defense mechanisms, self-image, vulnerability
   * V. Symbolic & Metapsychological Analysis (10 questions) - archetypes, dream symbolism, unconscious conflicts
-- **EVIDENCE-BASED RESULTS**: All analysis answers now anchored in specific visual evidence from the actual photo
+- **COMPREHENSIVE VIDEO ANALYSIS - 50-Question Framework**: Implemented detailed video analysis with timestamps covering:
+  * I. Physical & Behavioral Cues (10 questions) - gait, gestures, muscle tension, posture, hand movements, eye contact, breathing
+  * II. Expression & Emotion Over Time (10 questions) - micro-expressions with timestamps, emotion shifts, blink rate, facial tics, incongruence
+  * III. Speech, Voice & Timing (10 questions) - vocal timbre, pitch changes, speaking rate, pauses, filler words, gesture-speech sync
+  * IV. Context, Environment & Interaction (10 questions) - environmental cues, camera angles, off-screen presence, object use, background
+  * V. Personality & Psychological Inference (10 questions) - temperament, defense mechanisms, anxiety markers, unguarded moments, transformation
+- **VIDEO VISION API**: Extracts multiple frames from videos and sends them to GPT-4o Vision API for temporal analysis
+- **EVIDENCE-BASED RESULTS**: All analysis answers anchored in specific visual/audio evidence with timestamps from actual media
 
 ## API Keys Required
 - `OPENAI_API_KEY` - For GPT-4o analysis and Whisper transcription

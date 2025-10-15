@@ -1165,7 +1165,10 @@ Provide a comprehensive analysis of this document, including:
           faceAnalysis = await analyzeFaceWithRekognition(frameBuffer, maxPeople);
           console.log(`Detected ${Array.isArray(faceAnalysis) ? faceAnalysis.length : 1} people in the video frame`);
           
-          // Process each chunk to gather comprehensive analysis
+          // Collect frames for Vision API analysis
+          const videoFrames: Array<{timestamp: number, base64Data: string}> = [];
+          
+          // Process each chunk to gather comprehensive analysis and extract frames
           for (let i = 0; i < videoChunks.length; i++) {
             try {
               const chunkPath = path.join(chunkDir, videoChunks[i]);
@@ -1184,8 +1187,15 @@ Provide a comprehensive analysis of this document, including:
                   .on('error', (err: Error) => reject(err));
               });
               
-              // Analyze the frame from this chunk
+              // Read frame and convert to base64 for Vision API
               const chunkFrameBuffer = await fs.promises.readFile(chunkFramePath);
+              const frameBase64 = `data:image/jpeg;base64,${chunkFrameBuffer.toString('base64')}`;
+              videoFrames.push({
+                timestamp: i,
+                base64Data: frameBase64
+              });
+              
+              // Analyze the frame from this chunk for face detection
               const chunkFaceAnalysis = await analyzeFaceWithRekognition(chunkFrameBuffer).catch(() => null);
               
               if (chunkFaceAnalysis) {
@@ -1204,6 +1214,8 @@ Provide a comprehensive analysis of this document, including:
           videoAnalysis = {
             totalChunks: videoChunks.length,
             successfullyProcessedChunks: chunkAnalyses.length,
+            videoDuration,
+            videoFrames, // Include frames for Vision API
             chunkData: chunkAnalyses,
             temporalAnalysis: {
               emotionOverTime: chunkAnalyses.map(chunk => ({
@@ -1297,24 +1309,47 @@ Provide a comprehensive analysis of this document, including:
           
           formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
           
-          if (detailedAnalysis.physical_cues) {
-            formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
-          }
-          
-          if (detailedAnalysis.expression_emotion) {
-            formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
-          }
-          
-          if (detailedAnalysis.composition_context) {
-            formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
-          }
-          
-          if (detailedAnalysis.personality_inference) {
-            formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
-          }
-          
-          if (detailedAnalysis.symbolic_analysis) {
-            formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
+          // Check if this is video or image analysis
+          if (detailedAnalysis.physical_behavioral) {
+            // VIDEO ANALYSIS FORMAT
+            formattedContent += `I. Physical & Behavioral Cues:\n${detailedAnalysis.physical_behavioral}\n\n`;
+            
+            if (detailedAnalysis.expression_emotion_time) {
+              formattedContent += `II. Expression & Emotion Over Time:\n${detailedAnalysis.expression_emotion_time}\n\n`;
+            }
+            
+            if (detailedAnalysis.speech_voice_timing) {
+              formattedContent += `III. Speech, Voice & Timing:\n${detailedAnalysis.speech_voice_timing}\n\n`;
+            }
+            
+            if (detailedAnalysis.context_environment) {
+              formattedContent += `IV. Context, Environment & Interaction:\n${detailedAnalysis.context_environment}\n\n`;
+            }
+            
+            if (detailedAnalysis.personality_inference) {
+              formattedContent += `V. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
+            }
+          } else {
+            // IMAGE ANALYSIS FORMAT
+            if (detailedAnalysis.physical_cues) {
+              formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
+            }
+            
+            if (detailedAnalysis.expression_emotion) {
+              formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
+            }
+            
+            if (detailedAnalysis.composition_context) {
+              formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
+            }
+            
+            if (detailedAnalysis.personality_inference) {
+              formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
+            }
+            
+            if (detailedAnalysis.symbolic_analysis) {
+              formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
+            }
           }
         });
         
@@ -1339,7 +1374,7 @@ Provide a comprehensive analysis of this document, including:
         
         formattedContent = `AI-Powered Psychological Profile Report\n`;
         formattedContent += `Subject Detected: 1 Individual\n`;
-        formattedContent += `Mode: Individual Analysis\n\n`;
+        formattedContent += `Mode: ${mediaType === 'video' ? 'Video' : 'Individual'} Analysis\n\n`;
         
         formattedContent += `${'─'.repeat(65)}\n`;
         formattedContent += `Subject 1${genderAge ? ` (${genderAge})` : ''}\n`;
@@ -1347,24 +1382,47 @@ Provide a comprehensive analysis of this document, including:
         
         formattedContent += `Summary:\n${profile.summary || 'No summary available'}\n\n`;
         
-        if (detailedAnalysis.physical_cues) {
-          formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
-        }
-        
-        if (detailedAnalysis.expression_emotion) {
-          formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
-        }
-        
-        if (detailedAnalysis.composition_context) {
-          formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
-        }
-        
-        if (detailedAnalysis.personality_inference) {
-          formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
-        }
-        
-        if (detailedAnalysis.symbolic_analysis) {
-          formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
+        // Check if this is a video analysis with video-specific sections
+        if (detailedAnalysis.physical_behavioral) {
+          // VIDEO ANALYSIS FORMAT
+          formattedContent += `I. Physical & Behavioral Cues:\n${detailedAnalysis.physical_behavioral}\n\n`;
+          
+          if (detailedAnalysis.expression_emotion_time) {
+            formattedContent += `II. Expression & Emotion Over Time:\n${detailedAnalysis.expression_emotion_time}\n\n`;
+          }
+          
+          if (detailedAnalysis.speech_voice_timing) {
+            formattedContent += `III. Speech, Voice & Timing:\n${detailedAnalysis.speech_voice_timing}\n\n`;
+          }
+          
+          if (detailedAnalysis.context_environment) {
+            formattedContent += `IV. Context, Environment & Interaction:\n${detailedAnalysis.context_environment}\n\n`;
+          }
+          
+          if (detailedAnalysis.personality_inference) {
+            formattedContent += `V. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
+          }
+        } else {
+          // IMAGE ANALYSIS FORMAT
+          if (detailedAnalysis.physical_cues) {
+            formattedContent += `I. Physical Cues:\n${detailedAnalysis.physical_cues}\n\n`;
+          }
+          
+          if (detailedAnalysis.expression_emotion) {
+            formattedContent += `II. Expression & Emotion:\n${detailedAnalysis.expression_emotion}\n\n`;
+          }
+          
+          if (detailedAnalysis.composition_context) {
+            formattedContent += `III. Composition & Context:\n${detailedAnalysis.composition_context}\n\n`;
+          }
+          
+          if (detailedAnalysis.personality_inference) {
+            formattedContent += `IV. Personality & Psychological Inference:\n${detailedAnalysis.personality_inference}\n\n`;
+          }
+          
+          if (detailedAnalysis.symbolic_analysis) {
+            formattedContent += `V. Symbolic & Metapsychological Analysis:\n${detailedAnalysis.symbolic_analysis}\n\n`;
+          }
         }
       } else {
         // Fallback if no profiles
@@ -1933,6 +1991,141 @@ async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = nu
         }
       }]
     };
+  }
+  
+  // SPECIAL HANDLING FOR VIDEO ANALYSIS
+  if (mediaType === 'video' && videoAnalysis?.videoFrames && videoAnalysis.videoFrames.length > 0) {
+    console.log(`Analyzing video with ${videoAnalysis.videoFrames.length} frames and audio transcription...`);
+    
+    const videoDuration = videoAnalysis.videoDuration || videoAnalysis.videoFrames.length;
+    const transcription = audioTranscription?.transcription || "No audio transcription available";
+    
+    const videoAnalysisPrompt = `You are an expert personality analyst. Analyze this video comprehensively, providing specific evidence-based answers to ALL questions below WITH TIMESTAMPS.
+
+CRITICAL: Every answer must reference SPECIFIC VISUAL/AUDIO EVIDENCE with TIMESTAMPS (e.g., "at 0:05" or "from 0:10-0:15").
+
+Video Duration: ${videoDuration} seconds
+Audio Transcription: "${transcription}"
+
+I. PHYSICAL & BEHAVIORAL CUES
+1. How does the person's gait or movement rhythm change across the clip?
+2. Which recurring gesture seems habitual rather than situational?
+3. Describe one moment where muscle tension releases or spikes — what triggers it?
+4. How does posture vary when the person speaks vs. listens?
+5. Identify one micro-adjustment (e.g., hair touch, collar fix) and explain its likely emotional cause.
+6. What is the person doing with their hands during silent intervals?
+7. How consistent is eye-contact across frames? Give timestamps showing breaks or sustained gazes.
+8. At which point does breathing rate visibly change, and what precedes it?
+9. Describe the physical energy level throughout — rising, falling, or cyclical?
+10. What body part seems most expressive (eyes, shoulders, mouth), and how is that used?
+
+II. EXPRESSION & EMOTION OVER TIME
+11. Track micro-expressions that flicker and vanish. At what timestamps do they appear?
+12. When does the dominant emotion shift, and how abruptly?
+13. Does the person's smile fade naturally or snap off?
+14. Which emotion seems performed vs. spontaneous? Cite frames/timestamps.
+15. How does blink rate change when discussing specific topics?
+16. Identify one involuntary facial tic and interpret its significance.
+17. Are there moments of incongruence between facial expression and vocal tone?
+18. When does the person's face "freeze" — i.e., hold still unnaturally — and what triggers that?
+19. What subtle expression signals discomfort before any verbal cue?
+20. How does lighting or camera angle amplify or mute visible emotions?
+
+III. SPEECH, VOICE & TIMING
+21. Describe baseline vocal timbre — breathy, clipped, resonant — and what personality trait it implies.
+22. At which timestamp does pitch spike or flatten dramatically? Why?
+23. How does speaking rate change when emotionally charged content arises?
+24. Identify one pause longer than 1.5 seconds and interpret it psychologically.
+25. What filler words or vocal tics recur, and what function do they serve?
+26. How synchronized are gestures with speech rhythm?
+27. Does the voice carry underlying fatigue, tension, or confidence? Provide audible markers.
+28. Compare early vs. late segments: does articulation become more or less precise?
+29. What is the emotional contour of the voice across the clip (anxious → calm, etc.)?
+30. When does volume drop below baseline, and what coincides with it visually?
+
+IV. CONTEXT, ENVIRONMENT & INTERACTION
+31. What environmental cues (background noise, lighting shifts) change mid-video?
+32. How does the camera distance or angle influence perceived dominance or submission?
+33. Are there off-screen sounds or glances suggesting another presence?
+34. When the person looks away, where do they look, and what might they be avoiding?
+35. How do objects in the frame get used or ignored (cup, pen, phone)?
+36. Does the person adapt posture or tone in response to environmental change?
+37. What part of the environment most reflects personality (book titles, wall art, tidiness)?
+38. How does background color palette influence mood perception?
+39. Is there evidence of editing cuts or jump transitions that alter authenticity?
+40. What temporal pacing (camera motion, cut frequency) matches or mismatches emotional tempo?
+
+V. PERSONALITY & PSYCHOLOGICAL INFERENCE
+41. Based on kinetic patterns, what baseline temperament (introvert/extrovert, restrained/expressive) emerges?
+42. What defense mechanism manifests dynamically (e.g., laughter after stress cue)?
+43. When does self-presentation collapse momentarily into candor?
+44. What behavioral marker suggests anxiety management (fidgeting, throat clearing, leg bounce)?
+45. How does the person handle silence — restless, composed, avoidant?
+46. Identify one moment that feels genuinely unguarded; what detail proves it?
+47. What relational stance is enacted toward the viewer (teacher, confessor, performer)?
+48. Does the body ever contradict the words? Provide timestamps.
+49. What sustained pattern (voice-tone loop, repeated motion) indicates underlying psychological theme?
+50. What overall transformation occurs from first to last frame — and what emotional or existential story does that evolution tell?
+
+Return JSON:
+{
+  "summary": "2-3 sentence overview with specific details from video",
+  "detailed_analysis": {
+    "physical_behavioral": "Answers to questions 1-10 with timestamps and specific evidence",
+    "expression_emotion_time": "Answers to questions 11-20 with timestamps and specific evidence",
+    "speech_voice_timing": "Answers to questions 21-30 with timestamps and specific evidence",
+    "context_environment": "Answers to questions 31-40 with timestamps and specific evidence",
+    "personality_inference": "Answers to questions 41-50 with timestamps and specific evidence"
+  }
+}`;
+    
+    try {
+      if (!openai) {
+        throw new Error("OpenAI client not available");
+      }
+      
+      // Build content array with prompt and video frames
+      const visionContent: any[] = [
+        {
+          type: "text",
+          text: videoAnalysisPrompt
+        }
+      ];
+      
+      // Add all video frames (limit to prevent token overflow)
+      const framesToInclude = videoAnalysis.videoFrames.slice(0, 10); // Max 10 frames
+      framesToInclude.forEach((frame: any) => {
+        visionContent.push({
+          type: "image_url",
+          image_url: {
+            url: frame.base64Data
+          }
+        });
+      });
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: visionContent
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 4096
+      });
+      
+      const analysisResult = JSON.parse(response.choices[0]?.message.content || "{}");
+      
+      return {
+        peopleCount: 1,
+        individualProfiles: [analysisResult],
+        detailed_analysis: analysisResult.detailed_analysis || {}
+      };
+    } catch (error) {
+      console.error("Error in video analysis:", error);
+      throw new Error("Failed to analyze video. Please try again.");
+    }
   }
   
   // Check if faceAnalysis is an array (multiple people) or single object
