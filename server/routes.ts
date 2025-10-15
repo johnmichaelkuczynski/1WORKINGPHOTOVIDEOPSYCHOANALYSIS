@@ -6,7 +6,8 @@ import { insertAnalysisSchema, insertMessageSchema, insertShareSchema, uploadMed
 import { z } from "zod";
 import { 
   RekognitionClient, 
-  DetectFacesCommand, 
+  DetectFacesCommand,
+  DetectLabelsCommand,
   StartFaceDetectionCommand, 
   GetFaceDetectionCommand 
 } from "@aws-sdk/client-rekognition";
@@ -1094,11 +1095,18 @@ Provide a comprehensive analysis of this document, including:
       let audioTranscription: any = null;
       
       // Process based on media type
+      let sceneContext = '';
       if (mediaType === "image") {
         // For images, use multi-person face analysis
         console.log(`Analyzing image for up to ${maxPeople} people...`);
         faceAnalysis = await analyzeFaceWithRekognition(mediaBuffer, maxPeople);
         console.log(`Detected ${Array.isArray(faceAnalysis) ? faceAnalysis.length : 1} people in the image`);
+        
+        // Detect objects and scene context
+        sceneContext = await detectImageLabels(mediaBuffer);
+        if (sceneContext) {
+          console.log(`Scene context: ${sceneContext}`);
+        }
       } else {
         // For videos, we use the chunked processing approach
         try {
@@ -1245,7 +1253,8 @@ Provide a comprehensive analysis of this document, including:
       const personalityInsights = await getPersonalityInsights(
         faceAnalysis, 
         videoAnalysis, 
-        audioTranscription
+        audioTranscription,
+        sceneContext
       );
 
       // Determine how many people were detected
@@ -1944,9 +1953,31 @@ async function analyzeFaceWithRekognition(imageBuffer: Buffer, maxPeople: number
   });
 }
 
+// Detect objects and scenes in the image for context
+async function detectImageLabels(imageBuffer: Buffer) {
+  try {
+    const command = new DetectLabelsCommand({
+      Image: {
+        Bytes: imageBuffer
+      },
+      MaxLabels: 10,
+      MinConfidence: 70
+    });
 
+    const response = await rekognition.send(command);
+    const labels = response.Labels || [];
+    
+    // Format labels with confidence
+    return labels
+      .map(label => `${label.Name} (${label.Confidence?.toFixed(0)}%)`)
+      .join(', ');
+  } catch (error) {
+    console.error('Error detecting labels:', error);
+    return '';
+  }
+}
 
-async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = null, audioTranscription: any = null) {
+async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = null, audioTranscription: any = null, sceneContext: string = '') {
   // Check if any API clients are available, display warning if not
   if (!openai && !anthropic && !process.env.PERPLEXITY_API_KEY) {
     console.warn("No AI model API clients are available. Using fallback analysis.");
@@ -2021,6 +2052,7 @@ VISUAL DATA FOR ${personLabel}:
   * Mustache: ${faceData.faceAttributes?.mustache || 'No'}
   * Eyes Open: ${faceData.faceAttributes?.eyesOpen || 'Unknown'}
   * Mouth Open: ${faceData.faceAttributes?.mouthOpen || 'Unknown'}
+${sceneContext ? `- Scene/Objects Detected: ${sceneContext}` : ''}
 ${videoAnalysis ? '- Video Context: Gestures, body language, and movement patterns observed' : ''}
 ${audioTranscription ? `- Speech Content: "${audioTranscription.transcription || 'No transcription'}"` : ''}
 `;
