@@ -1877,8 +1877,17 @@ async function analyzeFaceWithRekognition(imageBuffer: Buffer, maxPeople: number
     throw new Error("No faces detected in the image");
   }
 
+  // Filter faces by confidence threshold (>=90%) to eliminate false positives
+  const highConfidenceFaces = faces.filter(face => (face.Confidence || 0) >= 90);
+  
+  if (highConfidenceFaces.length === 0) {
+    throw new Error("No high-confidence faces detected in the image");
+  }
+
+  console.log(`Filtered to ${highConfidenceFaces.length} high-confidence faces (>=90%) from ${faces.length} total detections`);
+
   // Limit the number of faces to analyze
-  const facesToProcess = faces.slice(0, maxPeople);
+  const facesToProcess = highConfidenceFaces.slice(0, maxPeople);
   
   // Process each face and add descriptive labels
   return facesToProcess.map((face, index) => {
@@ -1993,36 +2002,57 @@ async function getPersonalityInsights(faceAnalysis: any, videoAnalysis: any = nu
         
         // Use the standard analysis prompt but customized for the person
         const personLabel = personFaceData.personLabel || "Person";
-        const analysisPrompt = `
-You are an expert personality analyst capable of providing deep psychological insights. 
-Analyze the provided data to generate a comprehensive personality profile for ${personLabel}.
+        
+        // Format the Rekognition data in a human-readable way
+        const faceData = personFaceData;
+        const emotionList = Object.entries(faceData.emotion || {})
+          .map(([emotion, confidence]) => `${emotion}: ${(confidence * 100).toFixed(1)}%`)
+          .join(', ');
+        
+        const visualContext = `
+VISUAL DATA FOR ${personLabel}:
+- Age Range: ${faceData.age?.low || 'unknown'}-${faceData.age?.high || 'unknown'} years
+- Gender: ${faceData.gender || 'unknown'}
+- Emotional Expression: ${emotionList || 'neutral'}
+- Facial Features:
+  * Smile: ${faceData.faceAttributes?.smile ? (faceData.faceAttributes.smile * 100).toFixed(1) + '%' : 'No'}
+  * Eyeglasses: ${faceData.faceAttributes?.eyeglasses || 'No'}
+  * Beard: ${faceData.faceAttributes?.beard || 'No'}
+  * Mustache: ${faceData.faceAttributes?.mustache || 'No'}
+  * Eyes Open: ${faceData.faceAttributes?.eyesOpen || 'Unknown'}
+  * Mouth Open: ${faceData.faceAttributes?.mouthOpen || 'Unknown'}
+${videoAnalysis ? '- Video Context: Gestures, body language, and movement patterns observed' : ''}
+${audioTranscription ? `- Speech Content: "${audioTranscription.transcription || 'No transcription'}"` : ''}
+`;
 
-${videoAnalysis ? 'This analysis includes video data showing gestures, activities, and attention patterns.' : ''}
-${audioTranscription ? 'This analysis includes audio transcription and speech pattern data.' : ''}
+        const analysisPrompt = `You are an expert personality analyst. Analyze the VISUAL DATA provided to generate a personality profile for ${personLabel}.
+
+CRITICAL INSTRUCTIONS:
+1. Base your analysis ONLY on the actual visual data provided above
+2. DO NOT fabricate details not present in the data
+3. Reference specific observations (emotions, facial features, age, gender) in your analysis
+4. If the data is limited, acknowledge this and provide tentative insights
 
 Return a JSON object with the following structure:
 {
-  "summary": "Brief overview of ${personLabel}",
+  "summary": "Brief overview based on actual visual observations",
   "detailed_analysis": {
-    "personality_core": "Deep analysis of core personality traits",
-    "thought_patterns": "Analysis of cognitive processes and decision-making style",
-    "cognitive_style": "Description of learning and problem-solving approaches",
-    "professional_insights": "Career inclinations and work style",
+    "personality_core": "Analysis based on observable emotional patterns and facial expressions",
+    "thought_patterns": "Insights derived from facial cues and expressions observed",
+    "cognitive_style": "Inferences from visual presentation and demeanor",
+    "professional_insights": "Career suggestions based on visible traits",
     "relationships": {
-      "current_status": "Likely relationship status",
-      "parental_status": "Insights about parenting style or potential",
-      "ideal_partner": "Description of compatible partner characteristics"
+      "current_status": "Tentative insights based on emotional indicators",
+      "parental_status": "Age-appropriate observations only",
+      "ideal_partner": "Compatibility suggestions based on observed traits"
     },
     "growth_areas": {
-      "strengths": ["List of key strengths"],
-      "challenges": ["Areas for improvement"],
-      "development_path": "Suggested personal growth direction"
+      "strengths": ["Observable positive traits"],
+      "challenges": ["Areas suggested by emotional/visual cues"],
+      "development_path": "Growth direction based on analysis"
     }
   }
-}
-
-Be thorough and insightful while avoiding stereotypes. Each section should be at least 2-3 paragraphs long.
-Important: Pay careful attention to gender, facial expressions, emotional indicators, and any video/audio data provided. Base your insights on the actual analysis data provided.`;
+}`;
 
         // Use OpenAI as primary source for consistency across multiple analyses
         try {
@@ -2039,7 +2069,7 @@ Important: Pay careful attention to gender, facial expressions, emotional indica
               },
               {
                 role: "user",
-                content: JSON.stringify(personInput),
+                content: visualContext,
               },
             ],
             response_format: { type: "json_object" },
