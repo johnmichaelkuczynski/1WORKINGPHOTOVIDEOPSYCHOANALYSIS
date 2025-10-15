@@ -34,13 +34,22 @@ An advanced AI-powered personality insights platform that provides sophisticated
 
 ## Recent Changes
 ### October 2025
-- **COMPREHENSIVE TEXT ANALYSIS UPGRADE**: Fully implemented 50-question framework for text analysis
-  * All 50 questions across 5 categories (Language & Style, Emotional Indicators, Cognitive & Structural Patterns, Self-Representation & Identity, Symbolic & Unconscious Material)
+- **COMPREHENSIVE TEXT ANALYSIS UPGRADE - 100 QUESTIONS**: Fully implemented 100-question framework for text analysis
+  * All 100 questions across 10 categories:
+    - I. Information Processing Style (10)
+    - II. Emotional Processing Style (10)
+    - III. Agency & Activity Level (10)
+    - IV. Focus: Interpersonal vs. Ideational (10)
+    - V. Motivation, Value System, and Reality Testing (10)
+    - VI. Intelligence & Conceptual Control (10)
+    - VII. Honesty & Sincerity of Mind (10)
+    - VIII. Structure, Organization, and Focus (10)
+    - IX. Psychological Profile in Style (10)
+    - X. Substance, Depth, and Cognitive Flexibility (10)
   * Evidence-based analysis requiring direct quotes and specific phrases from text
   * Robust JSON parsing for OpenAI, Anthropic, and Perplexity with code fence extraction
-  * Comprehensive fallback structure maintaining all 5 sections if parsing fails
+  * Comprehensive fallback structure maintaining all 10 sections if parsing fails
   * Display formatting with Roman numeral section headers matching framework
-  * Removed duplicate handlers for cleaner codebase
 
 ### January 2025
 - **Fixed session clearing**: Added server-side session clearing to prevent analyses from stacking up when using "New Analysis" button
@@ -74,12 +83,17 @@ An advanced AI-powered personality insights platform that provides sophisticated
   * IV. Context, Environment & Interaction (10 questions) - environmental cues, camera angles, off-screen presence, object use, background
   * V. Personality & Psychological Inference (10 questions) - temperament, defense mechanisms, anxiety markers, unguarded moments, transformation
 - **VIDEO VISION API**: Extracts multiple frames from videos and sends them to GPT-4o Vision API for temporal analysis
-- **COMPREHENSIVE TEXT ANALYSIS - 50-Question Framework**: Implemented detailed text analysis with quotes covering:
-  * I. Language & Style (10 questions) - sentence rhythm, adjectives, pronoun use, abstraction, diction shifts, fragments, tense, metaphors, tone, register
-  * II. Emotional Indicators (10 questions) - primary emotion, repressed emotions, intensity progression, affect leakage, detachment, sensory words, ambivalence, humor
-  * III. Cognitive & Structural Patterns (10 questions) - coherence, thought style, syntactic habits, contradictions, uncertainty handling, circularity, topic shifts, repetition, insight
-  * IV. Self-Representation & Identity (10 questions) - self-portrayal, voice splits, authority seeking, self-image consistency, self-evaluation, vulnerability, relationship to others, audience
-  * V. Symbolic & Unconscious Material (10 questions) - recurring motifs, surreal elements, oppositions, wishes/fears, metaphors, time relation, intellect vs emotion, shadow aspects, projection
+- **COMPREHENSIVE TEXT ANALYSIS - 100-Question Framework**: Implemented detailed text analysis with quotes covering:
+  * I. Information Processing Style (10 questions) - active vs passive mind, restructuring vs repetition, causation analysis, distinctions, reasoning patterns, generalization, evidence proportion, inductive vs deductive, curiosity, complexity engagement
+  * II. Emotional Processing Style (10 questions) - emotion naming/avoidance, integration vs intrusion, intellectualization, restraint/volatility, meaning linkage, empathy/contempt, understanding vs distortion, defensiveness vs reflection, warmth, emotional growth
+  * III. Agency & Activity Level (10 questions) - action vs commentary, active vs passive verbs, argument control, responsibility taking, persuasion intent, initiative, adaptation, willpower, energy level, reality shaping confidence
+  * IV. Focus: Interpersonal vs. Ideational (10 questions) - people vs abstractions, treatment of others, social awareness, audience sensitivity, persuasion importance, relationship/systems interest, "we" usage, vulnerability to judgment, idea personification, understanding vs dominance
+  * V. Motivation, Value System, Reality Testing (10 questions) - achievement goals, success definition, trust basis, belief flexibility, worldview, agency vs spectator, reality conception, understanding vs vindication, problem framing, truth hunger
+  * VI. Intelligence & Conceptual Control (10 questions) - genuine intelligence vs mimicry, argument advancement, abstraction handling, evidence vs jargon, definition quality, term consistency, ambition vs pretension, mastery vs familiarity, tension tolerance, insight vs cliché
+  * VII. Honesty & Sincerity of Mind (10 questions) - straightforward vs manipulative, uncertainty admission, concession vs doubling down, mind-changing willingness, "I don't know" usage, doubt handling, confidence source, counterargument representation, truth caring, humility
+  * VIII. Structure, Organization, Focus (10 questions) - linear vs chaotic construction, paragraph advancement, transition quality, conclusion validity, example usage, topic discipline, redundancy, sequencing coherence, beginning/middle/end, closure type
+  * IX. Psychological Profile in Style (10 questions) - confidence vs control, style type, abstraction hiding, contempt vs curiosity, driving emotion, rhythm type, diction revelations, humor usage, intellectual domination, control obsession
+  * X. Substance, Depth, Cognitive Flexibility (10 questions) - idea integration, learning evidence, insight layering, paraphrase accuracy, curiosity type, self-correction capacity, perspective flexibility, dialogue invitation, intellectual empathy, mind vs mask
 - **EVIDENCE-BASED RESULTS**: All analysis answers anchored in specific visual/audio evidence with timestamps from actual media, or direct quotes from text
 
 ## API Keys Required
