@@ -51,6 +51,14 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - **CRITICAL FIX - Grounded analysis**: AI prompts now receive structured visual data (age, gender, emotions, facial features) instead of raw JSON
 - **CRITICAL FIX - Scene context**: Added AWS DetectLabels to identify objects/scenes in photos (e.g., piano, musical instrument) for contextual analysis
 - **CRITICAL FIX - Fabrication prevention**: AI explicitly instructed to base analysis only on actual visual data, not fabricate details
+- **REVOLUTIONARY UPGRADE - GPT-4o Vision Integration**: Now sends actual images to GPT-4o Vision API instead of just metadata
+- **COMPREHENSIVE ANALYSIS - 50-Question Framework**: Implemented detailed analysis covering:
+  * I. Physical Cues (10 questions) - age, lighting, skin, hair, symmetry, cosmetics
+  * II. Expression & Emotion (10 questions) - facial expression, micro-expressions, gaze, posed vs spontaneous
+  * III. Composition & Context (10 questions) - setting, objects, clothing, camera distance, spatial framing
+  * IV. Personality & Psychological Inference (10 questions) - baseline affect, defense mechanisms, self-image, vulnerability
+  * V. Symbolic & Metapsychological Analysis (10 questions) - archetypes, dream symbolism, unconscious conflicts
+- **EVIDENCE-BASED RESULTS**: All analysis answers now anchored in specific visual evidence from the actual photo
 
 ## API Keys Required
 - `OPENAI_API_KEY` - For GPT-4o analysis and Whisper transcription
