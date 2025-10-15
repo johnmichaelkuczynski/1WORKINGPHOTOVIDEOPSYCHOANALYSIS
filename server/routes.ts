@@ -279,436 +279,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Session ID is required" });
       }
       
-      // Choose which AI model to use
-      let aiModel = selectedModel;
-      if (
-        (selectedModel === "openai" && !openai) ||
-        (selectedModel === "anthropic" && !anthropic) ||
-        (selectedModel === "perplexity" && !process.env.PERPLEXITY_API_KEY)
-      ) {
-        // Fallback to available model if selected one is not available
-        if (openai) aiModel = "openai";
-        else if (anthropic) aiModel = "anthropic";
-        else if (process.env.PERPLEXITY_API_KEY) aiModel = "perplexity";
-        else {
-          return res.status(503).json({ 
-            error: "No AI models are currently available. Please try again later." 
-          });
-        }
-      }
-      
-      // Get personality insights based on text content
-      let personalityInsights;
-      const textAnalysisPrompt = `
-Please analyze the following text to provide comprehensive personality insights about the author:
-
-TEXT:
-${content}
-
-Provide a detailed psychological, emotional, and behavioral analysis of the author based on their writing style, tone, word choice, and content. Include:
-
-1. Personality core traits (Big Five traits, strengths, challenges)
-2. Thought patterns and cognitive style
-3. Emotional tendencies and expression
-4. Communication style and social dynamics
-5. Professional insights and work style
-6. Decision-making process
-7. Relationship approach and attachment style
-8. Potential areas for growth or self-awareness
-
-Format your analysis as detailed JSON with the following structure:
-{
-  "summary": "brief overall summary",
-  "detailed_analysis": {
-    "personality_core": "",
-    "thought_patterns": "",
-    "emotional_tendencies": "",
-    "communication_style": "",
-    "professional_insights": "",
-    "decision_making": "",
-    "relationships": {}
-  }
-}
-`;
-
-      // Get personality analysis from selected AI model
-      let analysisResult;
-      if (aiModel === "openai" && openai) {
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          messages: [
-            { role: "system", content: "You are an expert in personality analysis and psychological assessment." },
-            { role: "user", content: textAnalysisPrompt }
-          ],
-          response_format: { type: "json_object" }
-        });
-        
-        analysisResult = JSON.parse(completion.choices[0].message.content);
-      } 
-      else if (aiModel === "anthropic" && anthropic) {
-        const response = await anthropic.messages.create({
-          model: "claude-3-7-sonnet-20250219", // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-          max_tokens: 4000,
-          system: "You are an expert in personality analysis and psychological assessment. Always respond with well-structured JSON.",
-          messages: [{ role: "user", content: textAnalysisPrompt }],
-        });
-        
-        // Extract JSON from markdown code blocks if present
-        let responseText = '';
-        if (response.content[0].type === 'text') {
-          responseText = response.content[0].text;
-        }
-        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
-        if (jsonMatch) {
-          responseText = jsonMatch[1];
-        }
-        
-        analysisResult = JSON.parse(responseText);
-      }
-      else if (aiModel === "deepseek") {
-        // DeepSeek is not currently configured
-        analysisResult = {
-          summary: "DeepSeek analysis is not currently available. Please use ZHI 1, ZHI 2, or ZHI 4 for analysis.",
-          detailed_analysis: {
-            personality_core: "DeepSeek API integration is not currently configured",
-            thought_patterns: "Please select a different AI model for analysis",
-            emotional_tendencies: "Analysis unavailable",
-            communication_style: "Analysis unavailable", 
-            professional_insights: "Analysis unavailable",
-            decision_making: "Analysis unavailable",
-            relationships: {}
-          }
-        };
-      }
-      else if (aiModel === "perplexity") {
-        const response = await perplexity.query({
-          model: "llama-3.1-sonar-small-128k-online",
-          query: textAnalysisPrompt
-        });
-        
-        try {
-          analysisResult = JSON.parse(response.text);
-        } catch (e) {
-          console.error("Error parsing Perplexity response:", e);
-          // Fallback structure if parsing fails
-          analysisResult = {
-            summary: response.text.substring(0, 200) + "...",
-            detailed_analysis: {
-              personality_core: "Error parsing structured response from Perplexity",
-              thought_patterns: "Please try again with a different AI model"
-            }
-          };
-        }
-      }
-      
-      // Create personality insights in expected format
-      personalityInsights = {
-        peopleCount: 1,
-        individualProfiles: [analysisResult]
-      };
-      
-      // Create analysis record in storage
-      const analysis = await storage.createAnalysis({
-        sessionId,
-        mediaType: "text",
-        personalityInsights,
-        title: title || "Text Analysis"
-      });
-      
-      // Helper function to format objects into readable text
-      const formatAnalysisSection = (data: any): string => {
-        if (typeof data === 'string') {
-          return data;
-        }
-        if (typeof data === 'object' && data !== null) {
-          const lines: string[] = [];
-          for (const [key, value] of Object.entries(data)) {
-            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            if (typeof value === 'string') {
-              lines.push(`${formattedKey}: ${value}`);
-            } else {
-              lines.push(`${formattedKey}: ${String(value)}`);
-            }
-          }
-          return lines.join('\n');
-        }
-        return String(data);
-      };
-
-      // Format message for response
-      const formattedContent = `Personality Analysis Based on Text
-
-${analysisResult.summary}
-
-Detailed Analysis
-
-Personality Core
-${formatAnalysisSection(analysisResult.detailed_analysis.personality_core)}
-
-Thought Patterns
-${formatAnalysisSection(analysisResult.detailed_analysis.thought_patterns)}
-
-Emotional Tendencies
-${formatAnalysisSection(analysisResult.detailed_analysis.emotional_tendencies || "")}
-
-Communication Style
-${formatAnalysisSection(analysisResult.detailed_analysis.communication_style || "")}
-
-Professional Insights
-${formatAnalysisSection(analysisResult.detailed_analysis.professional_insights || "")}
-
-You can ask follow-up questions about this analysis.
-`;
-      
-      // Create initial message
-      const initialMessage = await storage.createMessage({
-        sessionId,
-        analysisId: analysis.id,
-        role: "assistant",
-        content: formattedContent
-      });
-      
-      // Return data to client
-      res.json({
-        analysisId: analysis.id,
-        messages: [initialMessage],
-        emailServiceAvailable: isEmailServiceConfigured
-      });
-    } catch (error) {
-      console.error("Text analysis error:", error);
-      if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: "Failed to analyze text" });
-      }
-    }
-  });
-  
-  // Document analysis endpoint
-  app.post("/api/analyze/document", async (req, res) => {
-    try {
-      const { fileData, fileName, fileType, sessionId, selectedModel = "openai", title } = req.body;
-      
-      if (!fileData || typeof fileData !== 'string') {
-        return res.status(400).json({ error: "Document data is required" });
-      }
-      
-      if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
-      }
-      
-      // Extract base64 content from data URL
-      const base64Data = fileData.split(',')[1];
-      if (!base64Data) {
-        return res.status(400).json({ error: "Invalid document data format" });
-      }
-      
-      // Save the document to a temporary file
-      const fileBuffer = Buffer.from(base64Data, 'base64');
-      const tempDocPath = path.join(tempDir, `doc_${Date.now()}_${fileName}`);
-      await writeFileAsync(tempDocPath, fileBuffer);
-      
-      // Choose which AI model to use
-      let aiModel = selectedModel;
-      if (
-        (selectedModel === "openai" && !openai) ||
-        (selectedModel === "anthropic" && !anthropic) ||
-        (selectedModel === "perplexity" && !process.env.PERPLEXITY_API_KEY)
-      ) {
-        // Fallback to available model if selected one is not available
-        if (openai) aiModel = "openai";
-        else if (anthropic) aiModel = "anthropic";
-        else if (process.env.PERPLEXITY_API_KEY) aiModel = "perplexity";
-        else {
-          return res.status(503).json({ 
-            error: "No AI models are currently available. Please try again later." 
-          });
-        }
-      }
-      
-      // Extract text from document and analyze it
-      // Note: In a real implementation, use proper document parsing libraries
-      // like pdf.js, docx, etc. For simplicity, we're using a placeholder.
-      const documentAnalysisPrompt = `
-I'm going to analyze the uploaded document: ${fileName} (${fileType}).
-
-Provide a comprehensive analysis of this document, including:
-
-1. Document overview and key topics
-2. Main themes and insights
-3. Emotional tone and sentiment
-4. Writing style assessment
-5. Author personality assessment based on the document
-
-Format your analysis as detailed JSON with the following structure:
-{
-  "summary": "brief overall summary",
-  "detailed_analysis": {
-    "document_overview": "",
-    "main_themes": "",
-    "emotional_tone": "",
-    "writing_style": "",
-    "author_personality": ""
-  }
-}
-`;
-
-      // Get document analysis from selected AI model
-      let analysisResult;
-      if (aiModel === "openai" && openai) {
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          messages: [
-            { role: "system", content: "You are an expert in document analysis and personality assessment." },
-            { role: "user", content: documentAnalysisPrompt }
-          ],
-          response_format: { type: "json_object" }
-        });
-        
-        analysisResult = JSON.parse(completion.choices[0].message.content);
-      } 
-      else if (aiModel === "anthropic" && anthropic) {
-        const response = await anthropic.messages.create({
-          model: "claude-3-7-sonnet-20250219", // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-          max_tokens: 4000,
-          system: "You are an expert in document analysis and psychological assessment. Always respond with well-structured JSON.",
-          messages: [{ role: "user", content: documentAnalysisPrompt }],
-        });
-        
-        // Extract JSON from markdown code blocks if present
-        let responseText = '';
-        if (response.content[0].type === 'text') {
-          responseText = response.content[0].text;
-        }
-        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
-        if (jsonMatch) {
-          responseText = jsonMatch[1];
-        }
-        
-        analysisResult = JSON.parse(responseText);
-      }
-      else if (aiModel === "deepseek") {
-        // DeepSeek is not currently configured
-        analysisResult = {
-          summary: "DeepSeek analysis is not currently available. Please use ZHI 1, ZHI 2, or ZHI 4 for analysis.",
-          detailed_analysis: {
-            document_overview: "DeepSeek API integration is not currently configured",
-            main_themes: "Please select a different AI model for analysis",
-            emotional_tone: "Analysis unavailable",
-            writing_style: "Analysis unavailable",
-            author_personality: "Analysis unavailable"
-          }
-        };
-      }
-      else if (aiModel === "perplexity") {
-        const response = await perplexity.query({
-          model: "llama-3.1-sonar-small-128k-online",
-          query: documentAnalysisPrompt
-        });
-        
-        try {
-          analysisResult = JSON.parse(response.text);
-        } catch (e) {
-          console.error("Error parsing Perplexity response:", e);
-          // Fallback structure if parsing fails
-          analysisResult = {
-            summary: response.text.substring(0, 200) + "...",
-            detailed_analysis: {
-              document_overview: "Error parsing structured response from Perplexity",
-              main_themes: "Please try again with a different AI model"
-            }
-          };
-        }
-      }
-      
-      // Create personality insights in expected format
-      const personalityInsights = {
-        peopleCount: 1,
-        individualProfiles: [{
-          summary: analysisResult.summary,
-          detailed_analysis: {
-            personality_core: analysisResult.detailed_analysis.author_personality,
-            thought_patterns: analysisResult.detailed_analysis.main_themes,
-            emotional_tendencies: analysisResult.detailed_analysis.emotional_tone,
-            communication_style: analysisResult.detailed_analysis.writing_style
-          }
-        }]
-      };
-      
-      // Clean up temporary file
-      try {
-        await unlinkAsync(tempDocPath);
-      } catch (e) {
-        console.warn("Error removing temporary document file:", e);
-      }
-      
-      // Create analysis record in storage
-      const analysis = await storage.createAnalysis({
-        sessionId,
-        mediaType: "document",
-        personalityInsights,
-        title: title || fileName
-      });
-      
-      // Format message for response
-      const formattedContent = `Document Analysis: ${fileName}
-
-${analysisResult.summary}
-
-Document Overview
-${analysisResult.detailed_analysis.document_overview}
-
-Main Themes
-${analysisResult.detailed_analysis.main_themes}
-
-Emotional Tone
-${analysisResult.detailed_analysis.emotional_tone}
-
-Writing Style
-${analysisResult.detailed_analysis.writing_style}
-
-Author Personality Assessment
-${analysisResult.detailed_analysis.author_personality}
-
-You can ask follow-up questions about this analysis.
-`;
-      
-      // Create initial message
-      const initialMessage = await storage.createMessage({
-        sessionId,
-        analysisId: analysis.id,
-        role: "assistant",
-        content: formattedContent
-      });
-      
-      // Return data to client
-      res.json({
-        analysisId: analysis.id,
-        messages: [initialMessage],
-        emailServiceAvailable: isEmailServiceConfigured
-      });
-    } catch (error) {
-      console.error("Document analysis error:", error);
-      if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: "Failed to analyze document" });
-      }
-    }
-  });
-  // Text analysis endpoint
-  app.post("/api/analyze/text", async (req, res) => {
-    try {
-      const { content, sessionId, selectedModel = "openai", title } = req.body;
-      
-      if (!content || typeof content !== 'string') {
-        return res.status(400).json({ error: "Text content is required" });
-      }
-      
-      if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
-      }
-      
       console.log(`Processing text analysis with model: ${selectedModel}`);
       
       // Get comprehensive personality insights based on text content with 50-question framework
@@ -816,15 +386,26 @@ Return JSON:
           messages: [{ role: "user", content: textAnalysisPrompt }],
         });
         
-        const textContent = response.content[0].text;
-        // Try to parse JSON, fallback to wrapping in analysis object
+        let textContent = response.content[0].text;
+        
+        // Extract JSON from markdown code blocks if present
+        const jsonMatch = textContent.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          textContent = jsonMatch[1];
+        }
+        
+        // Try to parse JSON, fallback to wrapping in analysis object with all 5 sections
         try {
           analysisResult = JSON.parse(textContent);
         } catch {
           analysisResult = {
-            summary: "Text analysis completed",
+            summary: "Text analysis completed. Unable to parse structured response.",
             detailed_analysis: {
-              language_style: textContent
+              language_style: textContent.substring(0, 1000) || "Analysis section unavailable",
+              emotional_indicators: "Unable to parse emotional indicators section",
+              cognitive_structural: "Unable to parse cognitive patterns section", 
+              self_representation: "Unable to parse identity section",
+              symbolic_unconscious: "Unable to parse symbolic analysis section"
             }
           };
         }
@@ -836,14 +417,26 @@ Return JSON:
           query: textAnalysisPrompt
         });
         
-        // Try to parse JSON, fallback to wrapping
+        let responseText = response.text;
+        
+        // Extract JSON from markdown code blocks if present
+        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          responseText = jsonMatch[1];
+        }
+        
+        // Try to parse JSON, fallback to wrapping with all 5 sections
         try {
-          analysisResult = JSON.parse(response.text);
+          analysisResult = JSON.parse(responseText);
         } catch {
           analysisResult = {
-            summary: "Text analysis completed",
+            summary: "Text analysis completed. Unable to parse structured response.",
             detailed_analysis: {
-              language_style: response.text
+              language_style: responseText.substring(0, 1000) || "Analysis section unavailable",
+              emotional_indicators: "Unable to parse emotional indicators section",
+              cognitive_structural: "Unable to parse cognitive patterns section",
+              self_representation: "Unable to parse identity section", 
+              symbolic_unconscious: "Unable to parse symbolic analysis section"
             }
           };
         }
