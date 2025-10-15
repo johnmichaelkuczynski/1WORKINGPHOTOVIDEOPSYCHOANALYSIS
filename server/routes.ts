@@ -459,18 +459,23 @@ Return JSON:
           textContent = jsonMatch[1];
         }
         
-        // Try to parse JSON, fallback to wrapping in analysis object with all 5 sections
+        // Try to parse JSON, fallback to wrapping in analysis object with all 10 sections
         try {
           analysisResult = JSON.parse(textContent);
         } catch {
           analysisResult = {
             summary: "Text analysis completed. Unable to parse structured response.",
             detailed_analysis: {
-              language_style: textContent.substring(0, 1000) || "Analysis section unavailable",
-              emotional_indicators: "Unable to parse emotional indicators section",
-              cognitive_structural: "Unable to parse cognitive patterns section", 
-              self_representation: "Unable to parse identity section",
-              symbolic_unconscious: "Unable to parse symbolic analysis section"
+              information_processing: textContent.substring(0, 800) || "Analysis section unavailable",
+              emotional_processing: "Unable to parse emotional processing section",
+              agency_activity: "Unable to parse agency & activity section", 
+              interpersonal_ideational: "Unable to parse interpersonal/ideational section",
+              motivation_values: "Unable to parse motivation & values section",
+              intelligence_control: "Unable to parse intelligence & control section",
+              honesty_sincerity: "Unable to parse honesty & sincerity section",
+              structure_organization: "Unable to parse structure & organization section",
+              psychological_style: "Unable to parse psychological style section",
+              substance_flexibility: "Unable to parse substance & flexibility section"
             }
           };
         }
@@ -490,18 +495,23 @@ Return JSON:
           responseText = jsonMatch[1];
         }
         
-        // Try to parse JSON, fallback to wrapping with all 5 sections
+        // Try to parse JSON, fallback to wrapping with all 10 sections
         try {
           analysisResult = JSON.parse(responseText);
         } catch {
           analysisResult = {
             summary: "Text analysis completed. Unable to parse structured response.",
             detailed_analysis: {
-              language_style: responseText.substring(0, 1000) || "Analysis section unavailable",
-              emotional_indicators: "Unable to parse emotional indicators section",
-              cognitive_structural: "Unable to parse cognitive patterns section",
-              self_representation: "Unable to parse identity section", 
-              symbolic_unconscious: "Unable to parse symbolic analysis section"
+              information_processing: responseText.substring(0, 800) || "Analysis section unavailable",
+              emotional_processing: "Unable to parse emotional processing section",
+              agency_activity: "Unable to parse agency & activity section",
+              interpersonal_ideational: "Unable to parse interpersonal/ideational section", 
+              motivation_values: "Unable to parse motivation & values section",
+              intelligence_control: "Unable to parse intelligence & control section",
+              honesty_sincerity: "Unable to parse honesty & sincerity section",
+              structure_organization: "Unable to parse structure & organization section",
+              psychological_style: "Unable to parse psychological style section",
+              substance_flexibility: "Unable to parse substance & flexibility section"
             }
           };
         }
@@ -513,7 +523,7 @@ Return JSON:
       }
       
       // Format the analysis for display
-      let formattedContent = `AI-Powered Text Analysis\nMode: Comprehensive Literary & Psychological Analysis\n\n`;
+      let formattedContent = `AI-Powered Text Analysis\nMode: Comprehensive Cognitive & Psychological Analysis (100 Questions)\n\n`;
       formattedContent += `${'─'.repeat(65)}\n`;
       formattedContent += `Analysis Results\n`;
       formattedContent += `${'─'.repeat(65)}\n\n`;
@@ -522,24 +532,44 @@ Return JSON:
       
       const detailedAnalysis = analysisResult.detailed_analysis || {};
       
-      if (detailedAnalysis.language_style) {
-        formattedContent += `I. Language & Style:\n${detailedAnalysis.language_style}\n\n`;
+      if (detailedAnalysis.information_processing) {
+        formattedContent += `I. Information Processing Style:\n${detailedAnalysis.information_processing}\n\n`;
       }
       
-      if (detailedAnalysis.emotional_indicators) {
-        formattedContent += `II. Emotional Indicators:\n${detailedAnalysis.emotional_indicators}\n\n`;
+      if (detailedAnalysis.emotional_processing) {
+        formattedContent += `II. Emotional Processing Style:\n${detailedAnalysis.emotional_processing}\n\n`;
       }
       
-      if (detailedAnalysis.cognitive_structural) {
-        formattedContent += `III. Cognitive & Structural Patterns:\n${detailedAnalysis.cognitive_structural}\n\n`;
+      if (detailedAnalysis.agency_activity) {
+        formattedContent += `III. Agency & Activity Level:\n${detailedAnalysis.agency_activity}\n\n`;
       }
       
-      if (detailedAnalysis.self_representation) {
-        formattedContent += `IV. Self-Representation & Identity:\n${detailedAnalysis.self_representation}\n\n`;
+      if (detailedAnalysis.interpersonal_ideational) {
+        formattedContent += `IV. Focus: Interpersonal vs. Ideational:\n${detailedAnalysis.interpersonal_ideational}\n\n`;
       }
       
-      if (detailedAnalysis.symbolic_unconscious) {
-        formattedContent += `V. Symbolic & Unconscious Material:\n${detailedAnalysis.symbolic_unconscious}\n\n`;
+      if (detailedAnalysis.motivation_values) {
+        formattedContent += `V. Motivation, Value System, and Reality Testing:\n${detailedAnalysis.motivation_values}\n\n`;
+      }
+      
+      if (detailedAnalysis.intelligence_control) {
+        formattedContent += `VI. Intelligence & Conceptual Control:\n${detailedAnalysis.intelligence_control}\n\n`;
+      }
+      
+      if (detailedAnalysis.honesty_sincerity) {
+        formattedContent += `VII. Honesty & Sincerity of Mind:\n${detailedAnalysis.honesty_sincerity}\n\n`;
+      }
+      
+      if (detailedAnalysis.structure_organization) {
+        formattedContent += `VIII. Structure, Organization, and Focus:\n${detailedAnalysis.structure_organization}\n\n`;
+      }
+      
+      if (detailedAnalysis.psychological_style) {
+        formattedContent += `IX. Psychological Profile in Style:\n${detailedAnalysis.psychological_style}\n\n`;
+      }
+      
+      if (detailedAnalysis.substance_flexibility) {
+        formattedContent += `X. Substance, Depth, and Cognitive Flexibility:\n${detailedAnalysis.substance_flexibility}\n\n`;
       }
       
       // Create an analysis with a dummy mediaUrl since the schema requires it but we don't have
