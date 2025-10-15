@@ -47,6 +47,10 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - **Implemented Chinese character**: Used authentic "知" character for elegant model naming
 - **Fixed text analysis formatting**: Removed raw JSON code display, now shows clean readable text output
 - **Fixed DeepSeek validation**: Added "deepseek" to backend validation schemas to enable 知 3 for all analysis types
+- **CRITICAL FIX - Face detection accuracy**: Added 90% confidence threshold filter to AWS Rekognition to eliminate false positives (shadows, reflections, background elements)
+- **CRITICAL FIX - Grounded analysis**: AI prompts now receive structured visual data (age, gender, emotions, facial features) instead of raw JSON
+- **CRITICAL FIX - Scene context**: Added AWS DetectLabels to identify objects/scenes in photos (e.g., piano, musical instrument) for contextual analysis
+- **CRITICAL FIX - Fabrication prevention**: AI explicitly instructed to base analysis only on actual visual data, not fabricate details
 
 ## API Keys Required
 - `OPENAI_API_KEY` - For GPT-4o analysis and Whisper transcription
