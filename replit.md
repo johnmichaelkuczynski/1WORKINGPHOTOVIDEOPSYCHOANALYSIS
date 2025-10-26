@@ -11,6 +11,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - Email sharing with SendGrid integration
 - Session management with analysis history
 - Clean UI with re-analysis capabilities
+- **Deep Dive Psychological Assessments** - Comprehensive assessment across 32+ psychological tests including MBTI, Big Five, HEXACO, Enneagram, DISC, clinical diagnostics, cognitive tests, and personality pathology indicators
 
 ## Technologies
 - **Frontend**: React.js with TypeScript, Tailwind CSS, shadcn/ui components
@@ -34,6 +35,21 @@ An advanced AI-powered personality insights platform that provides sophisticated
 
 ## Recent Changes
 ### October 2025
+- **DEEP DIVE PSYCHOLOGICAL ASSESSMENTS**: Added comprehensive deep dive analysis feature for all media types
+  * Three specialized endpoints: Image Deep Dive, Video Deep Dive, Text Deep Dive
+  * Evaluates subjects across 32+ standardized psychological assessments
+  * Assessment categories include:
+    - I. Trait/Type Assessments (MBTI, Big Five, HEXACO, Enneagram, DISC, 16PF, Keirsey, Socionics, Hogan)
+    - II. Clinical/Mental Health Diagnostics (MMPI-2/3, MCMI, Beck Depression, Beck Anxiety, GAD-7, PHQ-9)
+    - III. Cognitive/Intelligence Indicators (WAIS, Stanford-Binet, cognitive strengths)
+    - IV. Projective Assessment Implications (Rorschach, TAT)
+    - V. Emotional & Social Functioning (EQ-i, MSCEIT, Social Responsiveness)
+    - VI. Behavioral/Attention/Executive Function (ADHD indicators, executive function)
+    - VII. Vocational/Motivation/Values (Strong Interest, RIASEC/Holland Codes, VIA Character Strengths, Schwartz Values)
+    - VIII. Personality Pathology/Dark Traits (PCL-R, Dark Triad, PID-5)
+  * Accessible via prominent "Deep Dive" button in analysis results
+  * Works with all AI models (知 1-4)
+  * Results formatted in structured 8-section report
 - **COMPREHENSIVE TEXT ANALYSIS UPGRADE - 100 QUESTIONS**: Fully implemented 100-question framework for text analysis
   * All 100 questions across 10 categories:
     - I. Information Processing Style (10)
