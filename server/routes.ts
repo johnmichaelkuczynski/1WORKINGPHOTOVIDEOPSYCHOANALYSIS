@@ -1274,6 +1274,752 @@ Be engaging, professional, and conversational in all responses. Feel free to hav
     }
   });
 
+  // MBTI Analysis Endpoints - Text
+  app.post("/api/analyze/text/mbti", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing MBTI text analysis with model: ${selectedModel}`);
+      
+      // MBTI text analysis prompt with 50 questions
+      const mbtiTextPrompt = `You are an expert MBTI analyst. Analyze this text comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT QUOTES from the text.
+
+CRITICAL: Every answer must reference SPECIFIC QUOTES or PHRASES from the text. Do not use generic descriptions.
+
+TEXT:
+${content}
+
+I. INTROVERSION VS EXTRAVERSION
+1. Does the text emphasize inner thoughts and reflection, or external events and social interaction?
+2. Is the author more focused on subjective experience ("I think/feel") or shared/group dynamics ("we," "people")?
+3. Does the work explore solitude, retreat, and internal processing—or engagement, action, or outward expression?
+4. Are ideas developed internally and abstractly—or through dialogue, examples, and external interactions?
+5. Is emotional expression restrained and implied—or direct, open, and outwardly engaged?
+
+II. SENSING VS INTUITION
+6. Does the writing focus on concrete details, sensory description, and observable facts (S) or possibilities, patterns, and abstractions (N)?
+7. Are examples literal and rooted in physical experience—or metaphoric, symbolic, or hypothetical?
+8. Does the author favor step-by-step description—or leaps to conceptual insight and synthesis?
+9. Are time, sequence, and practical procedures emphasized—or timeless principles and overarching meaning?
+10. Does the author show trust in past experience and tradition—or interest in innovation, speculation, and potential futures?
+
+III. THINKING VS FEELING
+11. Is the reasoning structured around logic, consistency, and objective principles—or values, ethics, and human impact?
+12. Does the author handle disagreement through argument and critique—or through empathy, harmony, and relational tone?
+13. Are judgments justified by cause-and-effect reasoning—or by moral relevance and personal meaning?
+14. Does the text prioritize truth over tone—or tone over blunt accuracy?
+15. Are emotions analyzed as data—or used as persuasive elements tied to human wellbeing?
+
+IV. JUDGING VS PERCEIVING
+16. Is the structure of the writing tight, organized, and conclusive—or open-ended, exploratory, and flexible?
+17. Does the author express certainty and closure—or ambiguity and willingness to leave questions unresolved?
+18. Is time handled with plans, deadlines, and deliberate pacing—or spontaneity and fluid transitions?
+19. Are definitions fixed and categories stable—or shifting, provisional, and context-dependent?
+20. Does the argument move linearly toward conclusions—or circle, revise, and adapt as it unfolds?
+
+V. DEEPER INDIRECT MBTI SIGNALS
+21. Does the text show preference for systemic analysis—or narrative, emotional resonance?
+22. Are values universalized and principled—or personal and relational?
+23. Does the author rely on internal intuition (private insight) or external data and observation?
+24. Is conflict treated as a problem to solve logically—or to reconcile interpersonally?
+25. Does the work prioritize control, predictability, and structure—or openness to uncertainty and adaptation?
+26. Is language precise and utilitarian—or expressive, aesthetic, or symbolic?
+27. Does the narrative voice depend on established rules—or break conventions playfully or freely?
+28. Are future possibilities extrapolated logically—or imagined freely and creatively?
+29. Do characters (or the narrator) suppress personal feelings to maintain objectivity—or elevate emotional truth?
+30. Is the tone disciplined and purposeful—or improvisational and fluid?
+
+Provide your analysis in JSON format:
+{
+  "summary": "Brief overall MBTI assessment with predicted type and confidence level",
+  "detailed_analysis": {
+    "introversion_extraversion": "Detailed analysis of I/E with specific quotes",
+    "sensing_intuition": "Detailed analysis of S/N with specific quotes",
+    "thinking_feeling": "Detailed analysis of T/F with specific quotes",
+    "judging_perceiving": "Detailed analysis of J/P with specific quotes",
+    "deeper_signals": "Detailed analysis of deeper MBTI indicators with specific quotes"
+  },
+  "predicted_type": "Four-letter MBTI type (e.g., INTJ, ENFP)",
+  "confidence": "High/Medium/Low with explanation"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: mbtiTextPrompt }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: "Analysis completed but formatting error occurred.",
+            detailed_analysis: {
+              introversion_extraversion: rawResponse.substring(0, 500),
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              deeper_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{ role: "user", content: mbtiTextPrompt }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000),
+            detailed_analysis: {
+              introversion_extraversion: "See summary for details",
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              deeper_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else if (selectedModel === "perplexity") {
+        const response = await perplexity.query({
+          model: "llama-3.1-sonar-huge-128k-online",
+          query: mbtiTextPrompt
+        });
+        
+        const rawResponse = response.text;
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000),
+            detailed_analysis: {
+              introversion_extraversion: "See summary for details",
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              deeper_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Selected AI model is not available. Please try again with a different model." 
+        });
+      }
+      
+      // Format the analysis for display
+      let formattedContent = `MBTI Personality Analysis (Text)\nMode: Myers-Briggs Type Indicator Framework\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Predicted Type: ${analysisResult.predicted_type || 'Unknown'}\n`;
+      formattedContent += `Confidence: ${analysisResult.confidence || 'Unknown'}\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      if (detailedAnalysis.introversion_extraversion) {
+        formattedContent += `I. Introversion vs Extraversion:\n${detailedAnalysis.introversion_extraversion}\n\n`;
+      }
+      
+      if (detailedAnalysis.sensing_intuition) {
+        formattedContent += `II. Sensing vs Intuition:\n${detailedAnalysis.sensing_intuition}\n\n`;
+      }
+      
+      if (detailedAnalysis.thinking_feeling) {
+        formattedContent += `III. Thinking vs Feeling:\n${detailedAnalysis.thinking_feeling}\n\n`;
+      }
+      
+      if (detailedAnalysis.judging_perceiving) {
+        formattedContent += `IV. Judging vs Perceiving:\n${detailedAnalysis.judging_perceiving}\n\n`;
+      }
+      
+      if (detailedAnalysis.deeper_signals) {
+        formattedContent += `V. Deeper Indirect MBTI Signals:\n${detailedAnalysis.deeper_signals}\n\n`;
+      }
+      
+      // Create analysis record
+      const dummyMediaUrl = `mbti-text:${Date.now()}`;
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `MBTI Text Analysis`,
+        mediaUrl: dummyMediaUrl,
+        mediaType: "text",
+        textContent: content,
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("MBTI text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for MBTI" });
+    }
+  });
+
+  // MBTI Analysis Endpoints - Image
+  app.post("/api/analyze/image/mbti", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing MBTI image analysis with model: ${selectedModel}`);
+      
+      // MBTI image analysis prompt with 50 questions
+      const mbtiImagePrompt = `You are an expert MBTI analyst specializing in visual cues. Analyze this image comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT VISUAL EVIDENCE.
+
+CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS from the image. Do not use generic descriptions.
+
+I. INTROVERSION VS EXTRAVERSION (I/E)
+1. Does the person's facial expression convey self-restraint, inward focus, and minimal performative energy—or open expressiveness and outward emotional broadcast?
+2. Is eye contact direct and socially assertive—or indirect, introspective, or observing rather than engaging?
+3. Are they alone or with others, and if with others, are they positioned as focal point or quiet participant?
+4. Does their body posture project "closed" (arms in, shoulders inward) or "open" (expanded, outward-facing)?
+5. Is the environment suggestive of solitude, study, or quiet spaces—or public, energetic, and socially dynamic?
+
+II. SENSING VS INTUITION (S/N)
+6. Are clothes and accessories practical, detail-oriented, and sensory-specific—or symbolic, abstract, or stylistically conceptual?
+7. Is the person's gaze locked into the environment (grounded) or slightly distant/"elsewhere" (abstracted)?
+8. Do facial micro-expressions show direct reaction to physical surroundings—or inward processing of ideas?
+9. Is the environment filled with literal objects/tools—or symbolic/artistic/ambiguous elements?
+10. Does the person's styling emphasize texture, material precision, and concreteness—or originality, metaphor, or thematic coherence?
+
+III. THINKING VS FEELING (T/F)
+11. Does the expression suggest emotional attunement and warmth—or analysis, restraint, and evaluative distance?
+12. Are facial muscles relaxed and receptive—or tense near brows/jaw, as if organizing or assessing?
+13. Is posture soft and adaptable—or structured, controlled, and deliberate?
+14. Is there visual evidence of values-driven identity (causes, humanitarian symbols)—or system/logic-driven identity (devices, strategy games, tools)?
+15. Is the overall emotional atmosphere personal and empathetic—or impersonal, technical, and principled?
+
+IV. JUDGING VS PERCEIVING (J/P)
+16. Are clothes symmetrical, ironed, and intentionally arranged—or more relaxed, mismatched, or improvisational?
+17. Does the photo composition show order and planning—or spontaneity and flow?
+18. Is the posture upright and resolved—or loose, adaptable, and mid-transition?
+19. Does the setting suggest schedules, structure, and completion—or exploration, activity, or ongoing process?
+20. Are facial expressions "settled" and decisive—or flexible, shifting, or open-ended?
+
+V. COGNITIVE / DEEPER INDICATORS
+21. Does the person occupy space confidently and definitively—or lightly, as if moving through possibilities?
+22. Are their hands used in expressive, relational ways—or instrumental, precise, or still?
+23. Do they display intense, narrow-focus gaze (Ni/Si) or scanning/observing multiple cues (Ne/Se)?
+24. Is the environment curated for meaning/symbolism—or for function, utility, or familiarity?
+25. Are emotional cues projected outward (Fe)—or held internally (Fi), visible only subtly around the eyes/mouth?
+26. Does the image show harmony-seeking positioning near others—or independence and self-contained space?
+27. Does the person appear to structure their environment—or adapt fluidly to it?
+28. Are they visually aligned with tradition and convention—or personalized, unconventional, or experimental?
+29. Does their body language appear measured and restrained—or reactive and environment-responsive?
+30. Is their aesthetic intentional and minimal—or layered, evolving, and exploratory?
+
+Provide your analysis in JSON format:
+{
+  "summary": "Brief overall MBTI assessment with predicted type and confidence level",
+  "detailed_analysis": {
+    "introversion_extraversion": "Detailed analysis of I/E with specific visual evidence",
+    "sensing_intuition": "Detailed analysis of S/N with specific visual evidence",
+    "thinking_feeling": "Detailed analysis of T/F with specific visual evidence",
+    "judging_perceiving": "Detailed analysis of J/P with specific visual evidence",
+    "cognitive_indicators": "Detailed analysis of deeper cognitive indicators with specific visual evidence"
+  },
+  "predicted_type": "Four-letter MBTI type (e.g., INTJ, ENFP)",
+  "confidence": "High/Medium/Low with explanation"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability (OpenAI only for now)
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: mbtiImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: "Analysis completed but formatting error occurred.",
+            detailed_analysis: {
+              introversion_extraversion: rawResponse.substring(0, 500),
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              cognitive_indicators: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        // Anthropic vision support
+        const base64Match = mediaData.match(/^data:image\/[a-z]+;base64,(.+)$/);
+        const base64Data = base64Match ? base64Match[1] : mediaData;
+        const mediaTypeMatch = mediaData.match(/^data:(image\/[a-z]+);base64,/);
+        const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+        
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: mediaType as any,
+                  data: base64Data,
+                },
+              },
+              {
+                type: "text",
+                text: mbtiImagePrompt
+              }
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000),
+            detailed_analysis: {
+              introversion_extraversion: "See summary for details",
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              cognitive_indicators: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "MBTI image analysis currently only supports OpenAI and Anthropic models with vision capabilities." 
+        });
+      }
+      
+      // Format the analysis for display
+      let formattedContent = `MBTI Personality Analysis (Image)\nMode: Myers-Briggs Type Indicator Framework\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Predicted Type: ${analysisResult.predicted_type || 'Unknown'}\n`;
+      formattedContent += `Confidence: ${analysisResult.confidence || 'Unknown'}\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      if (detailedAnalysis.introversion_extraversion) {
+        formattedContent += `I. Introversion vs Extraversion:\n${detailedAnalysis.introversion_extraversion}\n\n`;
+      }
+      
+      if (detailedAnalysis.sensing_intuition) {
+        formattedContent += `II. Sensing vs Intuition:\n${detailedAnalysis.sensing_intuition}\n\n`;
+      }
+      
+      if (detailedAnalysis.thinking_feeling) {
+        formattedContent += `III. Thinking vs Feeling:\n${detailedAnalysis.thinking_feeling}\n\n`;
+      }
+      
+      if (detailedAnalysis.judging_perceiving) {
+        formattedContent += `IV. Judging vs Perceiving:\n${detailedAnalysis.judging_perceiving}\n\n`;
+      }
+      
+      if (detailedAnalysis.cognitive_indicators) {
+        formattedContent += `V. Cognitive / Deeper Indicators:\n${detailedAnalysis.cognitive_indicators}\n\n`;
+      }
+      
+      // Create analysis record
+      const mediaUrl = `mbti-image:${Date.now()}`;
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `MBTI Image Analysis`,
+        mediaUrl,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        messages: [message],
+        mediaUrl,
+      });
+    } catch (error) {
+      console.error("MBTI image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for MBTI" });
+    }
+  });
+
+  // MBTI Analysis Endpoints - Video
+  app.post("/api/analyze/video/mbti", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing MBTI video analysis with model: ${selectedModel}`);
+      
+      // For video, we'll extract frames and analyze them
+      // Save video temporarily
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const frames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      // MBTI video analysis prompt with 50 questions
+      const mbtiVideoPrompt = `You are an expert MBTI analyst specializing in behavioral cues. Analyze these video frames comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT VISUAL AND BEHAVIORAL EVIDENCE with timestamps.
+
+CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS, BEHAVIORS, and TEMPORAL CHANGES across the frames. Do not use generic descriptions.
+
+I. INTROVERSION VS EXTRAVERSION (I/E)
+1. Does their energy seem directed outward (projected), or inward (contained, self-referential)?
+2. Do they initiate interaction with surroundings/others—or wait, observe, respond?
+3. How quickly and confidently do they make eye contact with the camera/person—or do they glance briefly or avoid it?
+4. Are their gestures expansive and socially open—or minimized, controlled, and self-contained?
+5. Does their posture lean forward/engage—or stay anchored inward/backward, conserving energy?
+
+II. SENSING VS INTUITION (S/N)
+6. Do they tangibly engage with their physical surroundings—or appear mentally elsewhere, focused on ideas more than environment?
+7. Is their attention visibly grounded in the present moment—or drifting, future-oriented, symbolic, or associative?
+8. When interacting, do their eyes scan concrete objects—or look up/aside as if accessing concepts or abstractions?
+9. Are movements literal and practical—or stylized, metaphorical, or imaginative?
+10. Do they respond to immediate sensory input—or to internal interpretations of what could be happening?
+
+III. THINKING VS FEELING (T/F)
+11. Are facial reactions emotionally transparent—or filtered through analysis and composure?
+12. When reacting, do they first show empathy/connection—or evaluation/judgment/assessment?
+13. Do they adjust their posture and movements to maintain harmony—or to maintain logical structure and control?
+14. Are emotional expressions fluid and relational—or subtle, contained, or dampened?
+15. If speaking, do they choose words that connect emotionally—or words that systematize or clarify?
+
+IV. JUDGING VS PERCEIVING (J/P)
+16. Is their movement precise, planned, and concluded—or adaptive, flexible, and open-ended?
+17. Do they complete motions cleanly—or leave gestures half-open, unresolved?
+18. Are facial expressions decisive and consistent—or quickly changing, context-responsive?
+19. Do they anticipate and prepare for things before they happen—or react in-the-moment?
+20. Does their timing feel structured and rhythmic—or spontaneous and elastic?
+
+V. DEEPER COGNITIVE FUNCTION SIGNALS
+21. Do they show sustained focus on one point (Ni/Si)—or rapid shifting and idea-generation (Ne/Se)?
+22. Are emotional responses internalized (Fi) or immediately externalized toward others (Fe)?
+23. Do they use small, precise gestures (Ti/Si)—or broad, audience-aware ones (Fe/Se)?
+24. Is their speaking cadence clipped, sequential, and controlled—or flowing, adaptive, meandering?
+25. Do they pause to evaluate before acting—or act first and adjust afterward?
+26. Do they correct or adjust the environment (J)—or assimilate themselves into it (P)?
+27. Is their facial micro-expression delayed (inward processing) or immediate (external processing)?
+28. Do they show tension to maintain control—or relaxed adaptability to emerging stimuli?
+29. Does their energy rise the longer they engage (E/Ne/Se)—or deplete or pull inward (I/Ni/Si)?
+30. If surprised, do they freeze and process—or respond instantly and externally?
+
+Provide your analysis in JSON format:
+{
+  "summary": "Brief overall MBTI assessment with predicted type and confidence level",
+  "detailed_analysis": {
+    "introversion_extraversion": "Detailed analysis of I/E with specific behavioral evidence and timestamps",
+    "sensing_intuition": "Detailed analysis of S/N with specific behavioral evidence and timestamps",
+    "thinking_feeling": "Detailed analysis of T/F with specific behavioral evidence and timestamps",
+    "judging_perceiving": "Detailed analysis of J/P with specific behavioral evidence and timestamps",
+    "cognitive_function_signals": "Detailed analysis of deeper cognitive function indicators with specific behavioral evidence and timestamps"
+  },
+  "predicted_type": "Four-letter MBTI type (e.g., INTJ, ENFP)",
+  "confidence": "High/Medium/Low with explanation"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability (OpenAI only for now)
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: mbtiVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...frames.map((frame, idx) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: "Analysis completed but formatting error occurred.",
+            detailed_analysis: {
+              introversion_extraversion: rawResponse.substring(0, 500),
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              cognitive_function_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        // Anthropic vision support for multiple frames
+        const imageContents = frames.map(frame => {
+          const base64Match = frame.match(/^data:image\/[a-z]+;base64,(.+)$/);
+          const base64Data = base64Match ? base64Match[1] : frame;
+          const mediaTypeMatch = frame.match(/^data:(image\/[a-z]+);base64,/);
+          const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType as any,
+              data: base64Data,
+            },
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: mbtiVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:"
+              },
+              ...imageContents
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000),
+            detailed_analysis: {
+              introversion_extraversion: "See summary for details",
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              cognitive_function_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "MBTI video analysis currently only supports OpenAI and Anthropic models with vision capabilities." 
+        });
+      }
+      
+      // Format the analysis for display
+      let formattedContent = `MBTI Personality Analysis (Video)\nMode: Myers-Briggs Type Indicator Framework\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Predicted Type: ${analysisResult.predicted_type || 'Unknown'}\n`;
+      formattedContent += `Confidence: ${analysisResult.confidence || 'Unknown'}\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      if (detailedAnalysis.introversion_extraversion) {
+        formattedContent += `I. Introversion vs Extraversion:\n${detailedAnalysis.introversion_extraversion}\n\n`;
+      }
+      
+      if (detailedAnalysis.sensing_intuition) {
+        formattedContent += `II. Sensing vs Intuition:\n${detailedAnalysis.sensing_intuition}\n\n`;
+      }
+      
+      if (detailedAnalysis.thinking_feeling) {
+        formattedContent += `III. Thinking vs Feeling:\n${detailedAnalysis.thinking_feeling}\n\n`;
+      }
+      
+      if (detailedAnalysis.judging_perceiving) {
+        formattedContent += `IV. Judging vs Perceiving:\n${detailedAnalysis.judging_perceiving}\n\n`;
+      }
+      
+      if (detailedAnalysis.cognitive_function_signals) {
+        formattedContent += `V. Deeper Cognitive Function Signals:\n${detailedAnalysis.cognitive_function_signals}\n\n`;
+      }
+      
+      // Create analysis record
+      const mediaUrl = `mbti-video:${Date.now()}`;
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `MBTI Video Analysis`,
+        mediaUrl,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, mbti_type: analysisResult.predicted_type },
+        messages: [message],
+        mediaUrl,
+      });
+    } catch (error) {
+      console.error("MBTI video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for MBTI" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;
