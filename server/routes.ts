@@ -447,34 +447,43 @@ Return JSON:
         });
       }
       
+      // Helper function to safely stringify any value
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          return JSON.stringify(value, null, 2);
+        }
+        return String(value || '');
+      };
+      
       // Format the analysis for display
       let formattedContent = `AI-Powered Text Analysis\nMode: Comprehensive Literary & Psychological Analysis\n\n`;
       formattedContent += `${'─'.repeat(65)}\n`;
       formattedContent += `Analysis Results\n`;
       formattedContent += `${'─'.repeat(65)}\n\n`;
       
-      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary) || 'No summary available'}\n\n`;
       
       const detailedAnalysis = analysisResult.detailed_analysis || {};
       
       if (detailedAnalysis.language_style) {
-        formattedContent += `I. Language & Style:\n${detailedAnalysis.language_style}\n\n`;
+        formattedContent += `I. Language & Style:\n${safeStringify(detailedAnalysis.language_style)}\n\n`;
       }
       
       if (detailedAnalysis.emotional_indicators) {
-        formattedContent += `II. Emotional Indicators:\n${detailedAnalysis.emotional_indicators}\n\n`;
+        formattedContent += `II. Emotional Indicators:\n${safeStringify(detailedAnalysis.emotional_indicators)}\n\n`;
       }
       
       if (detailedAnalysis.cognitive_structural) {
-        formattedContent += `III. Cognitive & Structural Patterns:\n${detailedAnalysis.cognitive_structural}\n\n`;
+        formattedContent += `III. Cognitive & Structural Patterns:\n${safeStringify(detailedAnalysis.cognitive_structural)}\n\n`;
       }
       
       if (detailedAnalysis.self_representation) {
-        formattedContent += `IV. Self-Representation & Identity:\n${detailedAnalysis.self_representation}\n\n`;
+        formattedContent += `IV. Self-Representation & Identity:\n${safeStringify(detailedAnalysis.self_representation)}\n\n`;
       }
       
       if (detailedAnalysis.symbolic_unconscious) {
-        formattedContent += `V. Symbolic & Unconscious Material:\n${detailedAnalysis.symbolic_unconscious}\n\n`;
+        formattedContent += `V. Symbolic & Unconscious Material:\n${safeStringify(detailedAnalysis.symbolic_unconscious)}\n\n`;
       }
       
       // Create an analysis with a dummy mediaUrl since the schema requires it but we don't have
