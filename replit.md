@@ -6,6 +6,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 ## Key Features
 - Multi-modal analysis (images, videos, documents, text)
 - Multiple AI model support (OpenAI GPT-4o, Anthropic Claude, Perplexity)
+- MBTI personality analysis (text, images, videos) - NEW!
 - Facial analysis using AWS Rekognition and Face++
 - Audio transcription with OpenAI Whisper
 - Email sharing with SendGrid integration
@@ -33,6 +34,16 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - Wants clean state management (no stacking of old analyses)
 
 ## Recent Changes
+### October 2025 (Latest)
+- **NEW MBTI ANALYSIS FEATURE**: Added three dedicated MBTI analysis functions
+  * MBTI Text Analysis - 30-question framework covering I/E, S/N, T/F, J/P, and deeper MBTI signals with direct text quotes
+  * MBTI Image Analysis - 30-question visual framework analyzing posture, gaze, environment, styling, and cognitive indicators
+  * MBTI Video Analysis - 30-question behavioral framework analyzing movement, timing, expressions, and temporal patterns
+  * All MBTI analyses provide predicted type (e.g., INTJ, ENFP) with confidence levels
+  * Works with OpenAI, Anthropic, and Perplexity models
+  * Three new buttons added to frontend (separate from comprehensive analysis)
+  * Evidence-based results with specific visual/textual references
+  
 ### October 2025
 - **COMPREHENSIVE TEXT ANALYSIS UPGRADE**: Fully implemented 50-question framework for text analysis
   * All 50 questions across 5 categories (Language & Style, Emotional Indicators, Cognitive & Structural Patterns, Self-Representation & Identity, Symbolic & Unconscious Material)
