@@ -447,11 +447,26 @@ Return JSON:
         });
       }
       
-      // Helper function to safely stringify any value
+      // Helper function to safely stringify any value into readable text
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => String(item)).join('\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
         }
         return String(value || '');
       };
@@ -1459,11 +1474,26 @@ Provide your analysis in JSON format:
         });
       }
       
-      // Helper function to safely stringify any value
+      // Helper function to safely stringify any value into readable text
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => String(item)).join('\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
         }
         return String(value || '');
       };
@@ -1709,11 +1739,26 @@ Provide your analysis in JSON format:
         });
       }
       
-      // Helper function to safely stringify any value
+      // Helper function to safely stringify any value into readable text
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => String(item)).join('\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
         }
         return String(value || '');
       };
@@ -1950,11 +1995,26 @@ Provide your analysis in JSON format:
         });
       }
       
-      // Helper function to safely stringify any value
+      // Helper function to safely stringify any value into readable text
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => String(item)).join('\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
         }
         return String(value || '');
       };
@@ -2234,11 +2294,26 @@ Provide your analysis in JSON format:
         });
       }
       
-      // Helper function to safely stringify any value
+      // Helper function to safely stringify any value into readable text
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => String(item)).join('\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
         }
         return String(value || '');
       };
