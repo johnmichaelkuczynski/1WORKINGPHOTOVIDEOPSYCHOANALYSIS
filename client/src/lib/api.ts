@@ -236,6 +236,148 @@ export async function updateAnalysisTitle(analysisId: number, title: string) {
   return res.json();
 }
 
+// MBTI Analysis Functions
+export async function analyzeMBTIText(
+  content: string, 
+  sessionId: string, 
+  selectedModel: ModelType = "openai",
+  title?: string
+) {
+  console.log(`Analyzing text for MBTI with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/text/mbti", { 
+    content, 
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("MBTI text analysis response:", data);
+  
+  // Extract the analysis text into a proper message format if missing
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from MBTI text analysis insights");
+      let analysisContent = '';
+      
+      // Try to extract analysis text from different possible formats
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+      
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
+export async function analyzeMBTIImage(
+  mediaData: string, 
+  sessionId: string, 
+  selectedModel: ModelType = "openai",
+  title?: string
+) {
+  console.log(`Analyzing image for MBTI with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/image/mbti", { 
+    mediaData, 
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("MBTI image analysis response:", data);
+  
+  // Extract the analysis text into a proper message format if missing
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from MBTI image analysis insights");
+      let analysisContent = '';
+      
+      // Try to extract analysis text from different possible formats
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+      
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
+export async function analyzeMBTIVideo(
+  mediaData: string, 
+  sessionId: string, 
+  selectedModel: ModelType = "openai",
+  title?: string
+) {
+  console.log(`Analyzing video for MBTI with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/video/mbti", { 
+    mediaData, 
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("MBTI video analysis response:", data);
+  
+  // Extract the analysis text into a proper message format if missing
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from MBTI video analysis insights");
+      let analysisContent = '';
+      
+      // Try to extract analysis text from different possible formats
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+      
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
 // API status check
 export async function checkAPIStatus() {
   const res = await apiRequest("GET", "/api/status", null);
