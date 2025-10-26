@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, deepDiveImageAnalysis, deepDiveVideoAnalysis, deepDiveTextAnalysis, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -941,6 +941,50 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                     >
                       <File className="h-4 w-4" />
                       <span>DOCX</span>
+                    </Button>
+                  )}
+                  
+                  {/* Deep Dive button */}
+                  {analysisId && (
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      className="flex items-center gap-2 bg-primary"
+                      onClick={async () => {
+                        try {
+                          setIsAnalyzing(true);
+                          let response;
+                          
+                          if (mediaType === "image") {
+                            response = await deepDiveImageAnalysis(analysisId, selectedModel);
+                          } else if (mediaType === "video") {
+                            response = await deepDiveVideoAnalysis(analysisId, selectedModel);
+                          } else if (mediaType === "text" || mediaType === "document") {
+                            response = await deepDiveTextAnalysis(analysisId, selectedModel);
+                          }
+                          
+                          if (response?.message) {
+                            setMessages(prev => [...prev, response.message]);
+                            toast({
+                              title: "Deep Dive Complete",
+                              description: "Comprehensive psychological assessment generated",
+                            });
+                          }
+                        } catch (error) {
+                          console.error("Deep dive error:", error);
+                          toast({
+                            variant: "destructive",
+                            title: "Error",
+                            description: "Failed to perform deep dive analysis",
+                          });
+                        } finally {
+                          setIsAnalyzing(false);
+                        }
+                      }}
+                      disabled={isAnalyzing}
+                    >
+                      <AlertCircle className="h-4 w-4" />
+                      <span>Deep Dive</span>
                     </Button>
                   )}
                   
