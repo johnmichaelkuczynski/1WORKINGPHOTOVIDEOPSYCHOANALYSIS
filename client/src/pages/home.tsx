@@ -102,6 +102,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelType>("openai");
   const [documentName, setDocumentName] = useState<string>("");
+  const [selectedAnalysisType, setSelectedAnalysisType] = useState<string | null>(null);
   
   // References
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -673,9 +674,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             <h2 className="text-xl font-semibold mb-4">Step 2: Choose Input Type</h2>
             <div className="grid grid-cols-3 gap-3">
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "image" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={handleImageVideoClick}
+                onClick={() => {
+                  setSelectedAnalysisType("image");
+                  handleImageVideoClick();
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-image"
               >
@@ -691,9 +695,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
               
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "document" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={handleDocumentClick}
+                onClick={() => {
+                  setSelectedAnalysisType("document");
+                  handleDocumentClick();
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-document"
               >
@@ -709,9 +716,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
               
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "video" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={handleImageVideoClick}
+                onClick={() => {
+                  setSelectedAnalysisType("video");
+                  handleImageVideoClick();
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-video"
               >
@@ -720,9 +730,11 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={async () => {
+                  setSelectedAnalysisType("text-mbti");
+                  
                   if (!textInput.trim()) {
                     toast({
                       variant: "destructive",
@@ -768,9 +780,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "document-mbti" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => documentMBTIInputRef.current?.click()}
+                onClick={() => {
+                  setSelectedAnalysisType("document-mbti");
+                  documentMBTIInputRef.current?.click();
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-document-mbti"
               >
@@ -791,9 +806,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "video-mbti" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Video MBTI functionality will be added soon." })}
+                onClick={() => {
+                  setSelectedAnalysisType("video-mbti");
+                  toast({ title: "Coming Soon", description: "Video MBTI functionality will be added soon." });
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-video-mbti"
               >
@@ -802,9 +820,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "image-deepdive" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." })}
+                onClick={() => {
+                  setSelectedAnalysisType("image-deepdive");
+                  toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." });
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-image-deepdive"
               >
@@ -813,9 +834,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "text-deepdive" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." })}
+                onClick={() => {
+                  setSelectedAnalysisType("text-deepdive");
+                  toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." });
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-text-deepdive"
               >
@@ -824,9 +848,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant="outline" 
+                variant={selectedAnalysisType === "video-deepdive" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." })}
+                onClick={() => {
+                  setSelectedAnalysisType("video-deepdive");
+                  toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." });
+                }}
                 disabled={isAnalyzing}
                 data-testid="button-video-deepdive"
               >
