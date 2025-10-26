@@ -722,12 +722,49 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               <Button 
                 variant="outline" 
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Image MBTI functionality will be added soon." })}
+                onClick={async () => {
+                  if (!textInput.trim()) {
+                    toast({
+                      variant: "destructive",
+                      title: "No Text",
+                      description: "Please enter text in the Input Preview section below",
+                    });
+                    return;
+                  }
+                  
+                  setIsAnalyzing(true);
+                  setAnalysisProgress(0);
+                  setMessages([]);
+                  
+                  try {
+                    const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
+                    
+                    if (data.messages && data.messages.length > 0) {
+                      setMessages(data.messages);
+                      setAnalysisId(data.analysisId);
+                      setAnalysisProgress(100);
+                      toast({
+                        title: "MBTI Analysis Complete",
+                        description: "Your text has been analyzed using the MBTI framework",
+                      });
+                      setTextInput("");
+                    }
+                  } catch (error) {
+                    console.error("MBTI text analysis error:", error);
+                    toast({
+                      variant: "destructive",
+                      title: "Analysis Failed",
+                      description: "Failed to analyze text for MBTI. Please try again.",
+                    });
+                  } finally {
+                    setIsAnalyzing(false);
+                  }
+                }}
                 disabled={isAnalyzing}
-                data-testid="button-image-mbti"
+                data-testid="button-text-mbti"
               >
-                <FileImage className="h-6 w-6 mb-1" />
-                <span>Image MBTI</span>
+                <FileText className="h-6 w-6 mb-1" />
+                <span>Text MBTI</span>
               </Button>
 
               <Button 
@@ -737,8 +774,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 disabled={isAnalyzing}
                 data-testid="button-document-mbti"
               >
-                <FileText className="h-6 w-6 mb-1" />
-                <span>Document MBTI</span>
+                <File className="h-6 w-6 mb-1" />
+                <span>Doc File MBTI</span>
                 <input
                   ref={documentMBTIInputRef}
                   type="file"
