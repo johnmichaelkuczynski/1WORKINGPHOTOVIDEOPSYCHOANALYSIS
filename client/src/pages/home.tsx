@@ -594,14 +594,15 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           {/* Upload Options */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Step 2: Choose Input Type</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <Button 
                 variant="outline" 
-                className="h-24 flex flex-col items-center justify-center" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={handleImageVideoClick}
                 disabled={isAnalyzing}
+                data-testid="button-image"
               >
-                <FileImage className="h-8 w-8 mb-2" />
+                <FileImage className="h-6 w-6 mb-1" />
                 <span>Image</span>
                 <input
                   ref={fileInputRef}
@@ -614,11 +615,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               
               <Button 
                 variant="outline" 
-                className="h-24 flex flex-col items-center justify-center" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={handleDocumentClick}
                 disabled={isAnalyzing}
+                data-testid="button-document"
               >
-                <FileText className="h-8 w-8 mb-2" />
+                <FileText className="h-6 w-6 mb-1" />
                 <span>Document</span>
                 <input
                   ref={documentInputRef}
@@ -631,12 +633,79 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               
               <Button 
                 variant="outline" 
-                className="h-24 flex flex-col items-center justify-center" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={handleImageVideoClick}
                 disabled={isAnalyzing}
+                data-testid="button-video"
               >
-                <Film className="h-8 w-8 mb-2" />
+                <Film className="h-6 w-6 mb-1" />
                 <span>Video</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Image MBTI functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-image-mbti"
+              >
+                <FileImage className="h-6 w-6 mb-1" />
+                <span>Image MBTI</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Document MBTI functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-document-mbti"
+              >
+                <FileText className="h-6 w-6 mb-1" />
+                <span>Document MBTI</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Video MBTI functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-video-mbti"
+              >
+                <Film className="h-6 w-6 mb-1" />
+                <span>Video MBTI</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-image-deepdive"
+              >
+                <FileImage className="h-6 w-6 mb-1" />
+                <span>Image Deep Dive</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-text-deepdive"
+              >
+                <FileText className="h-6 w-6 mb-1" />
+                <span>Text Deep Dive</span>
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col items-center justify-center text-xs" 
+                onClick={() => toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." })}
+                disabled={isAnalyzing}
+                data-testid="button-video-deepdive"
+              >
+                <Film className="h-6 w-6 mb-1" />
+                <span>Video Deep Dive</span>
               </Button>
             </div>
             
