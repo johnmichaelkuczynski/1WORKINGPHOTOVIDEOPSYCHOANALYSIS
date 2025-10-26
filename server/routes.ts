@@ -1691,6 +1691,15 @@ Provide your analysis in JSON format:
         });
       }
       
+      // Helper function to safely stringify any value
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          return JSON.stringify(value, null, 2);
+        }
+        return String(value || '');
+      };
+      
       // Format the analysis for display
       let formattedContent = `MBTI Personality Analysis (Image)\nMode: Myers-Briggs Type Indicator Framework\n\n`;
       formattedContent += `${'─'.repeat(65)}\n`;
@@ -1699,28 +1708,28 @@ Provide your analysis in JSON format:
       
       formattedContent += `Predicted Type: ${analysisResult.predicted_type || 'Unknown'}\n`;
       formattedContent += `Confidence: ${analysisResult.confidence || 'Unknown'}\n\n`;
-      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary) || 'No summary available'}\n\n`;
       
       const detailedAnalysis = analysisResult.detailed_analysis || {};
       
       if (detailedAnalysis.introversion_extraversion) {
-        formattedContent += `I. Introversion vs Extraversion:\n${detailedAnalysis.introversion_extraversion}\n\n`;
+        formattedContent += `I. Introversion vs Extraversion:\n${safeStringify(detailedAnalysis.introversion_extraversion)}\n\n`;
       }
       
       if (detailedAnalysis.sensing_intuition) {
-        formattedContent += `II. Sensing vs Intuition:\n${detailedAnalysis.sensing_intuition}\n\n`;
+        formattedContent += `II. Sensing vs Intuition:\n${safeStringify(detailedAnalysis.sensing_intuition)}\n\n`;
       }
       
       if (detailedAnalysis.thinking_feeling) {
-        formattedContent += `III. Thinking vs Feeling:\n${detailedAnalysis.thinking_feeling}\n\n`;
+        formattedContent += `III. Thinking vs Feeling:\n${safeStringify(detailedAnalysis.thinking_feeling)}\n\n`;
       }
       
       if (detailedAnalysis.judging_perceiving) {
-        formattedContent += `IV. Judging vs Perceiving:\n${detailedAnalysis.judging_perceiving}\n\n`;
+        formattedContent += `IV. Judging vs Perceiving:\n${safeStringify(detailedAnalysis.judging_perceiving)}\n\n`;
       }
       
       if (detailedAnalysis.cognitive_indicators) {
-        formattedContent += `V. Cognitive / Deeper Indicators:\n${detailedAnalysis.cognitive_indicators}\n\n`;
+        formattedContent += `V. Cognitive / Deeper Indicators:\n${safeStringify(detailedAnalysis.cognitive_indicators)}\n\n`;
       }
       
       // Create analysis record
@@ -1966,6 +1975,15 @@ Provide your analysis in JSON format:
         });
       }
       
+      // Helper function to safely stringify any value
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          return JSON.stringify(value, null, 2);
+        }
+        return String(value || '');
+      };
+      
       // Format the analysis for display
       let formattedContent = `MBTI Personality Analysis (Video)\nMode: Myers-Briggs Type Indicator Framework\n\n`;
       formattedContent += `${'─'.repeat(65)}\n`;
@@ -1974,28 +1992,28 @@ Provide your analysis in JSON format:
       
       formattedContent += `Predicted Type: ${analysisResult.predicted_type || 'Unknown'}\n`;
       formattedContent += `Confidence: ${analysisResult.confidence || 'Unknown'}\n\n`;
-      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary) || 'No summary available'}\n\n`;
       
       const detailedAnalysis = analysisResult.detailed_analysis || {};
       
       if (detailedAnalysis.introversion_extraversion) {
-        formattedContent += `I. Introversion vs Extraversion:\n${detailedAnalysis.introversion_extraversion}\n\n`;
+        formattedContent += `I. Introversion vs Extraversion:\n${safeStringify(detailedAnalysis.introversion_extraversion)}\n\n`;
       }
       
       if (detailedAnalysis.sensing_intuition) {
-        formattedContent += `II. Sensing vs Intuition:\n${detailedAnalysis.sensing_intuition}\n\n`;
+        formattedContent += `II. Sensing vs Intuition:\n${safeStringify(detailedAnalysis.sensing_intuition)}\n\n`;
       }
       
       if (detailedAnalysis.thinking_feeling) {
-        formattedContent += `III. Thinking vs Feeling:\n${detailedAnalysis.thinking_feeling}\n\n`;
+        formattedContent += `III. Thinking vs Feeling:\n${safeStringify(detailedAnalysis.thinking_feeling)}\n\n`;
       }
       
       if (detailedAnalysis.judging_perceiving) {
-        formattedContent += `IV. Judging vs Perceiving:\n${detailedAnalysis.judging_perceiving}\n\n`;
+        formattedContent += `IV. Judging vs Perceiving:\n${safeStringify(detailedAnalysis.judging_perceiving)}\n\n`;
       }
       
       if (detailedAnalysis.cognitive_function_signals) {
-        formattedContent += `V. Deeper Cognitive Function Signals:\n${detailedAnalysis.cognitive_function_signals}\n\n`;
+        formattedContent += `V. Deeper Cognitive Function Signals:\n${safeStringify(detailedAnalysis.cognitive_function_signals)}\n\n`;
       }
       
       // Create analysis record
