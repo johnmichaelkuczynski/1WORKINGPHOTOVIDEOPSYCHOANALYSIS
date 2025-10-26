@@ -1,0 +1,74 @@
+MBTI PROTOCOL FOR TEXT: 
+
+WHEN RUNNING THE MBTI FUNCTION ON TEXT, THE APP MUST ASK THE FOLLOWING QUESTIONS IN CONNECTION WITH A GIVEN TEXT: 
+
+
+I. Introversion vs Extraversion
+
+Does the text emphasize inner thoughts and reflection, or external events and social interaction?
+
+Is the author more focused on subjective experience (“I think/feel”) or shared/group dynamics (“we,” “people”)?
+
+Does the work explore solitude, retreat, and internal processing—or engagement, action, or outward expression?
+
+Are ideas developed internally and abstractly—or through dialogue, examples, and external interactions?
+
+Is emotional expression restrained and implied—or direct, open, and outwardly engaged?
+
+II. Sensing vs Intuition
+
+Does the writing focus on concrete details, sensory description, and observable facts (S) or possibilities, patterns, and abstractions (N)?
+
+Are examples literal and rooted in physical experience—or metaphoric, symbolic, or hypothetical?
+
+Does the author favor step-by-step description—or leaps to conceptual insight and synthesis?
+
+Are time, sequence, and practical procedures emphasized—or timeless principles and overarching meaning?
+
+Does the author show trust in past experience and tradition—or interest in innovation, speculation, and potential futures?
+
+III. Thinking vs Feeling
+
+Is the reasoning structured around logic, consistency, and objective principles—or values, ethics, and human impact?
+
+Does the author handle disagreement through argument and critique—or through empathy, harmony, and relational tone?
+
+Are judgments justified by cause-and-effect reasoning—or by moral relevance and personal meaning?
+
+Does the text prioritize truth over tone—or tone over blunt accuracy?
+
+Are emotions analyzed as data—or used as persuasive elements tied to human wellbeing?
+
+IV. Judging vs Perceiving
+
+Is the structure of the writing tight, organized, and conclusive—or open-ended, exploratory, and flexible?
+
+Does the author express certainty and closure—or ambiguity and willingness to leave questions unresolved?
+
+Is time handled with plans, deadlines, and deliberate pacing—or spontaneity and fluid transitions?
+
+Are definitions fixed and categories stable—or shifting, provisional, and context-dependent?
+
+Does the argument move linearly toward conclusions—or circle, revise, and adapt as it unfolds?
+
+V. Deeper Indirect MBTI Signals
+
+Does the text show preference for systemic analysis—or narrative, emotional resonance?
+
+Are values universalized and principled—or personal and relational?
+
+Does the author rely on internal intuition (private insight) or external data and observation?
+
+Is conflict treated as a problem to solve logically—or to reconcile interpersonally?
+
+Does the work prioritize control, predictability, and structure—or openness to uncertainty and adaptation?
+
+Is language precise and utilitarian—or expressive, aesthetic, or symbolic?
+
+Does the narrative voice depend on established rules—or break conventions playfully or freely?
+
+Are future possibilities extrapolated logically—or imagined freely and creatively?
+
+Do characters (or the narrator) suppress personal feelings to maintain objectivity—or elevate emotional truth?
+
+Is the tone disciplined and purposeful—or improvisational and fluid?

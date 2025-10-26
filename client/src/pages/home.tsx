@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -108,6 +108,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const documentMBTIInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -295,6 +296,82 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       toast({
         title: "Analysis Complete",
         description: "Your document has been successfully analyzed.",
+      });
+    }
+  });
+
+  // Document MBTI analysis with file upload
+  const handleDocumentMBTIAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        setDocumentName(file.name);
+        setAnalysisProgress(30);
+        
+        // Read the file as data URL
+        const reader = new FileReader();
+        const fileData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setAnalysisProgress(50);
+        
+        // Determine file type
+        const fileExt = file.name.split('.').pop()?.toLowerCase();
+        const fileType = fileExt === 'pdf' ? 'pdf' : 'docx';
+        
+        const response = await analyzeMBTIDocument(
+          fileData,
+          file.name,
+          fileType,
+          sessionId,
+          selectedModel
+        );
+        
+        setAnalysisProgress(80);
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Document MBTI analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze document for MBTI. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: (data) => {
+      // Get all messages for the session to be sure we have the latest
+      if (data?.analysisId) {
+        // If we received an analysis ID, try to fetch any messages related to it
+        fetch(`/api/messages?sessionId=${sessionId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && Array.isArray(data) && data.length > 0) {
+              console.log("Fetched messages after document MBTI analysis:", data);
+              setMessages(data);
+            }
+          })
+          .catch(err => console.error("Error fetching messages after document MBTI analysis:", err));
+      }
+      
+      toast({
+        title: "MBTI Analysis Complete",
+        description: "Your document has been successfully analyzed for MBTI personality type.",
       });
     }
   });
@@ -656,12 +733,24 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               <Button 
                 variant="outline" 
                 className="h-20 flex flex-col items-center justify-center text-xs" 
-                onClick={() => toast({ title: "Coming Soon", description: "Document MBTI functionality will be added soon." })}
+                onClick={() => documentMBTIInputRef.current?.click()}
                 disabled={isAnalyzing}
                 data-testid="button-document-mbti"
               >
                 <FileText className="h-6 w-6 mb-1" />
                 <span>Document MBTI</span>
+                <input
+                  ref={documentMBTIInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                      handleDocumentMBTIAnalysis.mutate(files[0]);
+                    }
+                  }}
+                />
               </Button>
 
               <Button 
