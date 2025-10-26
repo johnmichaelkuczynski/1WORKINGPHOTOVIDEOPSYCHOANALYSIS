@@ -744,6 +744,54 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 >
                   Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
+                <div className="pt-4 mt-4 border-t">
+                  <p className="text-sm font-semibold mb-2">MBTI Analysis (Image)</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!mediaData) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "No image data available",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      setMessages([]);
+                      
+                      try {
+                        const data = await analyzeMBTIImage(mediaData, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "MBTI Analysis Complete",
+                            description: "Your image has been analyzed using the MBTI framework",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("MBTI image analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze image for MBTI. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full"
+                    disabled={isAnalyzing || !mediaData}
+                    data-testid="button-mbti-image"
+                  >
+                    MBTI Image Analysis
+                  </Button>
+                </div>
               </div>
             )}
             
@@ -809,6 +857,54 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 >
                   Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
+                <div className="pt-4 mt-4 border-t">
+                  <p className="text-sm font-semibold mb-2">MBTI Analysis (Video)</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!mediaData) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "No video data available",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      setMessages([]);
+                      
+                      try {
+                        const data = await analyzeMBTIVideo(mediaData, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "MBTI Analysis Complete",
+                            description: "Your video has been analyzed using the MBTI framework",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("MBTI video analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze video for MBTI. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full"
+                    disabled={isAnalyzing || !mediaData}
+                    data-testid="button-mbti-video"
+                  >
+                    MBTI Video Analysis
+                  </Button>
+                </div>
               </div>
             )}
             
@@ -863,6 +959,53 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 >
                   Analyze Text
                 </Button>
+                <div className="pt-4 mt-4 border-t">
+                  <p className="text-sm font-semibold mb-2">MBTI Analysis (Text)</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!textInput.trim()) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "Please enter some text first",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      
+                      try {
+                        const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "MBTI Analysis Complete",
+                            description: "Your text has been analyzed using the MBTI framework",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("MBTI text analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze text for MBTI. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full" 
+                    disabled={!textInput.trim() || isAnalyzing}
+                    data-testid="button-mbti-text"
+                  >
+                    MBTI Text Analysis
+                  </Button>
+                </div>
               </form>
             )}
           </Card>
