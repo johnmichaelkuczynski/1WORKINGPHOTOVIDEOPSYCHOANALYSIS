@@ -40,16 +40,27 @@ An advanced AI-powered personality insights platform that provides sophisticated
   * MBTI Image Analysis - 30-question visual framework analyzing posture, gaze, environment, styling, and cognitive indicators
   * MBTI Video Analysis - 30-question behavioral framework analyzing movement, timing, expressions, and temporal patterns
   * All MBTI analyses provide predicted type (e.g., INTJ, ENFP) with confidence levels
-  * Works with OpenAI, Anthropic, and Perplexity models
+  * Works with OpenAI, Anthropic, and Perplexity models (vision capabilities for image/video)
   * Three new buttons added to frontend (separate from comprehensive analysis)
   * Evidence-based results with specific visual/textual references
+  * MBTI endpoints: /api/analyze/text/mbti, /api/analyze/image/mbti, /api/analyze/video/mbti
   
 ### October 2025
-- **COMPREHENSIVE TEXT ANALYSIS UPGRADE**: Fully implemented 50-question framework for text analysis
-  * All 50 questions across 5 categories (Language & Style, Emotional Indicators, Cognitive & Structural Patterns, Self-Representation & Identity, Symbolic & Unconscious Material)
+- **COMPREHENSIVE TEXT ANALYSIS UPGRADE - 100 QUESTIONS**: Fully implemented 100-question framework for text analysis
+  * All 100 questions across 10 categories:
+    - I. Information Processing Style (10)
+    - II. Emotional Processing Style (10)
+    - III. Agency & Activity Level (10)
+    - IV. Focus: Interpersonal vs. Ideational (10)
+    - V. Motivation, Value System, and Reality Testing (10)
+    - VI. Intelligence & Conceptual Control (10)
+    - VII. Honesty & Sincerity of Mind (10)
+    - VIII. Structure, Organization, and Focus (10)
+    - IX. Psychological Profile in Style (10)
+    - X. Substance, Depth, and Cognitive Flexibility (10)
   * Evidence-based analysis requiring direct quotes and specific phrases from text
   * Robust JSON parsing for OpenAI, Anthropic, and Perplexity with code fence extraction
-  * Comprehensive fallback structure maintaining all 5 sections if parsing fails
+  * Comprehensive fallback structure maintaining all 10 sections if parsing fails
   * Display formatting with Roman numeral section headers matching framework
   * Removed duplicate handlers for cleaner codebase
 
