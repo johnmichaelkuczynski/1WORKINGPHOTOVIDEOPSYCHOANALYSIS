@@ -36,9 +36,9 @@ An advanced AI-powered personality insights platform that provides sophisticated
 ## Recent Changes
 ### October 2025 (Latest)
 - **NEW MBTI ANALYSIS FEATURE**: Added three dedicated MBTI analysis functions
-  * MBTI Text Analysis - 30-question framework covering I/E, S/N, T/F, J/P, and deeper MBTI signals with direct text quotes
-  * MBTI Image Analysis - 30-question visual framework analyzing posture, gaze, environment, styling, and cognitive indicators
-  * MBTI Video Analysis - 30-question behavioral framework analyzing movement, timing, expressions, and temporal patterns
+  * MBTI Text Analysis - 30-question framework (5 I/E + 5 S/N + 5 T/F + 5 J/P + 10 deeper signals) with direct text quotes
+  * MBTI Image Analysis - 30-question visual framework (5 I/E + 5 S/N + 5 T/F + 5 J/P + 10 cognitive indicators) analyzing visual cues
+  * MBTI Video Analysis - 30-question behavioral framework (5 I/E + 5 S/N + 5 T/F + 5 J/P + 10 cognitive signals) with timestamps
   * All MBTI analyses provide predicted type (e.g., INTJ, ENFP) with confidence levels
   * Works with OpenAI, Anthropic, and Perplexity models (vision capabilities for image/video)
   * Three new buttons added to frontend (separate from comprehensive analysis)

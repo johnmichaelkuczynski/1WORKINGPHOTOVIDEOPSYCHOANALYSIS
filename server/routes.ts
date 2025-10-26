@@ -1289,8 +1289,8 @@ Be engaging, professional, and conversational in all responses. Feel free to hav
       
       console.log(`Processing MBTI text analysis with model: ${selectedModel}`);
       
-      // MBTI text analysis prompt with 50 questions
-      const mbtiTextPrompt = `You are an expert MBTI analyst. Analyze this text comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT QUOTES from the text.
+      // MBTI text analysis prompt with 30 questions
+      const mbtiTextPrompt = `You are an expert MBTI analyst. Analyze this text comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below WITH DIRECT QUOTES from the text.
 
 CRITICAL: Every answer must reference SPECIFIC QUOTES or PHRASES from the text. Do not use generic descriptions.
 
@@ -1537,8 +1537,8 @@ Provide your analysis in JSON format:
       
       console.log(`Processing MBTI image analysis with model: ${selectedModel}`);
       
-      // MBTI image analysis prompt with 50 questions
-      const mbtiImagePrompt = `You are an expert MBTI analyst specializing in visual cues. Analyze this image comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT VISUAL EVIDENCE.
+      // MBTI image analysis prompt with 30 questions
+      const mbtiImagePrompt = `You are an expert MBTI analyst specializing in visual cues. Analyze this image comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below WITH DIRECT VISUAL EVIDENCE.
 
 CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS from the image. Do not use generic descriptions.
 
@@ -1814,8 +1814,8 @@ Provide your analysis in JSON format:
       // Clean up temp video file
       await unlinkAsync(tempVideoPath);
       
-      // MBTI video analysis prompt with 50 questions
-      const mbtiVideoPrompt = `You are an expert MBTI analyst specializing in behavioral cues. Analyze these video frames comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 50 questions below WITH DIRECT VISUAL AND BEHAVIORAL EVIDENCE with timestamps.
+      // MBTI video analysis prompt with 30 questions
+      const mbtiVideoPrompt = `You are an expert MBTI analyst specializing in behavioral cues. Analyze these video frames comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below WITH DIRECT VISUAL AND BEHAVIORAL EVIDENCE with timestamps.
 
 CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS, BEHAVIORS, and TEMPORAL CHANGES across the frames. Do not use generic descriptions.
 
