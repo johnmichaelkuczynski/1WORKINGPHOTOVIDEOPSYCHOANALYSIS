@@ -236,6 +236,46 @@ export async function updateAnalysisTitle(analysisId: number, title: string) {
   return res.json();
 }
 
+// Deep Dive Analysis functions
+export async function deepDiveImageAnalysis(analysisId: number, selectedModel: ModelType = "openai") {
+  console.log(`Deep dive image analysis with model: ${selectedModel}, analysisId: ${analysisId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze-deep-dive/image", { 
+    analysisId,
+    selectedModel
+  });
+  
+  const data = await res.json();
+  console.log("Deep dive image analysis response:", data);
+  return data;
+}
+
+export async function deepDiveVideoAnalysis(analysisId: number, selectedModel: ModelType = "openai") {
+  console.log(`Deep dive video analysis with model: ${selectedModel}, analysisId: ${analysisId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze-deep-dive/video", { 
+    analysisId,
+    selectedModel
+  });
+  
+  const data = await res.json();
+  console.log("Deep dive video analysis response:", data);
+  return data;
+}
+
+export async function deepDiveTextAnalysis(analysisId: number, selectedModel: ModelType = "openai") {
+  console.log(`Deep dive text analysis with model: ${selectedModel}, analysisId: ${analysisId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze-deep-dive/text", { 
+    analysisId,
+    selectedModel
+  });
+  
+  const data = await res.json();
+  console.log("Deep dive text analysis response:", data);
+  return data;
+}
+
 // API status check
 export async function checkAPIStatus() {
   const res = await apiRequest("GET", "/api/status", null);
