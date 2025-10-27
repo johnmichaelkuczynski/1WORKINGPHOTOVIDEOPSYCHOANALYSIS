@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -551,6 +551,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Big Five (OCEAN) image analysis
+  const handleBigFiveImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeBigFiveImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Big Five Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Big Five image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for Big Five. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Big Five Analysis Complete",
+        description: "Your image has been successfully analyzed using the Five-Factor Model.",
+      });
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -802,7 +858,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       if (type === 'media') {
         const fileType = file.type.split('/')[0];
         if (fileType === 'image' || fileType === 'video') {
-          handleUploadMedia.mutate(file);
+          // Check if Big Five image analysis is selected
+          if (selectedAnalysisType === 'bigfive-image' && fileType === 'image') {
+            handleBigFiveImageAnalysis.mutate(file);
+          } else {
+            handleUploadMedia.mutate(file);
+          }
         } else {
           toast({
             variant: "destructive",
@@ -843,6 +904,19 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-bigfive-text"
         >
           Big Five (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "bigfive-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("bigfive-image");
+            mediaInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-bigfive-image"
+        >
+          Big Five (Image)
         </Button>
       </div>
       
