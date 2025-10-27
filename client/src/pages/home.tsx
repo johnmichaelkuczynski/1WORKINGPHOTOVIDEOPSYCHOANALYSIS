@@ -110,6 +110,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const documentMBTIInputRef = useRef<HTMLInputElement>(null);
+  const imageMBTIInputRef = useRef<HTMLInputElement>(null);
+  const videoMBTIInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -373,6 +375,127 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       toast({
         title: "MBTI Analysis Complete",
         description: "Your document has been successfully analyzed for MBTI personality type.",
+      });
+    }
+  });
+
+  // Image MBTI analysis with file upload
+  const handleImageMBTIAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        setAnalysisProgress(30);
+        
+        // Resize image if needed
+        let mediaData: string;
+        if (file.size > 4 * 1024 * 1024) {
+          mediaData = await resizeImage(file, 1600);
+        } else {
+          const reader = new FileReader();
+          mediaData = await new Promise<string>((resolve) => {
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(file);
+          });
+        }
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(50);
+        
+        const response = await analyzeMBTIImage(
+          mediaData,
+          sessionId,
+          selectedModel
+        );
+        
+        setAnalysisProgress(80);
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Image MBTI analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for MBTI. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "MBTI Analysis Complete",
+        description: "Your image has been successfully analyzed for MBTI personality type.",
+      });
+    }
+  });
+
+  // Video MBTI analysis with file upload
+  const handleVideoMBTIAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        setAnalysisProgress(30);
+        
+        // Read video file as data URL
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("video");
+        setAnalysisProgress(50);
+        
+        const response = await analyzeMBTIVideo(
+          mediaData,
+          sessionId,
+          selectedModel
+        );
+        
+        setAnalysisProgress(80);
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Video MBTI analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze video for MBTI. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "MBTI Analysis Complete",
+        description: "Your video has been successfully analyzed for MBTI personality type.",
       });
     }
   });
@@ -780,26 +903,26 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </Button>
 
               <Button 
-                variant={selectedAnalysisType === "document-mbti" ? "default" : "outline"}
+                variant={selectedAnalysisType === "image-mbti" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={() => {
-                  setSelectedAnalysisType("document-mbti");
-                  documentMBTIInputRef.current?.click();
+                  setSelectedAnalysisType("image-mbti");
+                  imageMBTIInputRef.current?.click();
                 }}
                 disabled={isAnalyzing}
-                data-testid="button-document-mbti"
+                data-testid="button-image-mbti"
               >
-                <File className="h-6 w-6 mb-1" />
-                <span>Doc File MBTI</span>
+                <FileImage className="h-6 w-6 mb-1" />
+                <span>Image MBTI</span>
                 <input
-                  ref={documentMBTIInputRef}
+                  ref={imageMBTIInputRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt"
+                  accept="image/*"
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     const files = e.target.files;
                     if (files && files.length > 0) {
-                      handleDocumentMBTIAnalysis.mutate(files[0]);
+                      handleImageMBTIAnalysis.mutate(files[0]);
                     }
                   }}
                 />
@@ -810,13 +933,25 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 className="h-20 flex flex-col items-center justify-center text-xs" 
                 onClick={() => {
                   setSelectedAnalysisType("video-mbti");
-                  toast({ title: "Coming Soon", description: "Video MBTI functionality will be added soon." });
+                  videoMBTIInputRef.current?.click();
                 }}
                 disabled={isAnalyzing}
                 data-testid="button-video-mbti"
               >
                 <Film className="h-6 w-6 mb-1" />
                 <span>Video MBTI</span>
+                <input
+                  ref={videoMBTIInputRef}
+                  type="file"
+                  accept="video/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                      handleVideoMBTIAnalysis.mutate(files[0]);
+                    }
+                  }}
+                />
               </Button>
 
               <Button 
