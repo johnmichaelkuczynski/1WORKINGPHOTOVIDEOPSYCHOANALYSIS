@@ -1917,21 +1917,34 @@ Provide your analysis in JSON format:
         });
         
         const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI MBTI Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
         try {
           analysisResult = JSON.parse(rawResponse);
         } catch (parseError) {
           console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          // Try to extract any useful information from the raw response
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the MBTI analysis. Please try again with a different image showing a clear view of the person's face and body language.";
+          
           analysisResult = {
-            summary: "Analysis completed but formatting error occurred.",
+            summary: fallbackSummary,
             detailed_analysis: {
-              introversion_extraversion: rawResponse.substring(0, 500),
-              sensing_intuition: "See summary for details",
-              thinking_feeling: "See summary for details",
-              judging_perceiving: "See summary for details",
-              cognitive_indicators: "See summary for details"
+              introversion_extraversion: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              sensing_intuition: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              thinking_feeling: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              judging_perceiving: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              cognitive_indicators: "Unable to analyze due to formatting error. Please retry with a clearer image."
             },
             predicted_type: "Unable to determine",
-            confidence: "Low - parsing error"
+            confidence: "Low (formatting error occurred)"
           };
         }
       } else if (selectedModel === "anthropic" && anthropic) {
@@ -1964,6 +1977,11 @@ Provide your analysis in JSON format:
         });
         
         const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic MBTI Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Anthropic returned an empty response");
+        }
         
         // Extract JSON from code fence if present
         let jsonText = rawResponse;
@@ -1976,17 +1994,23 @@ Provide your analysis in JSON format:
           analysisResult = JSON.parse(jsonText);
         } catch (parseError) {
           console.error("Failed to parse Anthropic response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the MBTI analysis. Please try again with a different image showing a clear view of the person's face and body language.";
+          
           analysisResult = {
-            summary: rawResponse.substring(0, 1000),
+            summary: fallbackSummary,
             detailed_analysis: {
-              introversion_extraversion: "See summary for details",
-              sensing_intuition: "See summary for details",
-              thinking_feeling: "See summary for details",
-              judging_perceiving: "See summary for details",
-              cognitive_indicators: "See summary for details"
+              introversion_extraversion: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              sensing_intuition: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              thinking_feeling: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              judging_perceiving: "Unable to analyze due to formatting error. Please retry with a clearer image.",
+              cognitive_indicators: "Unable to analyze due to formatting error. Please retry with a clearer image."
             },
             predicted_type: "Unable to determine",
-            confidence: "Low - parsing error"
+            confidence: "Low (formatting error occurred)"
           };
         }
       } else {
