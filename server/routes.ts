@@ -2711,6 +2711,253 @@ Provide detailed analysis in JSON format:
     }
   });
 
+  // Big Five (OCEAN) Analysis - Image
+  app.post("/api/analyze/image/bigfive", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Big Five image analysis with model: ${selectedModel}`);
+      
+      // Big Five (OCEAN) visual analysis prompt
+      const bigFiveImagePrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through visual analysis. Analyze this image comprehensively using the Big Five framework, providing detailed evidence for each dimension based on VISIBLE ELEMENTS ONLY.
+
+The Big Five dimensions are:
+1. **Openness to Experience** - creativity, artistic expression, unconventional elements, symbolic imagery, variety
+2. **Conscientiousness** - organization, attention to detail, grooming, neatness, structure
+3. **Extraversion** - social engagement, expressiveness, energy level, body language, setting
+4. **Agreeableness** - warmth, approachability, soft features, cooperative body language
+5. **Neuroticism** (Emotional Stability) - tension, anxiety markers, emotional expression, stress indicators
+
+Analyze ONLY what you can actually see in the image. Do not fabricate or assume details.
+
+Provide detailed analysis in JSON format:
+{
+  "summary": "Overall Big Five assessment based on visual cues with key personality insights",
+  "detailed_analysis": {
+    "openness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of openness based on specific visual evidence",
+      "visual_indicators": ["list of specific visual cues from the image"]
+    },
+    "conscientiousness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of conscientiousness based on specific visual evidence",
+      "visual_indicators": ["list of specific visual cues from the image"]
+    },
+    "extraversion": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of extraversion based on specific visual evidence",
+      "visual_indicators": ["list of specific visual cues from the image"]
+    },
+    "agreeableness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of agreeableness based on specific visual evidence",
+      "visual_indicators": ["list of specific visual cues from the image"]
+    },
+    "neuroticism": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of neuroticism/emotional stability based on specific visual evidence",
+      "visual_indicators": ["list of specific visual cues from the image"]
+    }
+  },
+  "personality_profile": "Comprehensive personality description based on the five dimensions",
+  "strengths": ["list of key strengths based on the visual profile"],
+  "growth_areas": ["list of potential areas for development based on visual analysis"]
+}`;
+
+      let analysisResult: any;
+      
+      // Only OpenAI GPT-4o Vision supports image analysis
+      if (selectedModel === "openai" && openai) {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: bigFiveImagePrompt },
+                {
+                  type: "image_url",
+                  image_url: { url: mediaData }
+                }
+              ]
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("OpenAI Big Five Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Big Five analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              openness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              conscientiousness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              extraversion: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              agreeableness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              neuroticism: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] }
+            },
+            personality_profile: "Unable to generate profile due to formatting error",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Big Five image analysis currently only supports OpenAI GPT-4o Vision model." 
+        });
+      }
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map((item, idx) => `${idx + 1}. ${String(item)}`).join('\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Big Five (OCEAN) Visual Personality Analysis\nMode: Five-Factor Model Framework (Image Analysis)\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary) || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      // Openness
+      if (detailedAnalysis.openness) {
+        formattedContent += `I. Openness to Experience: ${detailedAnalysis.openness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.openness.description)}\n`;
+        if (detailedAnalysis.openness.visual_indicators && detailedAnalysis.openness.visual_indicators.length > 0) {
+          formattedContent += `Visual Indicators:\n${safeStringify(detailedAnalysis.openness.visual_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Conscientiousness
+      if (detailedAnalysis.conscientiousness) {
+        formattedContent += `II. Conscientiousness: ${detailedAnalysis.conscientiousness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.conscientiousness.description)}\n`;
+        if (detailedAnalysis.conscientiousness.visual_indicators && detailedAnalysis.conscientiousness.visual_indicators.length > 0) {
+          formattedContent += `Visual Indicators:\n${safeStringify(detailedAnalysis.conscientiousness.visual_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Extraversion
+      if (detailedAnalysis.extraversion) {
+        formattedContent += `III. Extraversion: ${detailedAnalysis.extraversion.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.extraversion.description)}\n`;
+        if (detailedAnalysis.extraversion.visual_indicators && detailedAnalysis.extraversion.visual_indicators.length > 0) {
+          formattedContent += `Visual Indicators:\n${safeStringify(detailedAnalysis.extraversion.visual_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Agreeableness
+      if (detailedAnalysis.agreeableness) {
+        formattedContent += `IV. Agreeableness: ${detailedAnalysis.agreeableness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.agreeableness.description)}\n`;
+        if (detailedAnalysis.agreeableness.visual_indicators && detailedAnalysis.agreeableness.visual_indicators.length > 0) {
+          formattedContent += `Visual Indicators:\n${safeStringify(detailedAnalysis.agreeableness.visual_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Neuroticism
+      if (detailedAnalysis.neuroticism) {
+        formattedContent += `V. Neuroticism (Emotional Stability): ${detailedAnalysis.neuroticism.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.neuroticism.description)}\n`;
+        if (detailedAnalysis.neuroticism.visual_indicators && detailedAnalysis.neuroticism.visual_indicators.length > 0) {
+          formattedContent += `Visual Indicators:\n${safeStringify(detailedAnalysis.neuroticism.visual_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Personality Profile
+      if (analysisResult.personality_profile) {
+        formattedContent += `Personality Profile:\n${safeStringify(analysisResult.personality_profile)}\n\n`;
+      }
+      
+      // Strengths
+      if (analysisResult.strengths && analysisResult.strengths.length > 0) {
+        formattedContent += `Strengths:\n${safeStringify(analysisResult.strengths)}\n\n`;
+      }
+      
+      // Growth Areas
+      if (analysisResult.growth_areas && analysisResult.growth_areas.length > 0) {
+        formattedContent += `Growth Areas:\n${safeStringify(analysisResult.growth_areas)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Big Five Image Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Big Five image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for Big Five" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;
