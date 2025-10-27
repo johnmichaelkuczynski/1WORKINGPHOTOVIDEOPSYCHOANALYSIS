@@ -2973,8 +2973,41 @@ Provide detailed analysis in JSON format:
       
       console.log(`Processing Big Five video analysis with model: ${selectedModel}`);
       
-      // Extract frames from video
-      const extractedFrames = await extractVideoFrames(mediaData);
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
       console.log(`Extracted ${extractedFrames.length} frames from video`);
       
       // Big Five (OCEAN) video analysis prompt
@@ -3025,15 +3058,190 @@ Provide detailed analysis in JSON format:
 }`;
 
       // Analyze with selected model
-      let analysisResult;
-      if (selectedModel === 'openai') {
-        analysisResult = await analyzeWithOpenAI(bigFiveVideoPrompt, extractedFrames, true);
-      } else if (selectedModel === 'anthropic') {
-        analysisResult = await analyzeWithAnthropic(bigFiveVideoPrompt, extractedFrames, true);
-      } else if (selectedModel === 'deepseek') {
-        analysisResult = await analyzeWithDeepSeek(bigFiveVideoPrompt, extractedFrames, true);
-      } else if (selectedModel === 'perplexity') {
-        analysisResult = await analyzeWithPerplexity(bigFiveVideoPrompt, extractedFrames, true);
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: bigFiveVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame, idx) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Big Five Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            detailed_analysis: {
+              openness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              conscientiousness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              extraversion: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              agreeableness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              neuroticism: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] }
+            },
+            personality_profile: "Unable to format analysis",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContents = extractedFrames.map(frame => {
+          const base64Match = frame.match(/^data:image\/[a-z]+;base64,(.+)$/);
+          const base64Data = base64Match ? base64Match[1] : frame;
+          const mediaTypeMatch = frame.match(/^data:(image\/[a-z]+);base64,/);
+          const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType as any,
+              data: base64Data,
+            },
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: bigFiveVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:"
+              },
+              ...imageContents
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Big Five Video raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            detailed_analysis: {
+              openness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              conscientiousness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              extraversion: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              agreeableness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              neuroticism: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] }
+            },
+            personality_profile: "Unable to format analysis",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [{
+              role: "user",
+              content: [
+                { type: "text", text: bigFiveVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+                ...extractedFrames.map(frame => ({
+                  type: "image_url",
+                  image_url: { url: frame }
+                }))
+              ]
+            }],
+            response_format: { type: "json_object" }
+          })
+        });
+
+        const data = await response.json();
+        const rawResponse = data.choices?.[0]?.message?.content || "";
+        console.log("DeepSeek Big Five Video raw response:", rawResponse.substring(0, 500));
+
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse DeepSeek response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            detailed_analysis: {
+              openness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              conscientiousness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              extraversion: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              agreeableness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              neuroticism: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] }
+            },
+            personality_profile: "Unable to format analysis",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else if (selectedModel === "perplexity" && perplexity) {
+        const response = await perplexity.chat.completions.create({
+          model: "llama-3.1-sonar-large-128k-online",
+          messages: [{
+            role: "user",
+            content: bigFiveVideoPrompt + "\n\nNote: Analyzing video frames for Big Five personality assessment."
+          }],
+        });
+
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Perplexity Big Five Video raw response:", rawResponse.substring(0, 500));
+
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            detailed_analysis: {
+              openness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              conscientiousness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              extraversion: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              agreeableness: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] },
+              neuroticism: { score: "N/A", description: "Formatting error occurred", behavioral_indicators: [] }
+            },
+            personality_profile: "Unable to format analysis",
+            strengths: [],
+            growth_areas: []
+          };
+        }
       }
       
       console.log("Big Five video analysis complete");
