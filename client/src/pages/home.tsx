@@ -911,7 +911,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           className="w-full justify-start text-xs h-auto py-3"
           onClick={() => {
             setSelectedAnalysisType("bigfive-image");
-            mediaInputRef.current?.click();
+            fileInputRef.current?.click();
           }}
           disabled={isAnalyzing}
           data-testid="button-bigfive-image"
