@@ -112,6 +112,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const documentMBTIInputRef = useRef<HTMLInputElement>(null);
   const imageMBTIInputRef = useRef<HTMLInputElement>(null);
   const videoMBTIInputRef = useRef<HTMLInputElement>(null);
+  const bigFiveImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -924,12 +925,24 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           className="w-full justify-start text-xs h-auto py-3"
           onClick={() => {
             setSelectedAnalysisType("bigfive-image");
-            fileInputRef.current?.click();
+            bigFiveImageInputRef.current?.click();
           }}
           disabled={isAnalyzing}
           data-testid="button-bigfive-image"
         >
           Big Five (Image)
+          <input
+            ref={bigFiveImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleBigFiveImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
       </div>
       
