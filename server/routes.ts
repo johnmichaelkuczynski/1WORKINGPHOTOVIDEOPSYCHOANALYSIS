@@ -2428,6 +2428,289 @@ Provide your analysis in JSON format:
     }
   });
 
+  // Big Five (OCEAN) Analysis Endpoints - Text
+  app.post("/api/analyze/text/bigfive", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Big Five text analysis with model: ${selectedModel}`);
+      
+      // Big Five (OCEAN) comprehensive prompt
+      const bigFivePrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment. Analyze the following text comprehensively using the Big Five framework, providing detailed evidence for each dimension.
+
+The Big Five dimensions are:
+1. **Openness to Experience** - imagination, creativity, curiosity, appreciation for art, emotion, adventure, unusual ideas, variety
+2. **Conscientiousness** - self-discipline, dutifulness, competence, order, deliberation, achievement-striving
+3. **Extraversion** - sociability, assertiveness, talkativeness, activity level, excitement-seeking, positive emotions
+4. **Agreeableness** - trust, altruism, kindness, affection, cooperation, modesty, sympathy
+5. **Neuroticism** (Emotional Stability) - anxiety, anger, depression, self-consciousness, vulnerability, stress
+
+TEXT TO ANALYZE:
+${content}
+
+Provide detailed analysis in JSON format:
+{
+  "summary": "Overall Big Five assessment with key personality insights",
+  "detailed_analysis": {
+    "openness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of openness with specific evidence from text",
+      "indicators": ["list of specific behavioral indicators from the text"]
+    },
+    "conscientiousness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of conscientiousness with specific evidence from text",
+      "indicators": ["list of specific behavioral indicators from the text"]
+    },
+    "extraversion": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of extraversion with specific evidence from text",
+      "indicators": ["list of specific behavioral indicators from the text"]
+    },
+    "agreeableness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of agreeableness with specific evidence from text",
+      "indicators": ["list of specific behavioral indicators from the text"]
+    },
+    "neuroticism": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of neuroticism/emotional stability with specific evidence from text",
+      "indicators": ["list of specific behavioral indicators from the text"]
+    }
+  },
+  "personality_profile": "Comprehensive personality description based on the five dimensions",
+  "strengths": ["list of key strengths based on the profile"],
+  "growth_areas": ["list of potential areas for development"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are an expert personality psychologist specializing in Big Five (OCEAN) personality assessment." },
+            { role: "user", content: bigFivePrompt }
+          ],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("OpenAI Big Five raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Big Five analysis. Please try again with different text.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              openness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              conscientiousness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              extraversion: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              agreeableness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              neuroticism: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] }
+            },
+            personality_profile: "Unable to generate profile due to formatting error",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{ role: "user", content: bigFivePrompt }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Big Five raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Anthropic returned an empty response");
+        }
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Big Five analysis. Please try again with different text.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              openness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              conscientiousness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              extraversion: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              agreeableness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              neuroticism: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] }
+            },
+            personality_profile: "Unable to generate profile due to formatting error",
+            strengths: [],
+            growth_areas: []
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Big Five text analysis currently only supports OpenAI and Anthropic models." 
+        });
+      }
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map((item, idx) => `${idx + 1}. ${String(item)}`).join('\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Big Five (OCEAN) Personality Analysis\nMode: Five-Factor Model Framework\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n`;
+      formattedContent += `Analysis Results\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary) || 'No summary available'}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      // Openness
+      if (detailedAnalysis.openness) {
+        formattedContent += `I. Openness to Experience: ${detailedAnalysis.openness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.openness.description)}\n`;
+        if (detailedAnalysis.openness.indicators && detailedAnalysis.openness.indicators.length > 0) {
+          formattedContent += `Indicators:\n${safeStringify(detailedAnalysis.openness.indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Conscientiousness
+      if (detailedAnalysis.conscientiousness) {
+        formattedContent += `II. Conscientiousness: ${detailedAnalysis.conscientiousness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.conscientiousness.description)}\n`;
+        if (detailedAnalysis.conscientiousness.indicators && detailedAnalysis.conscientiousness.indicators.length > 0) {
+          formattedContent += `Indicators:\n${safeStringify(detailedAnalysis.conscientiousness.indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Extraversion
+      if (detailedAnalysis.extraversion) {
+        formattedContent += `III. Extraversion: ${detailedAnalysis.extraversion.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.extraversion.description)}\n`;
+        if (detailedAnalysis.extraversion.indicators && detailedAnalysis.extraversion.indicators.length > 0) {
+          formattedContent += `Indicators:\n${safeStringify(detailedAnalysis.extraversion.indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Agreeableness
+      if (detailedAnalysis.agreeableness) {
+        formattedContent += `IV. Agreeableness: ${detailedAnalysis.agreeableness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.agreeableness.description)}\n`;
+        if (detailedAnalysis.agreeableness.indicators && detailedAnalysis.agreeableness.indicators.length > 0) {
+          formattedContent += `Indicators:\n${safeStringify(detailedAnalysis.agreeableness.indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Neuroticism
+      if (detailedAnalysis.neuroticism) {
+        formattedContent += `V. Neuroticism (Emotional Stability): ${detailedAnalysis.neuroticism.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.neuroticism.description)}\n`;
+        if (detailedAnalysis.neuroticism.indicators && detailedAnalysis.neuroticism.indicators.length > 0) {
+          formattedContent += `Indicators:\n${safeStringify(detailedAnalysis.neuroticism.indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Personality Profile
+      if (analysisResult.personality_profile) {
+        formattedContent += `Personality Profile:\n${safeStringify(analysisResult.personality_profile)}\n\n`;
+      }
+      
+      // Strengths
+      if (analysisResult.strengths && analysisResult.strengths.length > 0) {
+        formattedContent += `Strengths:\n${safeStringify(analysisResult.strengths)}\n\n`;
+      }
+      
+      // Growth Areas
+      if (analysisResult.growth_areas && analysisResult.growth_areas.length > 0) {
+        formattedContent += `Growth Areas:\n${safeStringify(analysisResult.growth_areas)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Big Five Text Analysis`,
+        mediaUrl: `bigfive-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Big Five text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Big Five" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;

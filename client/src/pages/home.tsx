@@ -766,10 +766,67 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl" {...getRootProps()}>
-      <h1 className="text-4xl font-bold text-center mb-8">AI Personality Analysis</h1>
+    <div className="flex" {...getRootProps()}>
+      {/* Left Sidebar - Additional Assessments */}
+      <div className="w-48 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
+        <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
+        
+        <Button
+          variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={async () => {
+            setSelectedAnalysisType("bigfive-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(0);
+            setMessages([]);
+            
+            try {
+              const data = await analyzeBigFiveText(textInput, sessionId, selectedModel);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(data.messages);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Big Five Analysis Complete",
+                  description: "Your text has been analyzed using the Big Five (OCEAN) framework",
+                });
+                setTextInput("");
+              }
+            } catch (error) {
+              console.error("Big Five text analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: "Failed to analyze text for Big Five. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-bigfive-text"
+        >
+          Big Five (Text)
+        </Button>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      {/* Main Content Area */}
+      <div className="flex-1">
+        <div className="container mx-auto p-4 max-w-6xl">
+          <h1 className="text-4xl font-bold text-center mb-8">AI Personality Analysis</h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Left Column - Inputs and Upload */}
         <div className="space-y-6">
           {/* Model Selector */}
@@ -1604,6 +1661,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               </form>
             </div>
           </Card>
+        </div>
+      </div>
         </div>
       </div>
     </div>
