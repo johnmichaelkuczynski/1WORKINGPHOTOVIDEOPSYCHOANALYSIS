@@ -776,7 +776,16 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     const fileType = file.type.split('/')[0];
     
     if (fileType === 'image' || fileType === 'video') {
-      handleUploadMedia.mutate(file);
+      // Check if a specific analysis type is selected
+      if (selectedAnalysisType === 'bigfive-image' && fileType === 'image') {
+        handleBigFiveImageAnalysis.mutate(file);
+      } else if (selectedAnalysisType === 'image-mbti' && fileType === 'image') {
+        handleImageMBTIAnalysis.mutate(file);
+      } else if (selectedAnalysisType === 'video-mbti' && fileType === 'video') {
+        handleVideoMBTIAnalysis.mutate(file);
+      } else {
+        handleUploadMedia.mutate(file);
+      }
     } else if (
       file.type === 'application/pdf' || 
       file.type === 'application/msword' || 
@@ -858,9 +867,13 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       if (type === 'media') {
         const fileType = file.type.split('/')[0];
         if (fileType === 'image' || fileType === 'video') {
-          // Check if Big Five image analysis is selected
+          // Check if a specific analysis type is selected
           if (selectedAnalysisType === 'bigfive-image' && fileType === 'image') {
             handleBigFiveImageAnalysis.mutate(file);
+          } else if (selectedAnalysisType === 'image-mbti' && fileType === 'image') {
+            handleImageMBTIAnalysis.mutate(file);
+          } else if (selectedAnalysisType === 'video-mbti' && fileType === 'video') {
+            handleVideoMBTIAnalysis.mutate(file);
           } else {
             handleUploadMedia.mutate(file);
           }
