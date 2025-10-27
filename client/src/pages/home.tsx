@@ -500,6 +500,57 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Big Five (OCEAN) text analysis
+  const handleBigFiveTextAnalysis = useMutation({
+    mutationFn: async (text: string) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        if (!text.trim()) {
+          throw new Error("Please provide text to analyze");
+        }
+        
+        setAnalysisProgress(30);
+        
+        const response = await analyzeBigFiveText(
+          text,
+          sessionId,
+          selectedModel,
+          `Big Five Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Big Five text analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze text for Big Five. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Big Five Analysis Complete",
+        description: "Your text has been successfully analyzed using the Five-Factor Model.",
+      });
+      setTextInput("");
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -774,7 +825,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         <Button
           variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3"
-          onClick={async () => {
+          onClick={() => {
             setSelectedAnalysisType("bigfive-text");
             
             if (!textInput.trim()) {
@@ -786,33 +837,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               return;
             }
             
-            setIsAnalyzing(true);
-            setAnalysisProgress(0);
-            setMessages([]);
-            
-            try {
-              const data = await analyzeBigFiveText(textInput, sessionId, selectedModel);
-              
-              if (data.messages && data.messages.length > 0) {
-                setMessages(data.messages);
-                setAnalysisId(data.analysisId);
-                setAnalysisProgress(100);
-                toast({
-                  title: "Big Five Analysis Complete",
-                  description: "Your text has been analyzed using the Big Five (OCEAN) framework",
-                });
-                setTextInput("");
-              }
-            } catch (error) {
-              console.error("Big Five text analysis error:", error);
-              toast({
-                variant: "destructive",
-                title: "Analysis Failed",
-                description: "Failed to analyze text for Big Five. Please try again.",
-              });
-            } finally {
-              setIsAnalyzing(false);
-            }
+            handleBigFiveTextAnalysis.mutate(textInput);
           }}
           disabled={isAnalyzing}
           data-testid="button-bigfive-text"
