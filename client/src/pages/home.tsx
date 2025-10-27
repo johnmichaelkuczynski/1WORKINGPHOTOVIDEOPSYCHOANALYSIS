@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -837,6 +837,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       // Check if a specific analysis type is selected
       if (selectedAnalysisType === 'bigfive-image' && fileType === 'image') {
         handleBigFiveImageAnalysis.mutate(file);
+      } else if (selectedAnalysisType === 'bigfive-video' && fileType === 'video') {
+        handleBigFiveVideoAnalysis.mutate(file);
       } else if (selectedAnalysisType === 'image-mbti' && fileType === 'image') {
         handleImageMBTIAnalysis.mutate(file);
       } else if (selectedAnalysisType === 'video-mbti' && fileType === 'video') {
@@ -928,6 +930,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           // Check if a specific analysis type is selected
           if (selectedAnalysisType === 'bigfive-image' && fileType === 'image') {
             handleBigFiveImageAnalysis.mutate(file);
+          } else if (selectedAnalysisType === 'bigfive-video' && fileType === 'video') {
+            handleBigFiveVideoAnalysis.mutate(file);
           } else if (selectedAnalysisType === 'image-mbti' && fileType === 'image') {
             handleImageMBTIAnalysis.mutate(file);
           } else if (selectedAnalysisType === 'video-mbti' && fileType === 'video') {
@@ -997,6 +1001,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               const files = e.target.files;
               if (files && files.length > 0) {
                 handleBigFiveImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "bigfive-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("bigfive-video");
+            bigFiveVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-bigfive-video"
+        >
+          Big Five (Video)
+          <input
+            ref={bigFiveVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleBigFiveVideoAnalysis.mutate(files[0]);
               }
             }}
           />

@@ -2958,6 +2958,187 @@ Provide detailed analysis in JSON format:
     }
   });
 
+  // Big Five (OCEAN) Analysis - Video
+  app.post("/api/analyze/video/bigfive", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Big Five video analysis with model: ${selectedModel}`);
+      
+      // Extract frames from video
+      const extractedFrames = await extractVideoFrames(mediaData);
+      console.log(`Extracted ${extractedFrames.length} frames from video`);
+      
+      // Big Five (OCEAN) video analysis prompt
+      const bigFiveVideoPrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through behavioral video analysis. Analyze this video comprehensively using the Big Five framework, providing detailed evidence for each dimension based on OBSERVABLE BEHAVIORS AND VISUAL ELEMENTS across the video timeline.
+
+The Big Five dimensions are:
+1. **Openness to Experience** - creative expression, unconventional behaviors, variety in gestures, exploratory movements
+2. **Conscientiousness** - organized movements, attention to detail, structured behavior, purposeful actions
+3. **Extraversion** - energy level, expressiveness, social engagement, body language dynamism
+4. **Agreeableness** - warm expressions, cooperative gestures, approachable demeanor, affiliative behaviors  
+5. **Neuroticism** (Emotional Stability) - tension patterns, anxiety markers, emotional fluctuations, stress indicators
+
+Analyze ONLY what you can actually observe in the video frames. Do not fabricate or assume details. Reference specific moments or behavioral patterns you observe.
+
+Provide detailed analysis in JSON format:
+{
+  "summary": "Overall Big Five assessment based on observable behavioral patterns with key personality insights",
+  "detailed_analysis": {
+    "openness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of openness based on specific behavioral evidence",
+      "behavioral_indicators": ["list of specific observable behaviors from the video"]
+    },
+    "conscientiousness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of conscientiousness based on specific behavioral evidence",
+      "behavioral_indicators": ["list of specific observable behaviors from the video"]
+    },
+    "extraversion": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of extraversion based on specific behavioral evidence",
+      "behavioral_indicators": ["list of specific observable behaviors from the video"]
+    },
+    "agreeableness": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of agreeableness based on specific behavioral evidence",
+      "behavioral_indicators": ["list of specific observable behaviors from the video"]
+    },
+    "neuroticism": {
+      "score": "High/Medium/Low",
+      "description": "Detailed analysis of neuroticism/emotional stability based on specific behavioral evidence",
+      "behavioral_indicators": ["list of specific observable behaviors from the video"]
+    }
+  },
+  "personality_profile": "Comprehensive personality description integrating all five dimensions with behavioral examples",
+  "strengths": ["list of personality strengths based on behavioral evidence"],
+  "growth_areas": ["list of potential growth areas based on behavioral evidence"]
+}`;
+
+      // Analyze with selected model
+      let analysisResult;
+      if (selectedModel === 'openai') {
+        analysisResult = await analyzeWithOpenAI(bigFiveVideoPrompt, extractedFrames, true);
+      } else if (selectedModel === 'anthropic') {
+        analysisResult = await analyzeWithAnthropic(bigFiveVideoPrompt, extractedFrames, true);
+      } else if (selectedModel === 'deepseek') {
+        analysisResult = await analyzeWithDeepSeek(bigFiveVideoPrompt, extractedFrames, true);
+      } else if (selectedModel === 'perplexity') {
+        analysisResult = await analyzeWithPerplexity(bigFiveVideoPrompt, extractedFrames, true);
+      }
+      
+      console.log("Big Five video analysis complete");
+      
+      // Format the analysis for display
+      let formattedContent = `Big Five (OCEAN) Video Analysis\nMode: Behavioral Analysis\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      const detailedAnalysis = analysisResult.detailed_analysis || {};
+      
+      // Openness
+      if (detailedAnalysis.openness) {
+        formattedContent += `I. Openness to Experience: ${detailedAnalysis.openness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.openness.description)}\n`;
+        if (detailedAnalysis.openness.behavioral_indicators && detailedAnalysis.openness.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(detailedAnalysis.openness.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Conscientiousness
+      if (detailedAnalysis.conscientiousness) {
+        formattedContent += `II. Conscientiousness: ${detailedAnalysis.conscientiousness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.conscientiousness.description)}\n`;
+        if (detailedAnalysis.conscientiousness.behavioral_indicators && detailedAnalysis.conscientiousness.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(detailedAnalysis.conscientiousness.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Extraversion
+      if (detailedAnalysis.extraversion) {
+        formattedContent += `III. Extraversion: ${detailedAnalysis.extraversion.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.extraversion.description)}\n`;
+        if (detailedAnalysis.extraversion.behavioral_indicators && detailedAnalysis.extraversion.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(detailedAnalysis.extraversion.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Agreeableness
+      if (detailedAnalysis.agreeableness) {
+        formattedContent += `IV. Agreeableness: ${detailedAnalysis.agreeableness.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.agreeableness.description)}\n`;
+        if (detailedAnalysis.agreeableness.behavioral_indicators && detailedAnalysis.agreeableness.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(detailedAnalysis.agreeableness.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Neuroticism
+      if (detailedAnalysis.neuroticism) {
+        formattedContent += `V. Neuroticism (Emotional Stability): ${detailedAnalysis.neuroticism.score || 'N/A'}\n`;
+        formattedContent += `${safeStringify(detailedAnalysis.neuroticism.description)}\n`;
+        if (detailedAnalysis.neuroticism.behavioral_indicators && detailedAnalysis.neuroticism.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(detailedAnalysis.neuroticism.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Personality Profile
+      if (analysisResult.personality_profile) {
+        formattedContent += `Personality Profile:\n${safeStringify(analysisResult.personality_profile)}\n\n`;
+      }
+      
+      // Strengths
+      if (analysisResult.strengths && analysisResult.strengths.length > 0) {
+        formattedContent += `Strengths:\n${safeStringify(analysisResult.strengths)}\n\n`;
+      }
+      
+      // Growth Areas
+      if (analysisResult.growth_areas && analysisResult.growth_areas.length > 0) {
+        formattedContent += `Growth Areas:\n${safeStringify(analysisResult.growth_areas)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Big Five Video Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, big_five: analysisResult },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Big Five video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for Big Five" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;
