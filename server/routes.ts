@@ -4744,123 +4744,196 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
       
       console.log(`Extracted ${extractedFrames.length} frames from video for Dark Traits analysis`);
       
-      // Dark Traits comprehensive video analysis prompt with speculative framing
-      const darkTraitsVideoPrompt = `This is a creative, speculative exercise in visual pattern analysis across video frames. Based on research literature about correlations between behavioral presentation and personality traits, provide a HYPOTHETICAL speculation about what personality patterns MIGHT be suggested by the visual cues across this video timeline.
+      // Behavioral Dynamics comprehensive video analysis prompt
+      const darkTraitsVideoPrompt = `You are analyzing behavioral patterns and communication dynamics across video frames. Provide a detailed, evidence-based analysis of observable behaviors, communication styles, and interpersonal patterns with comprehensive explanations and reasoning.
 
-CRITICAL DISCLAIMERS:
-- This is purely speculative and for research/entertainment purposes only
-- You are NOT making any clinical assessment or diagnosis
-- This is an imaginative exercise exploring hypothetical correlations
-- No claims are being made about the actual person's character or mental health
-- Focus on describing what visual patterns you observe across the video and what they MIGHT hypothetically correlate with in personality research literature
+ANALYSIS FRAMEWORK - Provide DETAILED EXPLANATIONS for every observation:
 
-Based purely on observable visual cues (facial expressions, body language, presentation, temporal changes) across the video frames, speculate creatively about personality patterns that these specific visual details MIGHT theoretically suggest:
+For each pattern you identify, you MUST provide:
+1. OBSERVATION: What specific visual behavior you see (cite frame timing)
+2. INTERPRETATION: What this behavior typically indicates in communication research
+3. EVIDENCE: Why you interpret it this way (reference specific visual details)
+4. CONTEXT: How this pattern evolves across the video timeline
 
-TEMPORAL VISUAL OBSERVATION FRAMEWORK:
+I. DOMINANCE & ASSERTIVENESS PATTERNS
 
-I. DARK TETRAD PATTERN SPECULATION
+Analyze across video timeline (0%, 25%, 50%, 75%) and provide detailed explanations:
 
-1. NARCISSISM (Hypothetical Speculation):
-   - Grandiose Presentation: Attention-seeking behaviors, self-focused positioning, dramatic expressions
-   - Vulnerable Presentation: Defensive patterns, validation-seeking, image concern
-   - Visual Markers: Grooming perfection, camera awareness, dominance displays, admiration-seeking
+1. CONFIDENT DOMINANCE SIGNALS:
+   - Direct eye contact patterns and intensity
+   - Space-taking body language and territorial behaviors
+   - Commanding gestures and power postures
+   - Voice projection and assertive vocal patterns (if audio)
+   - How these signals change across the video
+   
+2. STRATEGIC INFLUENCE BEHAVIORS:
+   - Persuasive communication techniques observed
+   - Adaptive response patterns to different situations
+   - Control of conversation flow and pacing
+   - Calculated vs spontaneous expression patterns
+   
+3. RISK-TAKING & BOLDNESS INDICATORS:
+   - Fearless expressions and confident demeanor
+   - Boundary-pushing behaviors or statements
+   - Reaction to challenge or stress
+   - Adventurous vs cautious communication style
 
-2. MACHIAVELLIANISM (Hypothetical Speculation):
-   - Strategic Presentation: Calculated expressions, controlled emotional displays, adaptive behaviors
-   - Manipulation Markers: Charm deployment, strategic positioning, instrumental warmth
-   - Visual Patterns: Expression management, tactical engagement, calculated authenticity
+II. EMOTIONAL INTELLIGENCE & EMPATHY PATTERNS
 
-3. PSYCHOPATHY (Hypothetical Speculation):
-   - Primary Type: Superficial charm, emotional flatness, predatory gaze, fearless expression
-   - Secondary Type: Impulsive behaviors, reactive aggression, emotional volatility
-   - Visual Markers: Shallow affect, callous expressions, lack of genuine warmth, thrill-seeking indicators
+Provide detailed analysis with specific examples:
 
-4. SADISM (Hypothetical Speculation):
-   - Enjoyment of Dominance: Pleasure in control, superiority displays, dismissive expressions
-   - Interpersonal Cruelty: Mocking expressions, contemptuous behaviors, aggressive humor
-   - Visual Patterns: Dark humor markers, cruel enjoyment, domination pleasure
+1. EMPATHY & WARMTH SIGNALS:
+   - Genuine vs performed emotional expressions
+   - Responsiveness to others (if visible in video)
+   - Emotional congruence between words and expressions
+   - Depth vs superficiality of emotional display
+   
+2. EMOTIONAL REGULATION QUALITY:
+   - Stability of emotional expression across timeline
+   - Impulse control vs reactive patterns
+   - Emotional range and flexibility
+   - Authenticity vs emotional manipulation cues
 
-II. CLUSTER B PATTERN SPECULATION
+III. INTERPERSONAL COMMUNICATION STYLE
 
-ANTISOCIAL: Disregard markers, rule-breaking indicators, aggressive posturing, lack of remorse signals
-BORDERLINE: Emotional instability, splitting behaviors, intense reactivity, abandonment anxiety
-HISTRIONIC: Dramatic expression, attention-seeking, emotional exaggeration, theatrical behaviors
-NARCISSISTIC: Grandiosity, admiration-seeking, entitlement displays, lack of empathy markers
+Analyze and explain in detail:
 
-III. TEMPORAL BEHAVIORAL ANALYSIS
+1. RELATIONSHIP APPROACH:
+   - Self-focused vs other-focused communication
+   - Collaborative vs competitive interaction style
+   - Respect signals vs dismissive patterns
+   - Validation-seeking vs self-sufficient presentation
+   
+2. SOCIAL CONFIDENCE & CHARISMA:
+   - Natural charm vs calculated presentation
+   - Social ease vs performance anxiety markers
+   - Attention-seeking vs attention-avoiding behaviors
+   - Authenticity indicators across video timeline
 
-CONSISTENCY: Whether behavioral patterns remain stable or shift across video timeline
-MASK SLIPPAGE: Moments where controlled presentation breaks down revealing underlying patterns
-EMOTIONAL REGULATION: Ability to maintain emotional control vs. impulsive expressions
-INTERPERSONAL STYLE: How subject relates to others (if visible) across different video moments
+IV. COMMUNICATION STRATEGY PATTERNS
 
-SPECULATIVE GUIDELINES:
-- Describe what you observe across the video frames
-- Reference specific visual details and temporal changes
-- Frame everything as hypothetical speculation ("might suggest", "could indicate", "may correlate with")
-- Make it clear this is creative speculation, not factual assessment
-- Emphasize this is based on theoretical research correlations, not actual diagnosis
-- This is an imaginative, speculative exercise for research purposes only
+Provide comprehensive explanations:
 
-Provide your SPECULATIVE HYPOTHESIS in JSON format:
+1. PRESENTATION CONSISTENCY:
+   - Maintained persona vs authentic variation
+   - Strategic self-presentation vs spontaneous expression
+   - Image management vs natural behavior
+   - Temporal changes in presentation style
+   
+2. INFLUENCE & PERSUASION STYLE:
+   - Direct vs indirect communication approach
+   - Logical vs emotional persuasion tactics
+   - Transparency vs strategic information sharing
+   - Trust-building vs guard-maintaining behaviors
+
+CRITICAL REQUIREMENTS:
+- Every pattern MUST include specific visual evidence with frame timing
+- Every interpretation MUST include detailed reasoning
+- Compare behaviors across 0%, 25%, 50%, 75% timeline
+- Explain HOW and WHY you draw each conclusion
+- Cite specific facial expressions, gestures, postures, voice patterns
+- Distinguish between definite observations and tentative interpretations
+- This is behavioral analysis for communication understanding, NOT clinical diagnosis
+
+Provide your analysis in JSON format:
 {
-  "summary": "Speculative overview of what the observable visual patterns across this video MIGHT hypothetically suggest about personality characteristics, based purely on theoretical correlations from research literature",
-  "dark_tetrad_visual_assessment": {
-    "narcissism": {
-      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
-      "subtype": "Grandiose/Vulnerable/Mixed (HYPOTHETICAL)",
-      "visual_evidence_timeline": ["Specific visual pattern at video start", "Pattern at mid-video", "Pattern at video end"],
-      "speculative_hypothesis": "HYPOTHETICAL speculation about what these temporal visual patterns MIGHT suggest regarding narcissistic traits"
+  "summary": "Comprehensive overview of behavioral patterns and communication dynamics observed across the video timeline, with key findings and interpretations",
+  
+  "dominance_assertiveness_patterns": {
+    "confident_dominance": {
+      "observation": "Specific visual behaviors observed (cite frames: 0%, 25%, 50%, 75%)",
+      "interpretation": "What these behaviors typically indicate in communication research",
+      "evidence": "Detailed explanation of WHY you interpret it this way, referencing specific visual cues",
+      "temporal_evolution": "How this pattern changes or remains consistent across the video",
+      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
     },
-    "machiavellianism": {
-      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
-      "visual_evidence_timeline": ["Observable pattern early in video", "Pattern during middle section", "Pattern toward end"],
-      "speculative_hypothesis": "HYPOTHETICAL speculation about what these patterns MIGHT suggest regarding Machiavellian traits"
+    "strategic_influence": {
+      "observation": "Specific persuasive or adaptive behaviors seen across frames",
+      "interpretation": "What these communication patterns suggest",
+      "evidence": "Detailed reasoning with specific visual references",
+      "temporal_evolution": "Evolution of influence tactics throughout video",
+      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
     },
-    "psychopathy": {
-      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
-      "subtype": "Primary/Secondary/Mixed (HYPOTHETICAL)",
-      "visual_evidence_timeline": ["Visual pattern at beginning", "Pattern at midpoint", "Pattern at conclusion"],
-      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding psychopathic traits"
-    },
-    "sadism": {
-      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
-      "visual_evidence_timeline": ["Observable element at start", "Element during video", "Element at end"],
-      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding sadistic tendencies"
+    "risk_taking_boldness": {
+      "observation": "Fearless vs cautious behaviors observed",
+      "interpretation": "What this suggests about behavioral approach",
+      "evidence": "Detailed explanation with visual evidence",
+      "temporal_evolution": "Changes in risk-taking patterns across timeline",
+      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
     }
   },
-  "personality_pathology_visual_indicators": {
-    "cluster_b_visual_features": {
-      "antisocial": "SPECULATIVE hypothesis about what temporal patterns MIGHT suggest",
-      "borderline": "SPECULATIVE hypothesis about what expression changes MIGHT suggest",
-      "histrionic": "SPECULATIVE hypothesis about what presentation evolution MIGHT suggest",
-      "narcissistic": "SPECULATIVE hypothesis about what confidence patterns MIGHT suggest"
+  
+  "emotional_intelligence_patterns": {
+    "empathy_warmth": {
+      "observation": "Specific emotional expressions and responsiveness observed",
+      "interpretation": "What genuine vs performed emotions suggest",
+      "evidence": "Detailed explanation citing facial expressions, micro-expressions, congruence",
+      "temporal_evolution": "How emotional warmth varies across video",
+      "quality": "Genuine/Performed/Mixed/Absent"
     },
-    "temporal_consistency": {
-      "behavioral_stability": "Whether patterns remain consistent or vary across video",
-      "mask_slippage_moments": "Points where presentation control appears to weaken (if any)",
-      "emotional_regulation_quality": "Stability of emotional expression across timeline"
+    "emotional_regulation": {
+      "observation": "Stability vs volatility of emotional expression",
+      "interpretation": "What this suggests about emotional control",
+      "evidence": "Detailed reasoning with specific behavioral examples",
+      "temporal_evolution": "Consistency or changes in regulation across timeline",
+      "quality": "Excellent/Good/Moderate/Poor/Unstable"
     }
   },
-  "temporal_behavioral_analysis": {
-    "beginning_patterns": "Visual/behavioral patterns observed at video start (0-25%)",
-    "middle_patterns": "Patterns observed mid-video (25-75%)",
-    "ending_patterns": "Patterns observed toward video end (75-100%)",
-    "overall_consistency": "Whether subject maintains consistent presentation or shows variation"
+  
+  "interpersonal_communication_style": {
+    "relationship_approach": {
+      "observation": "Self-focused vs other-focused communication patterns",
+      "interpretation": "What this suggests about interpersonal orientation",
+      "evidence": "Detailed explanation with specific visual cues",
+      "temporal_evolution": "Changes in relational style across video",
+      "style": "Collaborative/Competitive/Self-focused/Other-focused/Balanced"
+    },
+    "social_confidence_charisma": {
+      "observation": "Natural vs calculated presentation behaviors",
+      "interpretation": "What this suggests about social ease and authenticity",
+      "evidence": "Detailed reasoning citing specific charm patterns, ease vs anxiety markers",
+      "temporal_evolution": "Evolution of social presentation across timeline",
+      "quality": "Natural High/Calculated High/Moderate/Low/Anxious"
+    }
   },
-  "interpersonal_visual_cues": {
-    "dominance_submission": "Power dynamics visible in temporal presentation",
-    "warmth_vs_coldness": "Emotional temperature across video timeline",
-    "genuineness": "Authenticity vs. performed quality throughout video"
+  
+  "communication_strategy_patterns": {
+    "presentation_consistency": {
+      "observation": "Maintained persona vs authentic variation observed",
+      "interpretation": "What this suggests about strategic self-presentation",
+      "evidence": "Detailed explanation of image management vs spontaneous behavior",
+      "temporal_evolution": "Changes or consistency in presentation strategy",
+      "authenticity": "Highly Authentic/Mostly Authentic/Mixed/Mostly Strategic/Highly Strategic"
+    },
+    "influence_persuasion_style": {
+      "observation": "Direct vs indirect, logical vs emotional approaches observed",
+      "interpretation": "What persuasion tactics suggest about communication strategy",
+      "evidence": "Detailed reasoning with specific examples of influence attempts",
+      "temporal_evolution": "Evolution of persuasion approach across video",
+      "approach": "Direct-Logical/Direct-Emotional/Indirect-Logical/Indirect-Emotional/Mixed"
+    }
   },
-  "risk_visual_assessment": {
-    "concerning_visual_patterns": ["Notable visual patterns observed across timeline"],
-    "severity_level": "Subtle/Moderate/Notable/Strong/Very Strong (HYPOTHETICAL speculation only)",
-    "protective_visual_factors": ["Positive visual features observed"]
+  
+  "behavioral_dynamics_summary": {
+    "dominant_patterns": ["Primary behavioral tendencies observed with explanations"],
+    "strengths": ["Positive communication patterns with detailed reasoning"],
+    "areas_of_concern": ["Patterns that may indicate challenges, with full explanations"],
+    "temporal_consistency": "Detailed analysis of whether behavior remains stable or shifts across timeline",
+    "overall_communication_profile": "Comprehensive synthesis of all observations with detailed interpretations and reasoning"
   },
-  "clinical_visual_impressions": "SPECULATIVE SUMMARY: What the overall visual presentation across the video timeline MIGHT hypothetically suggest about personality patterns, based purely on theoretical research correlations. This is creative speculation for research purposes, NOT any form of actual assessment or diagnosis.",
-  "limitations": "This is purely hypothetical speculation based on extracted video frames. No actual conclusions can be drawn about the person's character, mental health, or personality from this exercise.",
-  "recommendations": ["This is a speculative exercise only - no real recommendations can be made"]
+  
+  "frame_by_frame_observations": {
+    "0_percent": "Specific detailed observations at video start",
+    "25_percent": "Specific detailed observations at first quarter",
+    "50_percent": "Specific detailed observations at midpoint",
+    "75_percent": "Specific detailed observations at final quarter"
+  },
+  
+  "analysis_confidence": {
+    "high_confidence_patterns": ["Patterns with strong visual evidence"],
+    "tentative_patterns": ["Patterns with limited or ambiguous evidence"],
+    "limitations": "Specific limitations of this analysis based on video quality, angle, context"
+  }
 }`;
 
       let analysisResult: any;
@@ -5008,122 +5081,167 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
       };
       
       // Format the analysis for display
-      let formattedContent = `Speculative Visual Pattern Analysis - Video Timeline\nMode: Hypothetical Personality Correlation Exercise\n\nCRITICAL DISCLAIMER: This is purely speculative analysis for research/entertainment purposes. This is NOT a clinical assessment, diagnosis, or factual evaluation. All content represents hypothetical speculation about what visual patterns MIGHT suggest based on theoretical research correlations.\n\n`;
-      formattedContent += `Speculative Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      let formattedContent = `Behavioral Dynamics Analysis - Video Timeline\nMode: Communication & Interpersonal Pattern Assessment\n\nNote: This is behavioral analysis for understanding communication patterns, NOT clinical diagnosis.\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
       
-      // Dark Tetrad Visual Assessment
-      if (analysisResult.dark_tetrad_visual_assessment) {
-        formattedContent += `HYPOTHETICAL DARK TETRAD PATTERN SPECULATION:\n(Speculative correlations based on video observations - NOT assessment)\n\n`;
+      // Dominance & Assertiveness Patterns
+      if (analysisResult.dominance_assertiveness_patterns) {
+        formattedContent += `DOMINANCE & ASSERTIVENESS PATTERNS:\n\n`;
         
-        if (analysisResult.dark_tetrad_visual_assessment.narcissism) {
-          formattedContent += `Narcissism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
-          if (analysisResult.dark_tetrad_visual_assessment.narcissism.subtype) {
-            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.narcissism.subtype}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence_timeline) {
-            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence_timeline)}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis) {
-            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis}\n`;
-          }
-          formattedContent += `\n`;
+        if (analysisResult.dominance_assertiveness_patterns.confident_dominance) {
+          const cd = analysisResult.dominance_assertiveness_patterns.confident_dominance;
+          formattedContent += `Confident Dominance [${cd.intensity || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(cd.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(cd.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(cd.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(cd.temporal_evolution)}\n\n`;
         }
         
-        if (analysisResult.dark_tetrad_visual_assessment.machiavellianism) {
-          formattedContent += `Machiavellianism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.level || 'N/A'}\n`;
-          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence_timeline) {
-            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence_timeline)}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis) {
-            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis}\n`;
-          }
-          formattedContent += `\n`;
+        if (analysisResult.dominance_assertiveness_patterns.strategic_influence) {
+          const si = analysisResult.dominance_assertiveness_patterns.strategic_influence;
+          formattedContent += `Strategic Influence [${si.intensity || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(si.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(si.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(si.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(si.temporal_evolution)}\n\n`;
         }
         
-        if (analysisResult.dark_tetrad_visual_assessment.psychopathy) {
-          formattedContent += `Psychopathy (Speculative): ${analysisResult.dark_tetrad_visual_assessment.psychopathy.level || 'N/A'}\n`;
-          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype) {
-            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence_timeline) {
-            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence_timeline)}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis) {
-            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis}\n`;
-          }
-          formattedContent += `\n`;
+        if (analysisResult.dominance_assertiveness_patterns.risk_taking_boldness) {
+          const rtb = analysisResult.dominance_assertiveness_patterns.risk_taking_boldness;
+          formattedContent += `Risk-Taking & Boldness [${rtb.intensity || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(rtb.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(rtb.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(rtb.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(rtb.temporal_evolution)}\n\n`;
+        }
+      }
+      
+      // Emotional Intelligence Patterns
+      if (analysisResult.emotional_intelligence_patterns) {
+        formattedContent += `EMOTIONAL INTELLIGENCE PATTERNS:\n\n`;
+        
+        if (analysisResult.emotional_intelligence_patterns.empathy_warmth) {
+          const ew = analysisResult.emotional_intelligence_patterns.empathy_warmth;
+          formattedContent += `Empathy & Warmth [${ew.quality || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(ew.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(ew.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(ew.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ew.temporal_evolution)}\n\n`;
         }
         
-        if (analysisResult.dark_tetrad_visual_assessment.sadism) {
-          formattedContent += `Sadism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.sadism.level || 'N/A'}\n`;
-          if (analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence_timeline) {
-            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence_timeline)}\n`;
-          }
-          if (analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis) {
-            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis}\n`;
-          }
-          formattedContent += `\n`;
+        if (analysisResult.emotional_intelligence_patterns.emotional_regulation) {
+          const er = analysisResult.emotional_intelligence_patterns.emotional_regulation;
+          formattedContent += `Emotional Regulation [${er.quality || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(er.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(er.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(er.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(er.temporal_evolution)}\n\n`;
         }
       }
       
-      // Personality Pathology Visual Indicators
-      if (analysisResult.personality_pathology_visual_indicators) {
-        formattedContent += `HYPOTHETICAL PERSONALITY PATTERN SPECULATION:\n(Speculative correlations only - NOT factual assessment)\n\n`;
-        if (analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features) {
-          formattedContent += `Cluster B Pattern Speculation:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
+      // Interpersonal Communication Style
+      if (analysisResult.interpersonal_communication_style) {
+        formattedContent += `INTERPERSONAL COMMUNICATION STYLE:\n\n`;
+        
+        if (analysisResult.interpersonal_communication_style.relationship_approach) {
+          const ra = analysisResult.interpersonal_communication_style.relationship_approach;
+          formattedContent += `Relationship Approach [${ra.style || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(ra.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(ra.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(ra.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ra.temporal_evolution)}\n\n`;
         }
-        if (analysisResult.personality_pathology_visual_indicators.temporal_consistency) {
-          formattedContent += `Temporal Consistency Analysis:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.temporal_consistency)}\n\n`;
+        
+        if (analysisResult.interpersonal_communication_style.social_confidence_charisma) {
+          const scc = analysisResult.interpersonal_communication_style.social_confidence_charisma;
+          formattedContent += `Social Confidence & Charisma [${scc.quality || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(scc.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(scc.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(scc.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(scc.temporal_evolution)}\n\n`;
         }
       }
       
-      // Temporal Behavioral Analysis
-      if (analysisResult.temporal_behavioral_analysis) {
-        formattedContent += `TEMPORAL BEHAVIORAL PATTERNS:\n${safeStringify(analysisResult.temporal_behavioral_analysis)}\n\n`;
-      }
-      
-      // Interpersonal Visual Cues
-      if (analysisResult.interpersonal_visual_cues) {
-        formattedContent += `INTERPERSONAL VISUAL CUES:\n${safeStringify(analysisResult.interpersonal_visual_cues)}\n\n`;
-      }
-      
-      // Risk Assessment
-      if (analysisResult.risk_visual_assessment) {
-        formattedContent += `HYPOTHETICAL PATTERN INTENSITY SPECULATION:\n(Speculative only - NOT actual assessment)\n`;
-        formattedContent += `Speculative Intensity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
-        if (analysisResult.risk_visual_assessment.concerning_visual_patterns && analysisResult.risk_visual_assessment.concerning_visual_patterns.length > 0) {
-          formattedContent += `Notable Visual Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
+      // Communication Strategy Patterns
+      if (analysisResult.communication_strategy_patterns) {
+        formattedContent += `COMMUNICATION STRATEGY PATTERNS:\n\n`;
+        
+        if (analysisResult.communication_strategy_patterns.presentation_consistency) {
+          const pc = analysisResult.communication_strategy_patterns.presentation_consistency;
+          formattedContent += `Presentation Consistency [${pc.authenticity || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(pc.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(pc.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(pc.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(pc.temporal_evolution)}\n\n`;
         }
-        if (analysisResult.risk_visual_assessment.protective_visual_factors && analysisResult.risk_visual_assessment.protective_visual_factors.length > 0) {
-          formattedContent += `Positive Visual Features:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
+        
+        if (analysisResult.communication_strategy_patterns.influence_persuasion_style) {
+          const ips = analysisResult.communication_strategy_patterns.influence_persuasion_style;
+          formattedContent += `Influence & Persuasion Style [${ips.approach || 'N/A'}]:\n`;
+          formattedContent += `OBSERVATION: ${safeStringify(ips.observation)}\n`;
+          formattedContent += `INTERPRETATION: ${safeStringify(ips.interpretation)}\n`;
+          formattedContent += `EVIDENCE: ${safeStringify(ips.evidence)}\n`;
+          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ips.temporal_evolution)}\n\n`;
         }
-        formattedContent += `\n`;
       }
       
-      // Overall Impressions
-      if (analysisResult.clinical_visual_impressions) {
-        formattedContent += `SPECULATIVE OVERALL SUMMARY:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
+      // Behavioral Dynamics Summary
+      if (analysisResult.behavioral_dynamics_summary) {
+        formattedContent += `BEHAVIORAL DYNAMICS SUMMARY:\n\n`;
+        const bds = analysisResult.behavioral_dynamics_summary;
+        
+        if (bds.dominant_patterns) {
+          formattedContent += `Dominant Patterns:\n${safeStringify(bds.dominant_patterns)}\n\n`;
+        }
+        if (bds.strengths) {
+          formattedContent += `Strengths:\n${safeStringify(bds.strengths)}\n\n`;
+        }
+        if (bds.areas_of_concern) {
+          formattedContent += `Areas of Concern:\n${safeStringify(bds.areas_of_concern)}\n\n`;
+        }
+        if (bds.temporal_consistency) {
+          formattedContent += `Temporal Consistency:\n${safeStringify(bds.temporal_consistency)}\n\n`;
+        }
+        if (bds.overall_communication_profile) {
+          formattedContent += `Overall Communication Profile:\n${safeStringify(bds.overall_communication_profile)}\n\n`;
+        }
       }
       
-      // Limitations
-      if (analysisResult.limitations) {
-        formattedContent += `LIMITATIONS:\n${safeStringify(analysisResult.limitations)}\n\n`;
+      // Frame-by-Frame Observations
+      if (analysisResult.frame_by_frame_observations) {
+        formattedContent += `FRAME-BY-FRAME OBSERVATIONS:\n\n`;
+        const fbo = analysisResult.frame_by_frame_observations;
+        if (fbo["0_percent"]) formattedContent += `At 0% (Video Start):\n${safeStringify(fbo["0_percent"])}\n\n`;
+        if (fbo["25_percent"]) formattedContent += `At 25% (First Quarter):\n${safeStringify(fbo["25_percent"])}\n\n`;
+        if (fbo["50_percent"]) formattedContent += `At 50% (Midpoint):\n${safeStringify(fbo["50_percent"])}\n\n`;
+        if (fbo["75_percent"]) formattedContent += `At 75% (Final Quarter):\n${safeStringify(fbo["75_percent"])}\n\n`;
       }
       
-      // Recommendations
-      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
-        formattedContent += `NOTES:\n${safeStringify(analysisResult.recommendations)}\n`;
+      // Analysis Confidence
+      if (analysisResult.analysis_confidence) {
+        formattedContent += `ANALYSIS CONFIDENCE:\n\n`;
+        const ac = analysisResult.analysis_confidence;
+        if (ac.high_confidence_patterns) {
+          formattedContent += `High Confidence Patterns:\n${safeStringify(ac.high_confidence_patterns)}\n\n`;
+        }
+        if (ac.tentative_patterns) {
+          formattedContent += `Tentative Patterns:\n${safeStringify(ac.tentative_patterns)}\n\n`;
+        }
+        if (ac.limitations) {
+          formattedContent += `Limitations:\n${safeStringify(ac.limitations)}\n\n`;
+        }
       }
       
       // Create analysis record in storage
       const analysis = await storage.createAnalysis({
         sessionId,
-        title: title || `Dark Traits Video Analysis`,
+        title: title || `Behavioral Dynamics Video Analysis`,
         mediaUrl: mediaData,
         personalityInsights: { 
-          analysis: formattedContent, 
-          dark_traits: analysisResult.dark_tetrad_visual_assessment,
-          severity: analysisResult.risk_visual_assessment?.severity_level 
+          analysis: formattedContent,
+          behavioral_dynamics: analysisResult.behavioral_dynamics_summary,
+          dominance_patterns: analysisResult.dominance_assertiveness_patterns,
+          emotional_intelligence: analysisResult.emotional_intelligence_patterns
         },
         modelUsed: selectedModel,
       });
@@ -5139,16 +5257,16 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
       res.json({
         analysisId: analysis.id,
         personalityInsights: { 
-          analysis: formattedContent, 
-          dark_traits: analysisResult.dark_tetrad_visual_assessment,
-          severity: analysisResult.risk_visual_assessment?.severity_level 
+          analysis: formattedContent,
+          behavioral_dynamics: analysisResult.behavioral_dynamics_summary,
+          dominance_patterns: analysisResult.dominance_assertiveness_patterns
         },
         messages: [message],
         mediaUrl: mediaData,
       });
     } catch (error) {
-      console.error("Dark Traits video analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze video for dark traits" });
+      console.error("Behavioral Dynamics video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for behavioral dynamics" });
     }
   });
 
