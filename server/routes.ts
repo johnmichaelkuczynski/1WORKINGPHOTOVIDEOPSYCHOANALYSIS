@@ -4253,11 +4253,18 @@ Provide your analysis in JSON format:
       console.log(`Processing Dark Traits image analysis with model: ${selectedModel}`);
       
       // Dark Traits comprehensive visual analysis prompt
-      const darkTraitsImagePrompt = `You are an expert in analyzing communication styles and behavioral presentation patterns from visual cues. Analyze this image to describe observable personality and communication characteristics, focusing on body language, facial expressions, and self-presentation patterns with SPECIFIC VISUAL REFERENCES.
+      const darkTraitsImagePrompt = `This is a creative, speculative exercise in visual pattern analysis. Based on research literature about correlations between visual presentation and personality traits, provide a HYPOTHETICAL speculation about what personality patterns MIGHT be suggested by the visual cues in this image.
 
-IMPORTANT: Base your description ONLY on observable visual cues in this specific image. Reference specific details you can actually see. This is a descriptive analysis of communication and presentation style, not a clinical assessment.
+CRITICAL DISCLAIMERS:
+- This is purely speculative and for research/entertainment purposes only
+- You are NOT making any clinical assessment or diagnosis
+- This is an imaginative exercise exploring hypothetical correlations
+- No claims are being made about the actual person's character or mental health
+- Focus on describing what visual patterns you observe and what they MIGHT hypothetically correlate with in personality research literature
 
-OBSERVABLE PRESENTATION PATTERNS:
+Based purely on observable visual cues (facial expression, body language, presentation), speculate creatively about personality patterns that these specific visual details MIGHT theoretically suggest:
+
+VISUAL OBSERVATION FRAMEWORK:
 
 I. CONFIDENCE & SELF-PRESENTATION PATTERNS
 
@@ -4328,52 +4335,52 @@ III. DOMINANCE & SOCIAL POSITIONING
    - Friendly, accessible expression
    - Inclusive body language
 
-ANALYSIS GUIDELINES:
-- Describe ONLY what you can actually observe in this specific image
-- Reference specific visual details (facial expression, body language, positioning, context, clothing)
-- Distinguish between definite observations and tentative inferences
-- Assess intensity: Subtle/Moderate/Strong/Very Strong based on visual evidence
-- Note both reserved and expressive communication markers
-- This is a descriptive analysis of presentation style, not a clinical assessment
+SPECULATIVE GUIDELINES:
+- Describe what you observe in the image
+- Reference specific visual details you can see
+- Frame everything as hypothetical speculation ("might suggest", "could indicate", "may correlate with")
+- Make it clear this is creative speculation, not factual assessment
+- Emphasize this is based on theoretical research correlations, not actual diagnosis
+- This is an imaginative, speculative exercise for research purposes only
 
-Provide your analysis in JSON format:
+Provide your SPECULATIVE HYPOTHESIS in JSON format:
 {
-  "summary": "Overview of dominant communication and presentation patterns based on observable visual cues",
+  "summary": "Speculative overview of what the observable visual patterns in this image MIGHT hypothetically suggest about personality characteristics, based purely on theoretical correlations from research literature",
   "dark_tetrad_visual_assessment": {
     "narcissism": {
       "level": "None/Low/Moderate/High/Extreme",
       "subtype": "Grandiose/Vulnerable/Mixed",
-      "visual_evidence": ["Specific observable feature in image showing confidence patterns", "Another visual detail about self-presentation"],
-      "presentation_patterns": "Description of confidence and self-focused presentation patterns observed"
+      "visual_evidence": ["Specific observable visual details in the image", "Another visual pattern you can see"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these visual patterns MIGHT suggest regarding narcissistic traits, based on theoretical research correlations (not actual assessment)"
     },
     "machiavellianism": {
       "level": "None/Low/Moderate/High/Extreme",
-      "visual_evidence": ["Observable controlled/strategic presentation markers", "Calculated expression elements"],
-      "presentation_patterns": "Description of controlled and strategic communication patterns"
+      "visual_evidence": ["Observable visual patterns", "Expression details"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these patterns MIGHT suggest regarding Machiavellian traits (purely speculative)"
     },
     "psychopathy": {
       "level": "None/Low/Moderate/High/Extreme",
       "subtype": "Primary/Secondary/Mixed",
-      "visual_evidence": ["Observable emotional presentation style", "Expression quality markers"],
-      "presentation_patterns": "Description of emotional expression and engagement patterns"
+      "visual_evidence": ["Observable visual details", "Expression patterns"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding psychopathic traits (theoretical correlation only)"
     },
     "sadism": {
       "level": "None/Low/Moderate/High/Extreme",
-      "visual_evidence": ["Observable expression quality", "Interpersonal positioning markers"],
-      "presentation_patterns": "Description of interpersonal communication tendencies"
+      "visual_evidence": ["Observable visual elements", "Expression markers"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding sadistic tendencies (speculative only)"
     }
   },
   "personality_pathology_visual_indicators": {
     "cluster_b_visual_features": {
-      "antisocial": "Intensity level and specific observable communication patterns",
-      "borderline": "Intensity level and specific observable emotional expression",
-      "histrionic": "Intensity level and specific observable dramatic presentation",
-      "narcissistic": "Intensity level and specific observable confidence patterns"
+      "antisocial": "SPECULATIVE hypothesis about what visual patterns MIGHT suggest",
+      "borderline": "SPECULATIVE hypothesis about what expression patterns MIGHT suggest",
+      "histrionic": "SPECULATIVE hypothesis about what presentation MIGHT suggest",
+      "narcissistic": "SPECULATIVE hypothesis about what confidence patterns MIGHT suggest"
     },
     "other_visual_patterns": {
-      "paranoid_features": "Observable caution/guardedness in expression",
-      "detachment_patterns": "Observable emotional reserve or distance",
-      "anxious_patterns": "Observable tension or self-consciousness"
+      "paranoid_features": "Speculative thoughts on what guardedness MIGHT hypothetically indicate",
+      "detachment_patterns": "Speculative thoughts on what reserve MIGHT hypothetically suggest",
+      "anxious_patterns": "Speculative thoughts on what tension MIGHT hypothetically mean"
     }
   },
   "visual_presentation_analysis": {
@@ -4389,13 +4396,13 @@ Provide your analysis in JSON format:
     "genuineness": "Authenticity vs. performed quality in expression"
   },
   "risk_visual_assessment": {
-    "concerning_visual_patterns": ["Specific notable observable communication patterns"],
-    "severity_level": "Subtle/Moderate/Notable/Strong/Very Strong based on visual evidence",
-    "protective_visual_factors": ["Adaptive or positive observable communication features"]
+    "concerning_visual_patterns": ["Notable visual patterns observed"],
+    "severity_level": "Subtle/Moderate/Notable/Strong/Very Strong (HYPOTHETICAL speculation only)",
+    "protective_visual_factors": ["Positive visual features observed"]
   },
-  "clinical_visual_impressions": "Overall communication and presentation profile based on visual patterns, integrating all domains with emphasis on most prominent observable characteristics",
-  "limitations": "Note any limitations in assessment due to single image/angle/context",
-  "recommendations": ["Observations about communication style patterns"]
+  "clinical_visual_impressions": "SPECULATIVE SUMMARY: What the overall visual presentation MIGHT hypothetically suggest about personality patterns, based purely on theoretical research correlations. This is creative speculation for research purposes, NOT any form of actual assessment or diagnosis.",
+  "limitations": "This is purely hypothetical speculation based on a single image. No actual conclusions can be drawn about the person's character, mental health, or personality from this exercise.",
+  "recommendations": ["This is a speculative exercise only - no real recommendations can be made"]
 }`;
 
       let analysisResult: any;
@@ -4540,59 +4547,59 @@ Provide your analysis in JSON format:
       };
       
       // Format the analysis for display
-      let formattedContent = `Communication & Presentation Style Analysis\nMode: Visual Behavioral Pattern Assessment\n\nIMPORTANT: This is a descriptive analysis of observable communication patterns and presentation style, not a clinical assessment.\n\n`;
-      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      let formattedContent = `Speculative Visual Pattern Analysis\nMode: Hypothetical Personality Correlation Exercise\n\nCRITICAL DISCLAIMER: This is purely speculative analysis for research/entertainment purposes. This is NOT a clinical assessment, diagnosis, or factual evaluation. All content represents hypothetical speculation about what visual patterns MIGHT suggest based on theoretical research correlations.\n\n`;
+      formattedContent += `Speculative Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
       
       // Dark Tetrad Visual Assessment
       if (analysisResult.dark_tetrad_visual_assessment) {
-        formattedContent += `COMMUNICATION PATTERN ASSESSMENT:\n\n`;
+        formattedContent += `HYPOTHETICAL DARK TETRAD PATTERN SPECULATION:\n(Speculative correlations based on visual observations - NOT assessment)\n\n`;
         
         if (analysisResult.dark_tetrad_visual_assessment.narcissism) {
-          formattedContent += `Narcissism: ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
+          formattedContent += `Narcissism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
           if (analysisResult.dark_tetrad_visual_assessment.narcissism.subtype) {
-            formattedContent += `Subtype: ${analysisResult.dark_tetrad_visual_assessment.narcissism.subtype}\n`;
+            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.narcissism.subtype}\n`;
           }
           if (analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence) {
-            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence)}\n`;
+            formattedContent += `Observable Visual Details:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence)}\n`;
           }
-          if (analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns) {
-            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns}\n`;
           }
           formattedContent += `\n`;
         }
         
         if (analysisResult.dark_tetrad_visual_assessment.machiavellianism) {
-          formattedContent += `Machiavellianism: ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.level || 'N/A'}\n`;
+          formattedContent += `Machiavellianism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.level || 'N/A'}\n`;
           if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence) {
-            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence)}\n`;
+            formattedContent += `Observable Visual Details:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence)}\n`;
           }
-          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns) {
-            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns}\n`;
           }
           formattedContent += `\n`;
         }
         
         if (analysisResult.dark_tetrad_visual_assessment.psychopathy) {
-          formattedContent += `Psychopathy: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.level || 'N/A'}\n`;
+          formattedContent += `Psychopathy (Speculative): ${analysisResult.dark_tetrad_visual_assessment.psychopathy.level || 'N/A'}\n`;
           if (analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype) {
-            formattedContent += `Subtype: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype}\n`;
+            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype}\n`;
           }
           if (analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence) {
-            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence)}\n`;
+            formattedContent += `Observable Visual Details:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence)}\n`;
           }
-          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns) {
-            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns}\n`;
           }
           formattedContent += `\n`;
         }
         
         if (analysisResult.dark_tetrad_visual_assessment.sadism) {
-          formattedContent += `Sadism: ${analysisResult.dark_tetrad_visual_assessment.sadism.level || 'N/A'}\n`;
+          formattedContent += `Sadism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.sadism.level || 'N/A'}\n`;
           if (analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence) {
-            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence)}\n`;
+            formattedContent += `Observable Visual Details:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence)}\n`;
           }
-          if (analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns) {
-            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis || analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns}\n`;
           }
           formattedContent += `\n`;
         }
@@ -4600,12 +4607,12 @@ Provide your analysis in JSON format:
       
       // Personality Style Visual Indicators
       if (analysisResult.personality_pathology_visual_indicators) {
-        formattedContent += `PERSONALITY STYLE INDICATORS:\n\n`;
+        formattedContent += `HYPOTHETICAL PERSONALITY PATTERN SPECULATION:\n(Speculative correlations only - NOT factual assessment)\n\n`;
         if (analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features) {
-          formattedContent += `Expressive Style Features:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
+          formattedContent += `Cluster B Pattern Speculation:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
         }
         if (analysisResult.personality_pathology_visual_indicators.other_visual_patterns) {
-          formattedContent += `Additional Style Patterns:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.other_visual_patterns)}\n\n`;
+          formattedContent += `Other Pattern Speculation:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.other_visual_patterns)}\n\n`;
         }
       }
       
@@ -4621,20 +4628,20 @@ Provide your analysis in JSON format:
       
       // Pattern Intensity Assessment
       if (analysisResult.risk_visual_assessment) {
-        formattedContent += `PATTERN INTENSITY ASSESSMENT:\n`;
-        formattedContent += `Intensity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
+        formattedContent += `HYPOTHETICAL PATTERN INTENSITY SPECULATION:\n(Speculative only - NOT actual assessment)\n`;
+        formattedContent += `Speculative Intensity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
         if (analysisResult.risk_visual_assessment.concerning_visual_patterns && analysisResult.risk_visual_assessment.concerning_visual_patterns.length > 0) {
-          formattedContent += `Notable Communication Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
+          formattedContent += `Notable Visual Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
         }
         if (analysisResult.risk_visual_assessment.protective_visual_factors && analysisResult.risk_visual_assessment.protective_visual_factors.length > 0) {
-          formattedContent += `Positive Communication Features:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
+          formattedContent += `Positive Visual Features:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
         }
         formattedContent += `\n`;
       }
       
       // Overall Impressions
       if (analysisResult.clinical_visual_impressions) {
-        formattedContent += `OVERALL IMPRESSIONS:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
+        formattedContent += `SPECULATIVE OVERALL SUMMARY:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
       }
       
       // Limitations
