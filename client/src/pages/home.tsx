@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -114,6 +114,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const videoMBTIInputRef = useRef<HTMLInputElement>(null);
   const bigFiveImageInputRef = useRef<HTMLInputElement>(null);
   const bigFiveVideoInputRef = useRef<HTMLInputElement>(null);
+  const enneagramTextInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -665,6 +666,56 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Enneagram text analysis
+  const handleEnneagramTextAnalysis = useMutation({
+    mutationFn: async (text: string) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        if (!text.trim()) {
+          throw new Error("Please provide text to analyze");
+        }
+        
+        setAnalysisProgress(30);
+        
+        const response = await analyzeEnneagramText(
+          text,
+          sessionId,
+          selectedModel,
+          `Enneagram Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Enneagram text analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze text for Enneagram. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Enneagram Analysis Complete",
+        description: "Your text has been successfully analyzed for Enneagram personality type.",
+      });
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -1029,6 +1080,29 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               }
             }}
           />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "enneagram-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("enneagram-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            handleEnneagramTextAnalysis.mutate(textInput);
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-enneagram-text"
+        >
+          Enneagram (Text)
         </Button>
       </div>
       
