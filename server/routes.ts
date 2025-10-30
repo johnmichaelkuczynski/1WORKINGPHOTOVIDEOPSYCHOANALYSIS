@@ -4237,6 +4237,474 @@ Provide your analysis in JSON format:
     }
   });
 
+  // Dark Traits / Personality Pathology Analysis - Image
+  app.post("/api/analyze/image/darktraits", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Dark Traits image analysis with model: ${selectedModel}`);
+      
+      // Dark Traits comprehensive visual analysis prompt
+      const darkTraitsImagePrompt = `You are an expert clinical psychologist specializing in assessing personality pathology and dark personality traits through visual analysis. Analyze this image comprehensively using evidence-based frameworks for maladaptive personality patterns, providing detailed evidence with SPECIFIC VISUAL REFERENCES.
+
+CRITICAL: Base your analysis ONLY on observable visual cues in this specific image. Reference specific details you can actually see.
+
+VISUAL ASSESSMENT FRAMEWORKS:
+
+I. DARK TETRAD VISUAL MARKERS
+
+1. NARCISSISM (Grandiose & Vulnerable)
+   Grandiose Visual Markers:
+   - Dominant/commanding posture and positioning
+   - Self-aggrandizing presentation, attention to appearance perfection
+   - Status symbols (luxury items, expensive clothing, power positioning)
+   - Camera-aware posing suggesting self-importance
+   - Facial expressions showing superiority or condescension
+   
+   Vulnerable Visual Markers:
+   - Defensive body language despite polished appearance
+   - Tense facial muscles suggesting insecurity beneath surface
+   - Over-compensating presentation elements
+   - Micro-expressions of envy or criticism-sensitivity
+
+2. MACHIAVELLIANISM Visual Markers:
+   - Calculated, controlled facial expressions lacking genuine warmth
+   - Strategic positioning relative to others in frame
+   - Mask-like quality to smile (charm without genuine emotion)
+   - Eyes that appear assessing/calculating rather than emotionally engaged
+   - Controlled body language suggesting tactical presentation
+
+3. PSYCHOPATHY Visual Markers:
+   Primary (Factor 1):
+   - Shallow affect, emotionally flat facial expression
+   - Charming smile that doesn't reach the eyes
+   - Direct, predatory gaze lacking empathic warmth
+   - Absence of anxiety markers despite potentially stressful contexts
+   
+   Secondary (Factor 2):
+   - Signs of impulsivity in grooming or presentation
+   - Aggressive or hostile micro-expressions
+   - Lack of behavioral constraint in body language
+   - Risk-taking presentation elements
+
+4. SADISM Visual Markers:
+   - Hostile or cruel undertones in facial expression
+   - Dominating physical positioning relative to others
+   - Enjoyment expressions in contexts involving others' distress
+   - Aggressive body language or threatening postures
+   - Cold eyes with hostile intent
+
+II. CLUSTER B PERSONALITY VISUAL INDICATORS
+
+1. ANTISOCIAL Features:
+   - Callous facial expression, lack of warmth
+   - Aggressive or threatening body language
+   - Disregard for social norms in presentation
+   - Hostile or intimidating postures
+
+2. BORDERLINE Features:
+   - Intense emotional expression, dramatic affect
+   - Identity instability visible in presentation contradictions
+   - Attention-seeking dramatic elements
+   - Relationship positioning suggesting fear of abandonment
+
+3. HISTRIONIC Features:
+   - Theatrical, exaggerated emotional displays
+   - Sexually provocative or seductive presentation
+   - Overly dramatic facial expressions and poses
+   - Excessive attention-seeking elements in appearance
+
+4. NARCISSISTIC Features:
+   - Grandiose presentation, superiority posturing
+   - Entitlement visible in body language
+   - Lack of empathic warmth in eyes/expression
+   - Self-focused positioning and attention demands
+
+III. OTHER PATHOLOGICAL VISUAL PATTERNS
+
+1. PARANOID Features:
+   - Hypervigilant eye movement or gaze
+   - Suspicious, mistrustful facial expression
+   - Defensive or guarded body posture
+   - Hostile attribution visible in expression
+
+2. DETACHMENT Patterns (Schizoid/Schizotypal):
+   - Flat affect, minimal emotional expression
+   - Social disconnection visible in positioning
+   - Odd or eccentric presentation elements
+   - Lack of interpersonal warmth
+
+3. ANXIOUS-FEARFUL Features:
+   - Tense body language, anxiety markers
+   - Avoidant gaze or body positioning
+   - Self-conscious or inadequate presentation
+   - Submissive or dependent postures
+
+IMPORTANT ANALYSIS RULES:
+- Describe ONLY what you can actually observe in this specific image
+- Reference specific visual details (facial expression, body language, positioning, context, symbols)
+- Distinguish between definite observations and tentative inferences
+- Assess severity: Minimal/Mild/Moderate/Severe based on visual evidence strength
+- Note any positive/adaptive visual markers alongside concerning patterns
+- CRITICAL: This is descriptive analysis of visual presentation, NOT clinical diagnosis
+
+Provide your analysis in JSON format:
+{
+  "summary": "Overview of dominant visual patterns suggesting maladaptive traits with severity assessment based on observable cues",
+  "dark_tetrad_visual_assessment": {
+    "narcissism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "subtype": "Grandiose/Vulnerable/Mixed",
+      "visual_evidence": ["Specific observable feature in image", "Another visual detail"],
+      "presentation_patterns": "Description of narcissistic visual markers observed"
+    },
+    "machiavellianism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "visual_evidence": ["Observable calculation/control markers", "Strategic presentation elements"],
+      "presentation_patterns": "Description of Machiavellian visual patterns"
+    },
+    "psychopathy": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "subtype": "Primary/Secondary/Mixed",
+      "visual_evidence": ["Observable callousness/shallow affect", "Charm without warmth markers"],
+      "presentation_patterns": "Description of psychopathic visual features"
+    },
+    "sadism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "visual_evidence": ["Hostile/cruel expression elements", "Dominating visual positioning"],
+      "presentation_patterns": "Description of sadistic visual tendencies"
+    }
+  },
+  "personality_pathology_visual_indicators": {
+    "cluster_b_visual_features": {
+      "antisocial": "Level and specific visual evidence",
+      "borderline": "Level and specific visual evidence",
+      "histrionic": "Level and specific visual evidence",
+      "narcissistic": "Level and specific visual evidence"
+    },
+    "other_visual_patterns": {
+      "paranoid_features": "Observable suspicion/hypervigilance markers",
+      "detachment_patterns": "Observable emotional flatness/disconnection",
+      "anxious_patterns": "Observable tension/fear markers"
+    }
+  },
+  "visual_presentation_analysis": {
+    "facial_expression": "Detailed analysis of affect, micro-expressions, eye contact quality",
+    "body_language": "Posture, positioning, gesture patterns observed",
+    "self_presentation": "Grooming, clothing choices, status symbols, attention to appearance",
+    "contextual_behaviors": "Interaction patterns if others present, environmental positioning"
+  },
+  "interpersonal_visual_cues": {
+    "empathy_markers": "Visual evidence of empathy presence or absence",
+    "dominance_submission": "Power dynamics visible in positioning and expression",
+    "warmth_vs_coldness": "Emotional temperature of presentation",
+    "genuineness": "Authenticity vs. performance quality in expression"
+  },
+  "risk_visual_assessment": {
+    "concerning_visual_patterns": ["Specific troubling observable features"],
+    "severity_level": "Subclinical/Mild/Moderate/Severe/Extreme based on visual evidence",
+    "protective_visual_factors": ["Adaptive or positive observable features"]
+  },
+  "clinical_visual_impressions": "Overall personality pathology profile based on visual presentation, integrating all domains with emphasis on most prominent observable patterns",
+  "limitations": "Note any limitations in assessment due to single image/angle/context",
+  "recommendations": ["Observations about whether visual patterns suggest need for further evaluation"]
+}`;
+
+      let analysisResult: any;
+      
+      // Prepare image for vision models
+      const base64Match = mediaData.match(/^data:image\/[a-z]+;base64,(.+)$/);
+      const base64Data = base64Match ? base64Match[1] : mediaData;
+      const mediaTypeMatch = mediaData.match(/^data:(image\/[a-z]+);base64,/);
+      const imageMediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: darkTraitsImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Dark Traits Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        // Try to extract JSON from the response
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {},
+            personality_pathology_visual_indicators: {},
+            visual_presentation_analysis: {},
+            interpersonal_visual_cues: {},
+            risk_visual_assessment: { concerning_visual_patterns: [], severity_level: "Unknown", protective_visual_factors: [] },
+            clinical_visual_impressions: "Unable to format analysis",
+            limitations: "Formatting error",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: darkTraitsImagePrompt
+              },
+              {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: imageMediaType as any,
+                  data: base64Data,
+                },
+              }
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Dark Traits Image raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {},
+            personality_pathology_visual_indicators: {},
+            visual_presentation_analysis: {},
+            interpersonal_visual_cues: {},
+            risk_visual_assessment: { concerning_visual_patterns: [], severity_level: "Unknown", protective_visual_factors: [] },
+            clinical_visual_impressions: "Unable to format analysis",
+            limitations: "Formatting error",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        return res.status(400).json({ 
+          error: "DeepSeek does not support image analysis. Please use OpenAI or Anthropic for image-based dark traits analysis." 
+        });
+      } else if (selectedModel === "perplexity") {
+        return res.status(400).json({ 
+          error: "Perplexity does not support image analysis. Please use OpenAI or Anthropic for image-based dark traits analysis." 
+        });
+      }
+      
+      console.log("Dark Traits image analysis complete");
+      
+      // Helper function to safely stringify any value
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${key}: ${safeStringify(val)}`)
+            .join('\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Personality Pathology & Dark Traits Visual Analysis\nMode: Clinical Visual Assessment Framework\n\nIMPORTANT: This is a descriptive analysis of visual presentation patterns, NOT a clinical diagnosis.\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Dark Tetrad Visual Assessment
+      if (analysisResult.dark_tetrad_visual_assessment) {
+        formattedContent += `DARK TETRAD VISUAL ASSESSMENT:\n\n`;
+        
+        if (analysisResult.dark_tetrad_visual_assessment.narcissism) {
+          formattedContent += `Narcissism: ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.subtype) {
+            formattedContent += `Subtype: ${analysisResult.dark_tetrad_visual_assessment.narcissism.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence) {
+            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns) {
+            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.narcissism.presentation_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.machiavellianism) {
+          formattedContent += `Machiavellianism: ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence) {
+            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns) {
+            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.machiavellianism.presentation_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.psychopathy) {
+          formattedContent += `Psychopathy: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype) {
+            formattedContent += `Subtype: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence) {
+            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns) {
+            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.psychopathy.presentation_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.sadism) {
+          formattedContent += `Sadism: ${analysisResult.dark_tetrad_visual_assessment.sadism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence) {
+            formattedContent += `Visual Evidence:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns) {
+            formattedContent += `${analysisResult.dark_tetrad_visual_assessment.sadism.presentation_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+      }
+      
+      // Personality Pathology Visual Indicators
+      if (analysisResult.personality_pathology_visual_indicators) {
+        formattedContent += `PERSONALITY PATHOLOGY VISUAL INDICATORS:\n\n`;
+        if (analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features) {
+          formattedContent += `Cluster B Visual Features:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
+        }
+        if (analysisResult.personality_pathology_visual_indicators.other_visual_patterns) {
+          formattedContent += `Other Visual Patterns:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.other_visual_patterns)}\n\n`;
+        }
+      }
+      
+      // Visual Presentation Analysis
+      if (analysisResult.visual_presentation_analysis) {
+        formattedContent += `VISUAL PRESENTATION ANALYSIS:\n${safeStringify(analysisResult.visual_presentation_analysis)}\n\n`;
+      }
+      
+      // Interpersonal Visual Cues
+      if (analysisResult.interpersonal_visual_cues) {
+        formattedContent += `INTERPERSONAL VISUAL CUES:\n${safeStringify(analysisResult.interpersonal_visual_cues)}\n\n`;
+      }
+      
+      // Risk Visual Assessment
+      if (analysisResult.risk_visual_assessment) {
+        formattedContent += `RISK VISUAL ASSESSMENT:\n`;
+        formattedContent += `Severity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
+        if (analysisResult.risk_visual_assessment.concerning_visual_patterns && analysisResult.risk_visual_assessment.concerning_visual_patterns.length > 0) {
+          formattedContent += `Concerning Visual Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
+        }
+        if (analysisResult.risk_visual_assessment.protective_visual_factors && analysisResult.risk_visual_assessment.protective_visual_factors.length > 0) {
+          formattedContent += `Protective Visual Factors:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Clinical Visual Impressions
+      if (analysisResult.clinical_visual_impressions) {
+        formattedContent += `CLINICAL VISUAL IMPRESSIONS:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
+      }
+      
+      // Limitations
+      if (analysisResult.limitations) {
+        formattedContent += `LIMITATIONS:\n${safeStringify(analysisResult.limitations)}\n\n`;
+      }
+      
+      // Recommendations
+      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
+        formattedContent += `RECOMMENDATIONS:\n${safeStringify(analysisResult.recommendations)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Dark Traits Image Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_visual_assessment,
+          severity: analysisResult.risk_visual_assessment?.severity_level 
+        },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_visual_assessment,
+          severity: analysisResult.risk_visual_assessment?.severity_level 
+        },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Dark Traits image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for dark traits" });
+    }
+  });
+
   // Enneagram Analysis Endpoints - Image
   app.post("/api/analyze/image/enneagram", async (req, res) => {
     try {
