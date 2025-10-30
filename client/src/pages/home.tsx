@@ -1704,6 +1704,98 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   >
                     MBTI Text Analysis
                   </Button>
+                  
+                  <p className="text-sm font-semibold mb-2 mt-4">Big Five Analysis (Text)</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!textInput.trim()) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "Please enter some text first",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      
+                      try {
+                        const data = await analyzeBigFiveText(textInput, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "Big Five Analysis Complete",
+                            description: "Your text has been analyzed using the Five-Factor Model",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("Big Five text analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze text for Big Five. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full" 
+                    disabled={!textInput.trim() || isAnalyzing}
+                    data-testid="button-bigfive-text-main"
+                  >
+                    Big Five Text Analysis
+                  </Button>
+                  
+                  <p className="text-sm font-semibold mb-2 mt-4">Enneagram Analysis (Text)</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!textInput.trim()) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "Please enter some text first",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      
+                      try {
+                        const data = await analyzeEnneagramText(textInput, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "Enneagram Analysis Complete",
+                            description: "Your personality type has been identified using the Enneagram framework",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("Enneagram text analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze text for Enneagram. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full" 
+                    disabled={!textInput.trim() || isAnalyzing}
+                    data-testid="button-enneagram-text-main"
+                  >
+                    Enneagram Text Analysis
+                  </Button>
                 </div>
               </form>
             )}
