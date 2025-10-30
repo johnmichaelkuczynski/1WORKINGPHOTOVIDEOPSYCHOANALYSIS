@@ -3874,20 +3874,28 @@ Provide your analysis in JSON format:
               { type: "image_url", image_url: { url: mediaData } }
             ]
           }],
-          response_format: { type: "json_object" },
+          max_tokens: 4000,
         });
         
         const rawResponse = response.choices[0]?.message.content || "";
         console.log("OpenAI Enneagram Image raw response:", rawResponse.substring(0, 500));
         
         if (!rawResponse || rawResponse.trim().length === 0) {
-          throw new Error("OpenAI returned an empty response");
+          throw new Error("OpenAI returned an empty response. This may be due to content moderation or image size issues.");
+        }
+        
+        // Try to extract JSON from the response
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
         }
         
         try {
-          analysisResult = JSON.parse(rawResponse);
+          analysisResult = JSON.parse(jsonText);
         } catch (parseError) {
           console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
           analysisResult = {
             summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
             primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
