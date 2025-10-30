@@ -8,7 +8,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - Multiple AI model support (OpenAI GPT-4o, Anthropic Claude, Perplexity)
 - MBTI personality analysis (text, images, videos)
 - Big Five/OCEAN personality analysis (text, images, videos)
-- Enneagram 9-Type personality analysis (text, images)
+- Enneagram 9-Type personality analysis (text, images, videos)
 - Facial analysis using AWS Rekognition and Face++
 - Audio transcription with OpenAI Whisper
 - Email sharing with SendGrid integration
@@ -37,6 +37,22 @@ An advanced AI-powered personality insights platform that provides sophisticated
 
 ## Recent Changes
 ### October 2025 (Latest)
+- **NEW ENNEAGRAM (VIDEO) ANALYSIS FEATURE**: Added behavioral Enneagram personality type detection through video analysis
+  * Analyzes videos to identify 9 Enneagram personality types based on behavioral patterns across timeline
+  * Comprehensive temporal framework covering all 9 types (Reformer, Helper, Achiever, Individualist, Investigator, Loyalist, Enthusiast, Challenger, Peacemaker)
+  * Extracts 4 frames at 0%, 25%, 50%, 75% timestamps for behavioral pattern analysis
+  * Identifies primary type with confidence level (High/Medium/Low) based on observable behaviors
+  * Provides secondary possibilities and wing analysis (e.g., 4w3 or 4w5)
+  * Includes triadic analysis (Head/Heart/Body center, Aggressive/Dependent/Withdrawing stance)
+  * Temporal patterns: consistency analysis, energy changes, defensive behaviors across video
+  * Behavioral style markers: movement patterns, emotional expressions, interaction style
+  * Works with OpenAI (GPT-4o) and Anthropic (Claude Sonnet) vision models
+  * New sidebar button with dedicated file input ref to prevent routing conflicts
+  * Backend endpoint: /api/analyze/video/enneagram
+  * Frontend API function: analyzeEnneagramVideo
+  * safeStringify helper function for clean result formatting
+  * Mutation handler: handleEnneagramVideoAnalysis
+
 - **NEW ENNEAGRAM (IMAGE) ANALYSIS FEATURE**: Added visual Enneagram personality type detection
   * Analyzes photographs to identify 9 Enneagram personality types with visual evidence
   * Comprehensive personality type framework covering all 9 types (Reformer, Helper, Achiever, Individualist, Investigator, Loyalist, Enthusiast, Challenger, Peacemaker)
