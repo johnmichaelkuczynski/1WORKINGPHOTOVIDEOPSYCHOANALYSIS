@@ -14,7 +14,8 @@ The platform is built with a React.js frontend (TypeScript, Tailwind CSS, shadcn
 
 **Key Features:**
 - **Multi-modal Analysis:** Supports analysis across text, images, videos, and documents.
-- **Personality Frameworks:** Offers MBTI, Big Five/OCEAN, Enneagram (9-Type), and Dark Traits / Personality Pathology analysis.
+- **Personality Frameworks:** Offers MBTI, Big Five/OCEAN, Enneagram (9-Type), and Dark Traits / Personality Pathology analysis across multiple modalities.
+- **Dark Traits Visual Assessment:** Analyzes personality pathology through visual cues including Dark Tetrad (narcissism, Machiavellianism, psychopathy, sadism), Cluster B patterns, and other maladaptive traits using facial expressions, body language, grooming patterns, and interpersonal markers.
 - **Facial Analysis:** Integrates AWS Rekognition and Face++ for detailed facial feature detection.
 - **Audio Transcription:** Utilizes OpenAI Whisper for transcribing audio content.
 - **Session Management:** Provides session-based storage of analysis history with clear state management to prevent analysis stacking.
