@@ -1318,6 +1318,29 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             }}
           />
         </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "darktraits-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("darktraits-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            handleDarkTraitsTextAnalysis.mutate(textInput);
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-darktraits-text"
+        >
+          Dark Traits (Text)
+        </Button>
       </div>
       
       {/* Main Content Area */}

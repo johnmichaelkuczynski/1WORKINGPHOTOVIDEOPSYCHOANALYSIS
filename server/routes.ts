@@ -3762,6 +3762,481 @@ Provide your analysis in JSON format:
     }
   });
 
+  // Dark Traits / Personality Pathology Analysis - Text
+  app.post("/api/analyze/text/darktraits", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Dark Traits text analysis with model: ${selectedModel}`);
+      
+      // Dark Traits comprehensive analysis prompt
+      const darkTraitsPrompt = `You are an expert clinical psychologist specializing in personality pathology and dark personality traits. Analyze this text comprehensively using evidence-based frameworks for maladaptive personality patterns and dark traits, providing detailed evidence with DIRECT QUOTES from the text.
+
+ASSESSMENT FRAMEWORKS:
+
+I. DARK TETRAD TRAITS
+
+1. NARCISSISM (Grandiose & Vulnerable)
+   - Grandiose: Inflated self-importance, need for admiration, lack of empathy
+   - Vulnerable: Hidden insecurity, hypersensitivity to criticism, envy
+   - Text Indicators: Self-aggrandizement, entitlement language, attention-seeking, dismissiveness of others
+
+2. MACHIAVELLIANISM
+   - Core: Strategic manipulation, cynical worldview, lack of conventional morality
+   - Text Indicators: Calculated language, strategic thinking, manipulation tactics, ends-justify-means reasoning
+
+3. PSYCHOPATHY (Primary & Secondary)
+   - Primary: Lack of empathy, shallow affect, charm, fearlessness
+   - Secondary: Impulsivity, anger, antisocial behavior, poor behavioral controls
+   - Text Indicators: Callousness, lack of remorse, superficial charm, impulsivity markers
+
+4. SADISM
+   - Core: Deriving pleasure from others' pain or humiliation
+   - Text Indicators: Enjoyment of cruelty, hostile humor, domination themes, vindictive language
+
+II. CLUSTER B PERSONALITY PATTERNS
+
+1. ANTISOCIAL FEATURES
+   - Deceitfulness, impulsivity, irritability, reckless disregard, lack of remorse
+   - Text Indicators: Rule-breaking pride, manipulation admissions, callous statements
+
+2. BORDERLINE FEATURES
+   - Fear of abandonment, unstable relationships, identity disturbance, impulsivity, intense mood shifts
+   - Text Indicators: All-or-nothing thinking, relationship chaos, emotional volatility, identity confusion
+
+3. HISTRIONIC FEATURES
+   - Excessive emotionality, attention-seeking, shallow emotional expression, dramatic presentation
+   - Text Indicators: Theatrical language, exaggerated emotions, seductive/provocative tone
+
+4. NARCISSISTIC FEATURES (Clinical)
+   - Grandiosity, need for admiration, lack of empathy, sense of entitlement, exploitation
+   - Text Indicators: Superiority claims, entitlement expressions, empathy deficits
+
+III. OTHER MALADAPTIVE PATTERNS
+
+1. PARANOID FEATURES
+   - Distrust, suspiciousness, grudge-holding, hostile attributions
+   - Text Indicators: Conspiracy thinking, hostile interpretations, victimization narratives
+
+2. SCHIZOID/SCHIZOTYPAL FEATURES
+   - Detachment from social relationships, restricted emotional expression, odd beliefs/perceptions
+   - Text Indicators: Emotional flatness, social withdrawal themes, unusual thinking patterns
+
+3. AVOIDANT FEATURES
+   - Social inhibition, feelings of inadequacy, hypersensitivity to rejection
+   - Text Indicators: Self-deprecation, fear-based withdrawal, criticism sensitivity
+
+4. DEPENDENT FEATURES
+   - Excessive need for care, submissiveness, fear of separation
+   - Text Indicators: Help-seeking, decision-making difficulty, subordination themes
+
+5. OBSESSIVE-COMPULSIVE FEATURES
+   - Perfectionism, rigidity, control preoccupation
+   - Text Indicators: Excessive detail, perfectionist standards, control themes
+
+CRITICAL RULES:
+- Base analysis ONLY on observable patterns in the text
+- Provide DIRECT QUOTES as evidence for every trait identified
+- Distinguish between clinical pathology and subclinical traits
+- Assess severity: Minimal/Mild/Moderate/Severe/Extreme
+- Note protective factors and adaptive strengths alongside pathology
+- IMPORTANT: This is descriptive analysis, not diagnosis. Emphasize patterns observed, not clinical labels.
+
+Provide your analysis in JSON format:
+{
+  "summary": "Overview of dominant maladaptive patterns with severity assessment and key concerns based on text evidence",
+  "dark_tetrad_assessment": {
+    "narcissism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "subtype": "Grandiose/Vulnerable/Mixed",
+      "evidence": ["Direct quote showing narcissistic pattern", "Another specific example"],
+      "key_behaviors": "Description of narcissistic patterns observed"
+    },
+    "machiavellianism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "evidence": ["Quote showing manipulative thinking", "Strategic language example"],
+      "key_behaviors": "Description of Machiavellian patterns"
+    },
+    "psychopathy": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "subtype": "Primary/Secondary/Mixed",
+      "evidence": ["Quote showing callousness or lack of empathy", "Impulsivity marker"],
+      "key_behaviors": "Description of psychopathic features"
+    },
+    "sadism": {
+      "level": "None/Low/Moderate/High/Extreme",
+      "evidence": ["Quote showing enjoyment of others' distress", "Hostile/cruel language"],
+      "key_behaviors": "Description of sadistic tendencies"
+    }
+  },
+  "personality_pathology_indicators": {
+    "cluster_b_features": {
+      "antisocial": "Level and evidence with quotes",
+      "borderline": "Level and evidence with quotes",
+      "histrionic": "Level and evidence with quotes",
+      "narcissistic": "Level and evidence with quotes"
+    },
+    "other_patterns": {
+      "paranoid": "Level and evidence",
+      "detachment_patterns": "Level and evidence",
+      "anxious_patterns": "Level and evidence",
+      "obsessive_patterns": "Level and evidence"
+    }
+  },
+  "interpersonal_patterns": {
+    "empathy_level": "Assessment with textual evidence",
+    "manipulation_tactics": ["Specific tactics observed in text"],
+    "relationship_approach": "How the person relates to others based on text",
+    "power_dynamics": "Dominance, submission, or control themes with quotes"
+  },
+  "cognitive_patterns": {
+    "moral_reasoning": "Observed moral framework with evidence",
+    "attribution_style": "How they explain events and behaviors",
+    "reality_testing": "Contact with reality, distortions observed",
+    "thought_organization": "Coherence, logic, tangentiality"
+  },
+  "emotional_regulation": {
+    "emotional_range": "Depth and variety of emotions expressed",
+    "impulse_control": "Evidence of impulsivity or constraint",
+    "affect_stability": "Mood stability or volatility with examples"
+  },
+  "risk_assessment": {
+    "concerning_patterns": ["Specific concerning behaviors or attitudes with quotes"],
+    "severity_level": "Subclinical/Mild/Moderate/Severe/Extreme",
+    "protective_factors": ["Adaptive strengths or mitigating factors observed"]
+  },
+  "clinical_impressions": "Overall personality profile integrating all domains with emphasis on most prominent maladaptive patterns",
+  "recommendations": ["Suggestions if clinical evaluation or intervention might be beneficial, framed as observations not diagnoses"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: darkTraitsPrompt + "\n\nText to analyze:\n" + content
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Dark Traits text raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_assessment: {},
+            personality_pathology_indicators: {},
+            interpersonal_patterns: {},
+            cognitive_patterns: {},
+            emotional_regulation: {},
+            risk_assessment: { concerning_patterns: [], severity_level: "Unknown", protective_factors: [] },
+            clinical_impressions: "Unable to format analysis",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: darkTraitsPrompt + "\n\nText to analyze:\n" + content
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Dark Traits text raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_assessment: {},
+            personality_pathology_indicators: {},
+            interpersonal_patterns: {},
+            cognitive_patterns: {},
+            emotional_regulation: {},
+            risk_assessment: { concerning_patterns: [], severity_level: "Unknown", protective_factors: [] },
+            clinical_impressions: "Unable to format analysis",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [{
+              role: "user",
+              content: darkTraitsPrompt + "\n\nText to analyze:\n" + content
+            }],
+            response_format: { type: "json_object" }
+          })
+        });
+
+        const data = await response.json();
+        const rawResponse = data.choices?.[0]?.message?.content || "";
+        console.log("DeepSeek Dark Traits text raw response:", rawResponse.substring(0, 500));
+
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse DeepSeek response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_assessment: {},
+            personality_pathology_indicators: {},
+            interpersonal_patterns: {},
+            cognitive_patterns: {},
+            emotional_regulation: {},
+            risk_assessment: { concerning_patterns: [], severity_level: "Unknown", protective_factors: [] },
+            clinical_impressions: "Unable to format analysis",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "perplexity" && perplexity) {
+        const response = await perplexity.chat.completions.create({
+          model: "llama-3.1-sonar-large-128k-online",
+          messages: [{
+            role: "user",
+            content: darkTraitsPrompt + "\n\nText to analyze:\n" + content
+          }],
+        });
+        
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Perplexity Dark Traits text raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_assessment: {},
+            personality_pathology_indicators: {},
+            interpersonal_patterns: {},
+            cognitive_patterns: {},
+            emotional_regulation: {},
+            risk_assessment: { concerning_patterns: [], severity_level: "Unknown", protective_factors: [] },
+            clinical_impressions: "Unable to format analysis",
+            recommendations: []
+          };
+        }
+      }
+      
+      console.log("Dark Traits text analysis complete");
+      
+      // Helper function to safely stringify any value
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${key}: ${safeStringify(val)}`)
+            .join('\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Personality Pathology & Dark Traits Analysis\nMode: Clinical Assessment Framework\n\nIMPORTANT: This is a descriptive analysis of patterns observed in text, NOT a clinical diagnosis.\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Dark Tetrad Assessment
+      if (analysisResult.dark_tetrad_assessment) {
+        formattedContent += `DARK TETRAD ASSESSMENT:\n\n`;
+        
+        if (analysisResult.dark_tetrad_assessment.narcissism) {
+          formattedContent += `Narcissism: ${analysisResult.dark_tetrad_assessment.narcissism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_assessment.narcissism.subtype) {
+            formattedContent += `Subtype: ${analysisResult.dark_tetrad_assessment.narcissism.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.narcissism.evidence) {
+            formattedContent += `Evidence:\n${safeStringify(analysisResult.dark_tetrad_assessment.narcissism.evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.narcissism.key_behaviors) {
+            formattedContent += `${analysisResult.dark_tetrad_assessment.narcissism.key_behaviors}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_assessment.machiavellianism) {
+          formattedContent += `Machiavellianism: ${analysisResult.dark_tetrad_assessment.machiavellianism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_assessment.machiavellianism.evidence) {
+            formattedContent += `Evidence:\n${safeStringify(analysisResult.dark_tetrad_assessment.machiavellianism.evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.machiavellianism.key_behaviors) {
+            formattedContent += `${analysisResult.dark_tetrad_assessment.machiavellianism.key_behaviors}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_assessment.psychopathy) {
+          formattedContent += `Psychopathy: ${analysisResult.dark_tetrad_assessment.psychopathy.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_assessment.psychopathy.subtype) {
+            formattedContent += `Subtype: ${analysisResult.dark_tetrad_assessment.psychopathy.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.psychopathy.evidence) {
+            formattedContent += `Evidence:\n${safeStringify(analysisResult.dark_tetrad_assessment.psychopathy.evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.psychopathy.key_behaviors) {
+            formattedContent += `${analysisResult.dark_tetrad_assessment.psychopathy.key_behaviors}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_assessment.sadism) {
+          formattedContent += `Sadism: ${analysisResult.dark_tetrad_assessment.sadism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_assessment.sadism.evidence) {
+            formattedContent += `Evidence:\n${safeStringify(analysisResult.dark_tetrad_assessment.sadism.evidence)}\n`;
+          }
+          if (analysisResult.dark_tetrad_assessment.sadism.key_behaviors) {
+            formattedContent += `${analysisResult.dark_tetrad_assessment.sadism.key_behaviors}\n`;
+          }
+          formattedContent += `\n`;
+        }
+      }
+      
+      // Personality Pathology Indicators
+      if (analysisResult.personality_pathology_indicators) {
+        formattedContent += `PERSONALITY PATHOLOGY INDICATORS:\n\n`;
+        if (analysisResult.personality_pathology_indicators.cluster_b_features) {
+          formattedContent += `Cluster B Features:\n${safeStringify(analysisResult.personality_pathology_indicators.cluster_b_features)}\n\n`;
+        }
+        if (analysisResult.personality_pathology_indicators.other_patterns) {
+          formattedContent += `Other Patterns:\n${safeStringify(analysisResult.personality_pathology_indicators.other_patterns)}\n\n`;
+        }
+      }
+      
+      // Interpersonal Patterns
+      if (analysisResult.interpersonal_patterns) {
+        formattedContent += `INTERPERSONAL PATTERNS:\n${safeStringify(analysisResult.interpersonal_patterns)}\n\n`;
+      }
+      
+      // Cognitive Patterns
+      if (analysisResult.cognitive_patterns) {
+        formattedContent += `COGNITIVE PATTERNS:\n${safeStringify(analysisResult.cognitive_patterns)}\n\n`;
+      }
+      
+      // Emotional Regulation
+      if (analysisResult.emotional_regulation) {
+        formattedContent += `EMOTIONAL REGULATION:\n${safeStringify(analysisResult.emotional_regulation)}\n\n`;
+      }
+      
+      // Risk Assessment
+      if (analysisResult.risk_assessment) {
+        formattedContent += `RISK ASSESSMENT:\n`;
+        formattedContent += `Severity Level: ${analysisResult.risk_assessment.severity_level || 'N/A'}\n`;
+        if (analysisResult.risk_assessment.concerning_patterns && analysisResult.risk_assessment.concerning_patterns.length > 0) {
+          formattedContent += `Concerning Patterns:\n${safeStringify(analysisResult.risk_assessment.concerning_patterns)}\n`;
+        }
+        if (analysisResult.risk_assessment.protective_factors && analysisResult.risk_assessment.protective_factors.length > 0) {
+          formattedContent += `Protective Factors:\n${safeStringify(analysisResult.risk_assessment.protective_factors)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Clinical Impressions
+      if (analysisResult.clinical_impressions) {
+        formattedContent += `CLINICAL IMPRESSIONS:\n${safeStringify(analysisResult.clinical_impressions)}\n\n`;
+      }
+      
+      // Recommendations
+      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
+        formattedContent += `RECOMMENDATIONS:\n${safeStringify(analysisResult.recommendations)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Dark Traits Analysis`,
+        mediaUrl: `darktraits-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_assessment,
+          severity: analysisResult.risk_assessment?.severity_level 
+        },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_assessment,
+          severity: analysisResult.risk_assessment?.severity_level 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Dark Traits text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for dark traits" });
+    }
+  });
+
   // Enneagram Analysis Endpoints - Image
   app.post("/api/analyze/image/enneagram", async (req, res) => {
     try {
