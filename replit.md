@@ -6,7 +6,9 @@ An advanced AI-powered personality insights platform that provides sophisticated
 ## Key Features
 - Multi-modal analysis (images, videos, documents, text)
 - Multiple AI model support (OpenAI GPT-4o, Anthropic Claude, Perplexity)
-- MBTI personality analysis (text, images, videos) - NEW!
+- MBTI personality analysis (text, images, videos)
+- Big Five/OCEAN personality analysis (text, images, videos)
+- Enneagram 9-Type personality analysis (text, images)
 - Facial analysis using AWS Rekognition and Face++
 - Audio transcription with OpenAI Whisper
 - Email sharing with SendGrid integration
@@ -35,6 +37,20 @@ An advanced AI-powered personality insights platform that provides sophisticated
 
 ## Recent Changes
 ### October 2025 (Latest)
+- **NEW ENNEAGRAM (IMAGE) ANALYSIS FEATURE**: Added visual Enneagram personality type detection
+  * Analyzes photographs to identify 9 Enneagram personality types with visual evidence
+  * Comprehensive personality type framework covering all 9 types (Reformer, Helper, Achiever, Individualist, Investigator, Loyalist, Enthusiast, Challenger, Peacemaker)
+  * Identifies primary type with confidence level (High/Medium/Low)
+  * Provides secondary possibilities and wing analysis (e.g., 4w3 or 4w5)
+  * Includes triadic analysis (Head/Heart/Body center, Aggressive/Dependent/Withdrawing stance)
+  * Visual style markers based on specific image details
+  * Works with OpenAI (GPT-4o) and Anthropic (Claude Sonnet) vision models
+  * New sidebar button with dedicated file input ref to prevent routing conflicts
+  * Backend endpoint: /api/analyze/image/enneagram
+  * Frontend API function: analyzeEnneagramImage
+  * safeStringify helper function for clean result formatting
+  * Mutation handler: handleEnneagramImageAnalysis
+
 - **NEW MBTI ANALYSIS FEATURE**: Added three dedicated MBTI analysis functions
   * MBTI Text Analysis - 30-question framework (5 I/E + 5 S/N + 5 T/F + 5 J/P + 10 deeper signals) with direct text quotes
   * MBTI Image Analysis - 30-question visual framework (5 I/E + 5 S/N + 5 T/F + 5 J/P + 10 cognitive indicators) analyzing visual cues
@@ -48,6 +64,21 @@ An advanced AI-powered personality insights platform that provides sophisticated
   * Corrected prompt documentation from "50 questions" to accurate "30 questions"
   * Frontend buttons with variant="secondary" styling and proper test IDs
   * API integration complete with proper error handling and fallbacks
+
+- **BIG FIVE/OCEAN ANALYSIS FEATURES**: Added three Big Five personality analysis functions
+  * Big Five Text Analysis - Measures Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
+  * Big Five Image Analysis - Visual assessment of Big Five traits
+  * Big Five Video Analysis - Behavioral assessment of Big Five traits with temporal patterns
+  * All analyses provide trait scores with evidence-based reasoning
+  * Frontend buttons in main input area and sidebar for easy access
+  
+- **ENNEAGRAM TEXT ANALYSIS**: Fixed critical routing bug
+  * Was calling generic analysis endpoint instead of Enneagram-specific endpoint
+  * Now correctly predicts Enneagram Type 1-9 with confidence levels
+  * Added missing safeStringify helper function (was causing ReferenceError crash)
+  * Fixed "[object Object]" display bug with recursive object formatting
+  * Improved UX by adding button to main input area alongside MBTI
+  * Backend endpoint: /api/analyze/text/enneagram
   
 ### October 2025
 - **COMPREHENSIVE TEXT ANALYSIS UPGRADE - 100 QUESTIONS**: Fully implemented 100-question framework for text analysis
