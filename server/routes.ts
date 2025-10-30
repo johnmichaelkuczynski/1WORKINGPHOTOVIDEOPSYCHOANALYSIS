@@ -4745,194 +4745,183 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
       console.log(`Extracted ${extractedFrames.length} frames from video for Dark Traits analysis`);
       
       // Behavioral Dynamics comprehensive video analysis prompt
-      const darkTraitsVideoPrompt = `You are analyzing behavioral patterns and communication dynamics across video frames. Provide a detailed, evidence-based analysis of observable behaviors, communication styles, and interpersonal patterns with comprehensive explanations and reasoning.
+      const darkTraitsVideoPrompt = `You are a communication research assistant helping catalog and describe observable nonverbal behaviors across video frames for educational/training purposes. Your role is to describe what communication behaviors are visible and explain what these behaviors typically signify in communication studies literature - without making claims about the specific individual.
 
-ANALYSIS FRAMEWORK - Provide DETAILED EXPLANATIONS for every observation:
+EDUCATIONAL FRAMEWORK - Catalog observable communication behaviors:
 
-For each pattern you identify, you MUST provide:
-1. OBSERVATION: What specific visual behavior you see (cite frame timing)
-2. INTERPRETATION: What this behavior typically indicates in communication research
-3. EVIDENCE: Why you interpret it this way (reference specific visual details)
-4. CONTEXT: How this pattern evolves across the video timeline
+For each communication pattern category, provide:
+1. VISIBLE BEHAVIORS: What specific nonverbal cues are observable (cite frame timing: 0%, 25%, 50%, 75%)
+2. RESEARCH CONTEXT: What communication research literature says about these types of behaviors
+3. BEHAVIORAL EVIDENCE: Which specific visual elements support this observation
+4. TEMPORAL PATTERN: How these observable behaviors change across the video timeline
 
-I. DOMINANCE & ASSERTIVENESS PATTERNS
+Focus on describing behaviors as communication training examples, not personal assessments.
 
-Analyze across video timeline (0%, 25%, 50%, 75%) and provide detailed explanations:
+I. NONVERBAL DOMINANCE BEHAVIORS (Communication Research Category)
 
-1. CONFIDENT DOMINANCE SIGNALS:
-   - Direct eye contact patterns and intensity
-   - Space-taking body language and territorial behaviors
-   - Commanding gestures and power postures
-   - Voice projection and assertive vocal patterns (if audio)
-   - How these signals change across the video
+Catalog observable nonverbal behaviors across timeline and explain their typical meanings in communication literature:
+
+1. ASSERTIVENESS DISPLAYS:
+   Observable: Eye gaze patterns, body orientation, space usage, gesture types
+   Literature significance: What research says about these nonverbal cues
+   Describe what you see at each frame: 0%, 25%, 50%, 75%
    
-2. STRATEGIC INFLUENCE BEHAVIORS:
-   - Persuasive communication techniques observed
-   - Adaptive response patterns to different situations
-   - Control of conversation flow and pacing
-   - Calculated vs spontaneous expression patterns
+2. INFLUENCE ATTEMPT BEHAVIORS:
+   Observable: Persuasive gestures, adaptive responses, turn-taking patterns
+   Literature significance: How communication studies interpret these behaviors
+   Temporal changes across the video frames
    
-3. RISK-TAKING & BOLDNESS INDICATORS:
-   - Fearless expressions and confident demeanor
-   - Boundary-pushing behaviors or statements
-   - Reaction to challenge or stress
-   - Adventurous vs cautious communication style
+3. CONFIDENCE MARKERS:
+   Observable: Posture type, movement quality, facial tension/relaxation
+   Literature significance: Research findings on these behavioral indicators
+   Evolution across video timeline
 
-II. EMOTIONAL INTELLIGENCE & EMPATHY PATTERNS
+II. EMOTIONAL EXPRESSION BEHAVIORS (Nonverbal Communication Category)
 
-Provide detailed analysis with specific examples:
+Catalog observable emotional displays and their research interpretations:
 
-1. EMPATHY & WARMTH SIGNALS:
-   - Genuine vs performed emotional expressions
-   - Responsiveness to others (if visible in video)
-   - Emotional congruence between words and expressions
-   - Depth vs superficiality of emotional display
+1. AFFECTIVE DISPLAYS:
+   Observable: Facial expressions, micro-expressions, expression duration
+   Literature significance: What affective science research indicates
+   Specific observations at each frame timing
    
-2. EMOTIONAL REGULATION QUALITY:
-   - Stability of emotional expression across timeline
-   - Impulse control vs reactive patterns
-   - Emotional range and flexibility
-   - Authenticity vs emotional manipulation cues
+2. EMOTIONAL STABILITY MARKERS:
+   Observable: Expression consistency, transition smoothness, affect range
+   Literature significance: Research on emotional regulation displays
+   Temporal patterns across frames
 
-III. INTERPERSONAL COMMUNICATION STYLE
+III. INTERPERSONAL BEHAVIOR PATTERNS (Social Communication Category)
 
-Analyze and explain in detail:
+Catalog social interaction behaviors:
 
-1. RELATIONSHIP APPROACH:
-   - Self-focused vs other-focused communication
-   - Collaborative vs competitive interaction style
-   - Respect signals vs dismissive patterns
-   - Validation-seeking vs self-sufficient presentation
+1. RELATIONAL ORIENTATION:
+   Observable: Body angles, proximity patterns (if visible), mirroring behaviors
+   Literature significance: Interpersonal communication research context
+   Frame-by-frame observations
    
-2. SOCIAL CONFIDENCE & CHARISMA:
-   - Natural charm vs calculated presentation
-   - Social ease vs performance anxiety markers
-   - Attention-seeking vs attention-avoiding behaviors
-   - Authenticity indicators across video timeline
+2. SOCIAL PRESENTATION:
+   Observable: Grooming awareness, camera engagement, self-monitoring cues
+   Literature significance: Self-presentation research findings
+   Evolution across timeline
 
-IV. COMMUNICATION STRATEGY PATTERNS
+IV. COMMUNICATION STYLE INDICATORS (Behavioral Communication Category)
 
-Provide comprehensive explanations:
+Catalog communication approach behaviors:
 
-1. PRESENTATION CONSISTENCY:
-   - Maintained persona vs authentic variation
-   - Strategic self-presentation vs spontaneous expression
-   - Image management vs natural behavior
-   - Temporal changes in presentation style
+1. AUTHENTICITY MARKERS:
+   Observable: Expression spontaneity, behavioral variability, control indicators
+   Literature significance: Research on authentic vs strategic communication
+   Temporal consistency analysis
    
-2. INFLUENCE & PERSUASION STYLE:
-   - Direct vs indirect communication approach
-   - Logical vs emotional persuasion tactics
-   - Transparency vs strategic information sharing
-   - Trust-building vs guard-maintaining behaviors
+2. PERSUASION BEHAVIORS:
+   Observable: Argument structure cues, appeal types visible, transparency markers
+   Literature significance: Persuasion research interpretations
+   Changes across video
 
-CRITICAL REQUIREMENTS:
-- Every pattern MUST include specific visual evidence with frame timing
-- Every interpretation MUST include detailed reasoning
-- Compare behaviors across 0%, 25%, 50%, 75% timeline
-- Explain HOW and WHY you draw each conclusion
-- Cite specific facial expressions, gestures, postures, voice patterns
-- Distinguish between definite observations and tentative interpretations
-- This is behavioral analysis for communication understanding, NOT clinical diagnosis
+CATALOGING REQUIREMENTS:
+- Describe specific visible behaviors at each frame (0%, 25%, 50%, 75%)
+- Reference what communication research literature says about each behavior type
+- Provide detailed behavioral evidence for each observation
+- Explain temporal patterns without making personal claims
+- This is educational cataloging of communication behaviors for research/training purposes
 
-Provide your analysis in JSON format:
+Provide your catalog in JSON format:
 {
-  "summary": "Comprehensive overview of behavioral patterns and communication dynamics observed across the video timeline, with key findings and interpretations",
+  "summary": "Overview of observable nonverbal communication behaviors cataloged across video frames for educational/research purposes",
   
-  "dominance_assertiveness_patterns": {
-    "confident_dominance": {
-      "observation": "Specific visual behaviors observed (cite frames: 0%, 25%, 50%, 75%)",
-      "interpretation": "What these behaviors typically indicate in communication research",
-      "evidence": "Detailed explanation of WHY you interpret it this way, referencing specific visual cues",
-      "temporal_evolution": "How this pattern changes or remains consistent across the video",
-      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
+  "nonverbal_dominance_behaviors": {
+    "assertiveness_displays": {
+      "visible_behaviors": "Specific observable behaviors at frames 0%, 25%, 50%, 75% (eye gaze, posture, gestures, space usage)",
+      "research_context": "What communication studies literature says about these behavior types",
+      "behavioral_evidence": "Detailed description of which visual elements are present and why they fit this category",
+      "temporal_pattern": "How these observable behaviors change or stay consistent across timeline",
+      "prevalence": "None/Subtle/Moderate/Strong/Very Strong"
     },
-    "strategic_influence": {
-      "observation": "Specific persuasive or adaptive behaviors seen across frames",
-      "interpretation": "What these communication patterns suggest",
-      "evidence": "Detailed reasoning with specific visual references",
-      "temporal_evolution": "Evolution of influence tactics throughout video",
-      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
+    "influence_attempt_behaviors": {
+      "visible_behaviors": "Observable persuasive behaviors, gestures, adaptive responses across frames",
+      "research_context": "Communication research findings on these behavior patterns",
+      "behavioral_evidence": "Specific visual details supporting this behavioral classification",
+      "temporal_pattern": "Evolution of these behaviors throughout video",
+      "prevalence": "None/Subtle/Moderate/Strong/Very Strong"
     },
-    "risk_taking_boldness": {
-      "observation": "Fearless vs cautious behaviors observed",
-      "interpretation": "What this suggests about behavioral approach",
-      "evidence": "Detailed explanation with visual evidence",
-      "temporal_evolution": "Changes in risk-taking patterns across timeline",
-      "intensity": "None/Subtle/Moderate/Strong/Very Strong"
+    "confidence_markers": {
+      "visible_behaviors": "Observable posture types, movement quality, tension patterns",
+      "research_context": "Research literature on confidence-related nonverbal cues",
+      "behavioral_evidence": "Visual evidence for this behavioral category",
+      "temporal_pattern": "Changes in these markers across timeline",
+      "prevalence": "None/Subtle/Moderate/Strong/Very Strong"
     }
   },
   
-  "emotional_intelligence_patterns": {
-    "empathy_warmth": {
-      "observation": "Specific emotional expressions and responsiveness observed",
-      "interpretation": "What genuine vs performed emotions suggest",
-      "evidence": "Detailed explanation citing facial expressions, micro-expressions, congruence",
-      "temporal_evolution": "How emotional warmth varies across video",
-      "quality": "Genuine/Performed/Mixed/Absent"
+  "emotional_expression_behaviors": {
+    "affective_displays": {
+      "visible_behaviors": "Observable facial expressions, micro-expressions, expression durations across frames",
+      "research_context": "Affective science research on these expression types",
+      "behavioral_evidence": "Specific facial cues and expression patterns visible",
+      "temporal_pattern": "How emotional displays vary across video",
+      "classification": "Describe the expression types observed based on research categories"
     },
-    "emotional_regulation": {
-      "observation": "Stability vs volatility of emotional expression",
-      "interpretation": "What this suggests about emotional control",
-      "evidence": "Detailed reasoning with specific behavioral examples",
-      "temporal_evolution": "Consistency or changes in regulation across timeline",
-      "quality": "Excellent/Good/Moderate/Poor/Unstable"
+    "emotional_stability_markers": {
+      "visible_behaviors": "Observable expression consistency, transition quality, affect range",
+      "research_context": "Research on emotional regulation behavioral displays",
+      "behavioral_evidence": "Visual evidence of stability/variability patterns",
+      "temporal_pattern": "Consistency or changes across timeline",
+      "classification": "Research-based description of regulation pattern type"
     }
   },
   
-  "interpersonal_communication_style": {
-    "relationship_approach": {
-      "observation": "Self-focused vs other-focused communication patterns",
-      "interpretation": "What this suggests about interpersonal orientation",
-      "evidence": "Detailed explanation with specific visual cues",
-      "temporal_evolution": "Changes in relational style across video",
-      "style": "Collaborative/Competitive/Self-focused/Other-focused/Balanced"
+  "interpersonal_behavior_patterns": {
+    "relational_orientation": {
+      "visible_behaviors": "Observable body angles, proximity patterns, mirroring if visible",
+      "research_context": "Interpersonal communication research on these cues",
+      "behavioral_evidence": "Specific visual elements present",
+      "temporal_pattern": "Evolution of relational behaviors",
+      "classification": "Research-based categorization of pattern type"
     },
-    "social_confidence_charisma": {
-      "observation": "Natural vs calculated presentation behaviors",
-      "interpretation": "What this suggests about social ease and authenticity",
-      "evidence": "Detailed reasoning citing specific charm patterns, ease vs anxiety markers",
-      "temporal_evolution": "Evolution of social presentation across timeline",
-      "quality": "Natural High/Calculated High/Moderate/Low/Anxious"
+    "social_presentation": {
+      "visible_behaviors": "Observable grooming awareness, camera engagement, self-monitoring cues",
+      "research_context": "Self-presentation research findings",
+      "behavioral_evidence": "Visual indicators supporting this classification",
+      "temporal_pattern": "Changes in presentation across timeline",
+      "classification": "Description based on presentation research"
     }
   },
   
-  "communication_strategy_patterns": {
-    "presentation_consistency": {
-      "observation": "Maintained persona vs authentic variation observed",
-      "interpretation": "What this suggests about strategic self-presentation",
-      "evidence": "Detailed explanation of image management vs spontaneous behavior",
-      "temporal_evolution": "Changes or consistency in presentation strategy",
-      "authenticity": "Highly Authentic/Mostly Authentic/Mixed/Mostly Strategic/Highly Strategic"
+  "communication_style_indicators": {
+    "authenticity_markers": {
+      "visible_behaviors": "Observable spontaneity levels, behavioral variability, control indicators",
+      "research_context": "Research on authentic vs strategic communication displays",
+      "behavioral_evidence": "Specific visual cues for this behavioral category",
+      "temporal_pattern": "Consistency of these markers across video",
+      "classification": "Research-based authenticity pattern description"
     },
-    "influence_persuasion_style": {
-      "observation": "Direct vs indirect, logical vs emotional approaches observed",
-      "interpretation": "What persuasion tactics suggest about communication strategy",
-      "evidence": "Detailed reasoning with specific examples of influence attempts",
-      "temporal_evolution": "Evolution of persuasion approach across video",
-      "approach": "Direct-Logical/Direct-Emotional/Indirect-Logical/Indirect-Emotional/Mixed"
+    "persuasion_behaviors": {
+      "visible_behaviors": "Observable argument cues, appeal types, transparency markers",
+      "research_context": "Persuasion research on nonverbal indicators",
+      "behavioral_evidence": "Visual evidence for persuasion behavior type",
+      "temporal_pattern": "Evolution across timeline",
+      "classification": "Research-based persuasion style description"
     }
   },
   
-  "behavioral_dynamics_summary": {
-    "dominant_patterns": ["Primary behavioral tendencies observed with explanations"],
-    "strengths": ["Positive communication patterns with detailed reasoning"],
-    "areas_of_concern": ["Patterns that may indicate challenges, with full explanations"],
-    "temporal_consistency": "Detailed analysis of whether behavior remains stable or shifts across timeline",
-    "overall_communication_profile": "Comprehensive synthesis of all observations with detailed interpretations and reasoning"
+  "behavioral_catalog_summary": {
+    "primary_behavior_categories": ["Main behavior types observed with research-based descriptions"],
+    "notable_research_applications": ["How these behavior types are studied in communication research"],
+    "temporal_consistency_notes": "Research perspective on behavioral stability vs variability observed",
+    "overall_behavior_profile": "Comprehensive catalog summary using communication research terminology"
   },
   
-  "frame_by_frame_observations": {
-    "0_percent": "Specific detailed observations at video start",
-    "25_percent": "Specific detailed observations at first quarter",
-    "50_percent": "Specific detailed observations at midpoint",
-    "75_percent": "Specific detailed observations at final quarter"
+  "frame_by_frame_catalog": {
+    "0_percent": "Observable behaviors at video start",
+    "25_percent": "Observable behaviors at first quarter",
+    "50_percent": "Observable behaviors at midpoint",
+    "75_percent": "Observable behaviors at final quarter"
   },
   
-  "analysis_confidence": {
-    "high_confidence_patterns": ["Patterns with strong visual evidence"],
-    "tentative_patterns": ["Patterns with limited or ambiguous evidence"],
-    "limitations": "Specific limitations of this analysis based on video quality, angle, context"
+  "cataloging_notes": {
+    "clear_observations": ["Behavior types with strong visual evidence"],
+    "tentative_observations": ["Behavior types with limited or ambiguous visual evidence"],
+    "limitations": "Specific limitations based on video quality, angle, framing, context availability"
   }
 }`;
 
@@ -5080,168 +5069,165 @@ Provide your analysis in JSON format:
         return String(value || '');
       };
       
-      // Format the analysis for display
-      let formattedContent = `Behavioral Dynamics Analysis - Video Timeline\nMode: Communication & Interpersonal Pattern Assessment\n\nNote: This is behavioral analysis for understanding communication patterns, NOT clinical diagnosis.\n\n`;
+      // Format the catalog for display
+      let formattedContent = `Communication Behavior Catalog - Video Timeline\nMode: Educational Research & Training Analysis\n\nNote: This catalogs observable nonverbal communication behaviors for educational/research purposes.\n\n`;
       formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
       
-      // Dominance & Assertiveness Patterns
-      if (analysisResult.dominance_assertiveness_patterns) {
-        formattedContent += `DOMINANCE & ASSERTIVENESS PATTERNS:\n\n`;
+      // Nonverbal Dominance Behaviors
+      if (analysisResult.nonverbal_dominance_behaviors) {
+        formattedContent += `NONVERBAL DOMINANCE BEHAVIORS (Communication Research):\n\n`;
         
-        if (analysisResult.dominance_assertiveness_patterns.confident_dominance) {
-          const cd = analysisResult.dominance_assertiveness_patterns.confident_dominance;
-          formattedContent += `Confident Dominance [${cd.intensity || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(cd.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(cd.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(cd.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(cd.temporal_evolution)}\n\n`;
+        if (analysisResult.nonverbal_dominance_behaviors.assertiveness_displays) {
+          const ad = analysisResult.nonverbal_dominance_behaviors.assertiveness_displays;
+          formattedContent += `Assertiveness Displays [${ad.prevalence || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(ad.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(ad.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(ad.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(ad.temporal_pattern)}\n\n`;
         }
         
-        if (analysisResult.dominance_assertiveness_patterns.strategic_influence) {
-          const si = analysisResult.dominance_assertiveness_patterns.strategic_influence;
-          formattedContent += `Strategic Influence [${si.intensity || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(si.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(si.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(si.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(si.temporal_evolution)}\n\n`;
+        if (analysisResult.nonverbal_dominance_behaviors.influence_attempt_behaviors) {
+          const iab = analysisResult.nonverbal_dominance_behaviors.influence_attempt_behaviors;
+          formattedContent += `Influence Attempt Behaviors [${iab.prevalence || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(iab.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(iab.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(iab.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(iab.temporal_pattern)}\n\n`;
         }
         
-        if (analysisResult.dominance_assertiveness_patterns.risk_taking_boldness) {
-          const rtb = analysisResult.dominance_assertiveness_patterns.risk_taking_boldness;
-          formattedContent += `Risk-Taking & Boldness [${rtb.intensity || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(rtb.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(rtb.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(rtb.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(rtb.temporal_evolution)}\n\n`;
+        if (analysisResult.nonverbal_dominance_behaviors.confidence_markers) {
+          const cm = analysisResult.nonverbal_dominance_behaviors.confidence_markers;
+          formattedContent += `Confidence Markers [${cm.prevalence || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(cm.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(cm.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(cm.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(cm.temporal_pattern)}\n\n`;
         }
       }
       
-      // Emotional Intelligence Patterns
-      if (analysisResult.emotional_intelligence_patterns) {
-        formattedContent += `EMOTIONAL INTELLIGENCE PATTERNS:\n\n`;
+      // Emotional Expression Behaviors
+      if (analysisResult.emotional_expression_behaviors) {
+        formattedContent += `EMOTIONAL EXPRESSION BEHAVIORS (Affective Research):\n\n`;
         
-        if (analysisResult.emotional_intelligence_patterns.empathy_warmth) {
-          const ew = analysisResult.emotional_intelligence_patterns.empathy_warmth;
-          formattedContent += `Empathy & Warmth [${ew.quality || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(ew.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(ew.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(ew.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ew.temporal_evolution)}\n\n`;
+        if (analysisResult.emotional_expression_behaviors.affective_displays) {
+          const ad = analysisResult.emotional_expression_behaviors.affective_displays;
+          formattedContent += `Affective Displays [${ad.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(ad.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(ad.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(ad.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(ad.temporal_pattern)}\n\n`;
         }
         
-        if (analysisResult.emotional_intelligence_patterns.emotional_regulation) {
-          const er = analysisResult.emotional_intelligence_patterns.emotional_regulation;
-          formattedContent += `Emotional Regulation [${er.quality || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(er.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(er.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(er.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(er.temporal_evolution)}\n\n`;
+        if (analysisResult.emotional_expression_behaviors.emotional_stability_markers) {
+          const esm = analysisResult.emotional_expression_behaviors.emotional_stability_markers;
+          formattedContent += `Emotional Stability Markers [${esm.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(esm.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(esm.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(esm.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(esm.temporal_pattern)}\n\n`;
         }
       }
       
-      // Interpersonal Communication Style
-      if (analysisResult.interpersonal_communication_style) {
-        formattedContent += `INTERPERSONAL COMMUNICATION STYLE:\n\n`;
+      // Interpersonal Behavior Patterns
+      if (analysisResult.interpersonal_behavior_patterns) {
+        formattedContent += `INTERPERSONAL BEHAVIOR PATTERNS (Social Communication):\n\n`;
         
-        if (analysisResult.interpersonal_communication_style.relationship_approach) {
-          const ra = analysisResult.interpersonal_communication_style.relationship_approach;
-          formattedContent += `Relationship Approach [${ra.style || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(ra.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(ra.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(ra.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ra.temporal_evolution)}\n\n`;
+        if (analysisResult.interpersonal_behavior_patterns.relational_orientation) {
+          const ro = analysisResult.interpersonal_behavior_patterns.relational_orientation;
+          formattedContent += `Relational Orientation [${ro.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(ro.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(ro.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(ro.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(ro.temporal_pattern)}\n\n`;
         }
         
-        if (analysisResult.interpersonal_communication_style.social_confidence_charisma) {
-          const scc = analysisResult.interpersonal_communication_style.social_confidence_charisma;
-          formattedContent += `Social Confidence & Charisma [${scc.quality || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(scc.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(scc.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(scc.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(scc.temporal_evolution)}\n\n`;
+        if (analysisResult.interpersonal_behavior_patterns.social_presentation) {
+          const sp = analysisResult.interpersonal_behavior_patterns.social_presentation;
+          formattedContent += `Social Presentation [${sp.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(sp.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(sp.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(sp.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(sp.temporal_pattern)}\n\n`;
         }
       }
       
-      // Communication Strategy Patterns
-      if (analysisResult.communication_strategy_patterns) {
-        formattedContent += `COMMUNICATION STRATEGY PATTERNS:\n\n`;
+      // Communication Style Indicators
+      if (analysisResult.communication_style_indicators) {
+        formattedContent += `COMMUNICATION STYLE INDICATORS (Behavioral Communication):\n\n`;
         
-        if (analysisResult.communication_strategy_patterns.presentation_consistency) {
-          const pc = analysisResult.communication_strategy_patterns.presentation_consistency;
-          formattedContent += `Presentation Consistency [${pc.authenticity || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(pc.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(pc.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(pc.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(pc.temporal_evolution)}\n\n`;
+        if (analysisResult.communication_style_indicators.authenticity_markers) {
+          const am = analysisResult.communication_style_indicators.authenticity_markers;
+          formattedContent += `Authenticity Markers [${am.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(am.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(am.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(am.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(am.temporal_pattern)}\n\n`;
         }
         
-        if (analysisResult.communication_strategy_patterns.influence_persuasion_style) {
-          const ips = analysisResult.communication_strategy_patterns.influence_persuasion_style;
-          formattedContent += `Influence & Persuasion Style [${ips.approach || 'N/A'}]:\n`;
-          formattedContent += `OBSERVATION: ${safeStringify(ips.observation)}\n`;
-          formattedContent += `INTERPRETATION: ${safeStringify(ips.interpretation)}\n`;
-          formattedContent += `EVIDENCE: ${safeStringify(ips.evidence)}\n`;
-          formattedContent += `TEMPORAL EVOLUTION: ${safeStringify(ips.temporal_evolution)}\n\n`;
+        if (analysisResult.communication_style_indicators.persuasion_behaviors) {
+          const pb = analysisResult.communication_style_indicators.persuasion_behaviors;
+          formattedContent += `Persuasion Behaviors [${pb.classification || 'N/A'}]:\n`;
+          formattedContent += `VISIBLE BEHAVIORS: ${safeStringify(pb.visible_behaviors)}\n`;
+          formattedContent += `RESEARCH CONTEXT: ${safeStringify(pb.research_context)}\n`;
+          formattedContent += `BEHAVIORAL EVIDENCE: ${safeStringify(pb.behavioral_evidence)}\n`;
+          formattedContent += `TEMPORAL PATTERN: ${safeStringify(pb.temporal_pattern)}\n\n`;
         }
       }
       
-      // Behavioral Dynamics Summary
-      if (analysisResult.behavioral_dynamics_summary) {
-        formattedContent += `BEHAVIORAL DYNAMICS SUMMARY:\n\n`;
-        const bds = analysisResult.behavioral_dynamics_summary;
+      // Behavioral Catalog Summary
+      if (analysisResult.behavioral_catalog_summary) {
+        formattedContent += `BEHAVIORAL CATALOG SUMMARY:\n\n`;
+        const bcs = analysisResult.behavioral_catalog_summary;
         
-        if (bds.dominant_patterns) {
-          formattedContent += `Dominant Patterns:\n${safeStringify(bds.dominant_patterns)}\n\n`;
+        if (bcs.primary_behavior_categories) {
+          formattedContent += `Primary Behavior Categories:\n${safeStringify(bcs.primary_behavior_categories)}\n\n`;
         }
-        if (bds.strengths) {
-          formattedContent += `Strengths:\n${safeStringify(bds.strengths)}\n\n`;
+        if (bcs.notable_research_applications) {
+          formattedContent += `Research Applications:\n${safeStringify(bcs.notable_research_applications)}\n\n`;
         }
-        if (bds.areas_of_concern) {
-          formattedContent += `Areas of Concern:\n${safeStringify(bds.areas_of_concern)}\n\n`;
+        if (bcs.temporal_consistency_notes) {
+          formattedContent += `Temporal Consistency:\n${safeStringify(bcs.temporal_consistency_notes)}\n\n`;
         }
-        if (bds.temporal_consistency) {
-          formattedContent += `Temporal Consistency:\n${safeStringify(bds.temporal_consistency)}\n\n`;
-        }
-        if (bds.overall_communication_profile) {
-          formattedContent += `Overall Communication Profile:\n${safeStringify(bds.overall_communication_profile)}\n\n`;
+        if (bcs.overall_behavior_profile) {
+          formattedContent += `Overall Behavior Profile:\n${safeStringify(bcs.overall_behavior_profile)}\n\n`;
         }
       }
       
-      // Frame-by-Frame Observations
-      if (analysisResult.frame_by_frame_observations) {
-        formattedContent += `FRAME-BY-FRAME OBSERVATIONS:\n\n`;
-        const fbo = analysisResult.frame_by_frame_observations;
-        if (fbo["0_percent"]) formattedContent += `At 0% (Video Start):\n${safeStringify(fbo["0_percent"])}\n\n`;
-        if (fbo["25_percent"]) formattedContent += `At 25% (First Quarter):\n${safeStringify(fbo["25_percent"])}\n\n`;
-        if (fbo["50_percent"]) formattedContent += `At 50% (Midpoint):\n${safeStringify(fbo["50_percent"])}\n\n`;
-        if (fbo["75_percent"]) formattedContent += `At 75% (Final Quarter):\n${safeStringify(fbo["75_percent"])}\n\n`;
+      // Frame-by-Frame Catalog
+      if (analysisResult.frame_by_frame_catalog) {
+        formattedContent += `FRAME-BY-FRAME CATALOG:\n\n`;
+        const fbc = analysisResult.frame_by_frame_catalog;
+        if (fbc["0_percent"]) formattedContent += `At 0% (Video Start):\n${safeStringify(fbc["0_percent"])}\n\n`;
+        if (fbc["25_percent"]) formattedContent += `At 25% (First Quarter):\n${safeStringify(fbc["25_percent"])}\n\n`;
+        if (fbc["50_percent"]) formattedContent += `At 50% (Midpoint):\n${safeStringify(fbc["50_percent"])}\n\n`;
+        if (fbc["75_percent"]) formattedContent += `At 75% (Final Quarter):\n${safeStringify(fbc["75_percent"])}\n\n`;
       }
       
-      // Analysis Confidence
-      if (analysisResult.analysis_confidence) {
-        formattedContent += `ANALYSIS CONFIDENCE:\n\n`;
-        const ac = analysisResult.analysis_confidence;
-        if (ac.high_confidence_patterns) {
-          formattedContent += `High Confidence Patterns:\n${safeStringify(ac.high_confidence_patterns)}\n\n`;
+      // Cataloging Notes
+      if (analysisResult.cataloging_notes) {
+        formattedContent += `CATALOGING NOTES:\n\n`;
+        const cn = analysisResult.cataloging_notes;
+        if (cn.clear_observations) {
+          formattedContent += `Clear Observations:\n${safeStringify(cn.clear_observations)}\n\n`;
         }
-        if (ac.tentative_patterns) {
-          formattedContent += `Tentative Patterns:\n${safeStringify(ac.tentative_patterns)}\n\n`;
+        if (cn.tentative_observations) {
+          formattedContent += `Tentative Observations:\n${safeStringify(cn.tentative_observations)}\n\n`;
         }
-        if (ac.limitations) {
-          formattedContent += `Limitations:\n${safeStringify(ac.limitations)}\n\n`;
+        if (cn.limitations) {
+          formattedContent += `Limitations:\n${safeStringify(cn.limitations)}\n\n`;
         }
       }
       
       // Create analysis record in storage
       const analysis = await storage.createAnalysis({
         sessionId,
-        title: title || `Behavioral Dynamics Video Analysis`,
+        title: title || `Communication Behavior Catalog - Video`,
         mediaUrl: mediaData,
         personalityInsights: { 
           analysis: formattedContent,
-          behavioral_dynamics: analysisResult.behavioral_dynamics_summary,
-          dominance_patterns: analysisResult.dominance_assertiveness_patterns,
-          emotional_intelligence: analysisResult.emotional_intelligence_patterns
+          behavioral_catalog: analysisResult.behavioral_catalog_summary,
+          nonverbal_dominance: analysisResult.nonverbal_dominance_behaviors,
+          emotional_expression: analysisResult.emotional_expression_behaviors
         },
         modelUsed: selectedModel,
       });
@@ -5258,8 +5244,8 @@ Provide your analysis in JSON format:
         analysisId: analysis.id,
         personalityInsights: { 
           analysis: formattedContent,
-          behavioral_dynamics: analysisResult.behavioral_dynamics_summary,
-          dominance_patterns: analysisResult.dominance_assertiveness_patterns
+          behavioral_catalog: analysisResult.behavioral_catalog_summary,
+          nonverbal_dominance: analysisResult.nonverbal_dominance_behaviors
         },
         messages: [message],
         mediaUrl: mediaData,
