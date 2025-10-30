@@ -3347,6 +3347,343 @@ Provide detailed analysis in JSON format:
     }
   });
 
+  // Enneagram Analysis Endpoints - Text
+  app.post("/api/analyze/text/enneagram", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Enneagram text analysis with model: ${selectedModel}`);
+      
+      // Enneagram text analysis prompt with 9 personality types
+      const enneagramTextPrompt = `You are an expert Enneagram analyst specializing in identifying personality types through written text. Analyze this text comprehensively using the Enneagram framework, providing detailed evidence for the most likely type(s) with DIRECT QUOTES from the text.
+
+The Enneagram 9 Types are:
+
+TYPE 1 - THE REFORMER (The Perfectionist)
+Core Fear: Being corrupt, evil, defective
+Core Desire: To be good, balanced, have integrity
+Key Traits: Principled, purposeful, self-controlled, perfectionistic, critical
+Writing Style: Precise language, moral/ethical concerns, "should/ought" statements, corrective tone, structured arguments
+
+TYPE 2 - THE HELPER (The Giver)
+Core Fear: Being unloved, unwanted
+Core Desire: To be loved, appreciated
+Key Traits: Caring, interpersonal, generous, possessive, people-pleasing
+Writing Style: Warm tone, focus on others' needs, relationship-oriented, emotional appeals, self-sacrificing language
+
+TYPE 3 - THE ACHIEVER (The Performer)
+Core Fear: Being worthless, without value
+Core Desire: To be valuable, admired
+Key Traits: Adaptive, excelling, driven, image-conscious, competitive
+Writing Style: Goal-oriented language, success metrics, achievement focus, polished presentation, efficiency emphasis
+
+TYPE 4 - THE INDIVIDUALIST (The Romantic)
+Core Fear: Having no identity or significance
+Core Desire: To be unique, authentic
+Key Traits: Expressive, dramatic, self-absorbed, temperamental, creative
+Writing Style: Poetic language, emotional depth, uniqueness emphasis, introspective, metaphorical
+
+TYPE 5 - THE INVESTIGATOR (The Observer)
+Core Fear: Being useless, incompetent
+Core Desire: To be capable, knowledgeable
+Key Traits: Perceptive, innovative, isolated, detached, cerebral
+Writing Style: Analytical, detailed, technical precision, minimal emotion, information-dense
+
+TYPE 6 - THE LOYALIST (The Skeptic)
+Core Fear: Being without support or guidance
+Core Desire: To have security, support
+Key Traits: Committed, security-oriented, anxious, suspicious, responsible
+Writing Style: Cautious language, contingency planning, authority references, worst-case scenarios, questioning
+
+TYPE 7 - THE ENTHUSIAST (The Epicure)
+Core Fear: Being deprived, trapped in pain
+Core Desire: To be happy, satisfied, free
+Key Traits: Spontaneous, versatile, scattered, optimistic, escapist
+Writing Style: Energetic, multiple ideas, future-focused, positive framing, scattered topics
+
+TYPE 8 - THE CHALLENGER (The Protector)
+Core Fear: Being harmed, controlled by others
+Core Desire: To protect self, be in control
+Key Traits: Self-confident, decisive, confrontational, protective, dominating
+Writing Style: Direct, assertive, confrontational, strong opinions, protective language
+
+TYPE 9 - THE PEACEMAKER (The Mediator)
+Core Fear: Loss, separation, conflict
+Core Desire: To have peace, harmony
+Key Traits: Receptive, reassuring, complacent, resigned, conflict-averse
+Writing Style: Harmonizing language, multiple perspectives, gentle tone, passive voice, minimizing conflict
+
+CRITICAL: Every indicator must include DIRECT QUOTES from the actual text showing the pattern.
+
+Provide your analysis in JSON format:
+{
+  "summary": "Overall Enneagram assessment with primary type, wing possibilities, and confidence level",
+  "primary_type": {
+    "type": "Type [Number] - [Name]",
+    "confidence": "High/Medium/Low",
+    "core_motivation": "Identified core fear and desire based on text evidence",
+    "key_indicators": [
+      "Specific quote or pattern from text showing this type trait",
+      "Another direct quote demonstrating the core motivation",
+      "Behavioral pattern with specific textual evidence"
+    ]
+  },
+  "secondary_possibilities": [
+    {
+      "type": "Type [Number] - [Name]",
+      "reasoning": "Why this type is also possible with specific text quotes"
+    }
+  ],
+  "wing_analysis": "Analysis of likely wing (e.g., 4w3 or 4w5) based on text patterns with evidence",
+  "stress_growth_patterns": "Identified stress (disintegration) and growth (integration) directions based on text with quotes",
+  "triadic_analysis": {
+    "center": "Head/Heart/Body center based on dominant cognitive style",
+    "stance": "Aggressive/Dependent/Withdrawing based on interpersonal approach in text"
+  },
+  "writing_style_markers": [
+    "Specific linguistic patterns observed with examples",
+    "Emotional tone indicators with quotes",
+    "Structural or thematic tendencies with evidence"
+  ],
+  "personality_summary": "Comprehensive Enneagram-based personality description integrating type, wing, and triadic patterns",
+  "growth_recommendations": ["Specific suggestions based on identified type patterns"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: enneagramTextPrompt + "\n\nText to analyze:\n" + content
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Enneagram text raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            stress_growth_patterns: "Unable to analyze",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            writing_style_markers: [],
+            personality_summary: "Unable to format analysis",
+            growth_recommendations: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: enneagramTextPrompt + "\n\nText to analyze:\n" + content
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Enneagram text raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            stress_growth_patterns: "Unable to analyze",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            writing_style_markers: [],
+            personality_summary: "Unable to format analysis",
+            growth_recommendations: []
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [{
+              role: "user",
+              content: enneagramTextPrompt + "\n\nText to analyze:\n" + content
+            }],
+            response_format: { type: "json_object" }
+          })
+        });
+
+        const data = await response.json();
+        const rawResponse = data.choices?.[0]?.message?.content || "";
+        console.log("DeepSeek Enneagram text raw response:", rawResponse.substring(0, 500));
+
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse DeepSeek response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            stress_growth_patterns: "Unable to analyze",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            writing_style_markers: [],
+            personality_summary: "Unable to format analysis",
+            growth_recommendations: []
+          };
+        }
+      } else if (selectedModel === "perplexity" && perplexity) {
+        const response = await perplexity.chat.completions.create({
+          model: "llama-3.1-sonar-large-128k-online",
+          messages: [{
+            role: "user",
+            content: enneagramTextPrompt + "\n\nText to analyze:\n" + content
+          }],
+        });
+
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Perplexity Enneagram text raw response:", rawResponse.substring(0, 500));
+
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            stress_growth_patterns: "Unable to analyze",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            writing_style_markers: [],
+            personality_summary: "Unable to format analysis",
+            growth_recommendations: []
+          };
+        }
+      }
+      
+      console.log("Enneagram text analysis complete");
+      
+      // Format the analysis for display
+      let formattedContent = `Enneagram Personality Analysis\nMode: 9-Type Framework\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Primary Type
+      if (analysisResult.primary_type) {
+        formattedContent += `Primary Type: ${analysisResult.primary_type.type}\n`;
+        formattedContent += `Confidence: ${analysisResult.primary_type.confidence}\n`;
+        formattedContent += `Core Motivation: ${safeStringify(analysisResult.primary_type.core_motivation)}\n`;
+        if (analysisResult.primary_type.key_indicators && analysisResult.primary_type.key_indicators.length > 0) {
+          formattedContent += `Key Indicators:\n${safeStringify(analysisResult.primary_type.key_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Secondary Possibilities
+      if (analysisResult.secondary_possibilities && analysisResult.secondary_possibilities.length > 0) {
+        formattedContent += `Secondary Possibilities:\n${safeStringify(analysisResult.secondary_possibilities)}\n\n`;
+      }
+      
+      // Wing Analysis
+      if (analysisResult.wing_analysis) {
+        formattedContent += `Wing Analysis:\n${safeStringify(analysisResult.wing_analysis)}\n\n`;
+      }
+      
+      // Stress/Growth Patterns
+      if (analysisResult.stress_growth_patterns) {
+        formattedContent += `Stress & Growth Patterns:\n${safeStringify(analysisResult.stress_growth_patterns)}\n\n`;
+      }
+      
+      // Triadic Analysis
+      if (analysisResult.triadic_analysis) {
+        formattedContent += `Triadic Analysis:\n`;
+        formattedContent += `Center: ${analysisResult.triadic_analysis.center || 'N/A'}\n`;
+        formattedContent += `Stance: ${analysisResult.triadic_analysis.stance || 'N/A'}\n\n`;
+      }
+      
+      // Writing Style Markers
+      if (analysisResult.writing_style_markers && analysisResult.writing_style_markers.length > 0) {
+        formattedContent += `Writing Style Markers:\n${safeStringify(analysisResult.writing_style_markers)}\n\n`;
+      }
+      
+      // Personality Summary
+      if (analysisResult.personality_summary) {
+        formattedContent += `Personality Summary:\n${safeStringify(analysisResult.personality_summary)}\n\n`;
+      }
+      
+      // Growth Recommendations
+      if (analysisResult.growth_recommendations && analysisResult.growth_recommendations.length > 0) {
+        formattedContent += `Growth Recommendations:\n${safeStringify(analysisResult.growth_recommendations)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Enneagram Text Analysis`,
+        mediaUrl: `enneagram-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Enneagram text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Enneagram" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;
