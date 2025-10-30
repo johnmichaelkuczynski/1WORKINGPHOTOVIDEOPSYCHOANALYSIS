@@ -4074,6 +4074,377 @@ Provide your analysis in JSON format:
     }
   });
 
+  // Enneagram Analysis Endpoints - Video
+  app.post("/api/analyze/video/enneagram", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Enneagram video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Enneagram analysis`);
+      
+      // Enneagram video analysis prompt
+      const enneagramVideoPrompt = `You are an expert Enneagram analyst specializing in identifying personality types through behavioral video analysis. Analyze this video comprehensively using the Enneagram framework, providing detailed evidence for the most likely type(s) with SPECIFIC BEHAVIORAL PATTERNS across the video timeline.
+
+The Enneagram 9 Types with behavioral markers:
+
+TYPE 1 - THE REFORMER (The Perfectionist)
+Core Fear: Being corrupt, evil, defective
+Core Desire: To be good, balanced, have integrity
+Behavioral Traits: Controlled movements, precise gestures, self-correcting behaviors, critical expressions, structured patterns
+
+TYPE 2 - THE HELPER (The Giver)
+Core Fear: Being unloved, unwanted
+Core Desire: To be loved, appreciated
+Behavioral Traits: Warm facial expressions, reaching gestures, attentive to others, nurturing movements, relational engagement
+
+TYPE 3 - THE ACHIEVER (The Performer)
+Core Fear: Being worthless, without value
+Core Desire: To be valuable, admired
+Behavioral Traits: Confident posture, polished presentation, goal-oriented movements, image-conscious behaviors, dynamic energy
+
+TYPE 4 - THE INDIVIDUALIST (The Romantic)
+Core Fear: Having no identity or significance
+Core Desire: To be unique, authentic
+Behavioral Traits: Expressive gestures, emotional depth in movements, unique mannerisms, introspective moments, artistic expression
+
+TYPE 5 - THE INVESTIGATOR (The Observer)
+Core Fear: Being useless, incompetent
+Core Desire: To be capable, knowledgeable
+Behavioral Traits: Reserved movements, analytical gaze, minimal emotional display, economical gestures, observational stance
+
+TYPE 6 - THE LOYALIST (The Skeptic)
+Core Fear: Being without support or guidance
+Core Desire: To have security, support
+Behavioral Traits: Cautious movements, vigilant expressions, testing behaviors, protective gestures, anxiety markers
+
+TYPE 7 - THE ENTHUSIAST (The Epicure)
+Core Fear: Being deprived, trapped in pain
+Core Desire: To be happy, satisfied, free
+Behavioral Traits: Energetic movements, animated expressions, quick transitions, playful gestures, exploratory behaviors
+
+TYPE 8 - THE CHALLENGER (The Protector)
+Core Fear: Being harmed, controlled by others
+Core Desire: To protect self, be in control
+Behavioral Traits: Strong movements, direct gaze, commanding presence, protective postures, assertive gestures
+
+TYPE 9 - THE PEACEMAKER (The Mediator)
+Core Fear: Loss, separation, conflict
+Core Desire: To have peace, harmony
+Behavioral Traits: Relaxed movements, gentle expressions, harmonizing gestures, conflict-avoiding behaviors, steady presence
+
+CRITICAL: Base your analysis ONLY on observable behaviors across the video frames. Reference specific behavioral patterns, movements, expressions, and temporal changes.
+
+Provide your analysis in JSON format:
+{
+  "summary": "Overall Enneagram assessment with primary type, confidence level, and behavioral reasoning across video timeline",
+  "primary_type": {
+    "type": "Type [Number] - [Name]",
+    "confidence": "High/Medium/Low",
+    "core_motivation": "Identified core fear and desire based on behavioral evidence",
+    "behavioral_indicators": [
+      "Specific behavior observed at beginning of video",
+      "Pattern that emerges mid-video",
+      "Consistent behavioral marker throughout"
+    ]
+  },
+  "secondary_possibilities": [
+    {
+      "type": "Type [Number] - [Name]",
+      "reasoning": "Why this type is also possible with specific behavioral evidence"
+    }
+  ],
+  "wing_analysis": "Analysis of likely wing (e.g., 4w3 or 4w5) based on behavioral patterns with evidence",
+  "temporal_patterns": {
+    "consistency": "Whether behaviors remain consistent or shift across video",
+    "energy_changes": "How energy level and engagement patterns evolve",
+    "defensive_patterns": "Any defensive behaviors or coping mechanisms observed"
+  },
+  "triadic_analysis": {
+    "center": "Head/Heart/Body center based on dominant behavioral presentation",
+    "stance": "Aggressive/Dependent/Withdrawing based on interpersonal behaviors"
+  },
+  "behavioral_style_markers": [
+    "Specific movement patterns observed (gestures, posture changes)",
+    "Emotional expression patterns across timeline",
+    "Interaction style and relational behaviors"
+  ],
+  "personality_summary": "Comprehensive Enneagram-based personality description integrating type, wing, temporal patterns, and behavioral evidence"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: enneagramVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Enneagram Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response. This may be due to content moderation or video complexity issues.");
+        }
+        
+        // Try to extract JSON from the response
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", behavioral_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            temporal_patterns: { consistency: "Unknown", energy_changes: "Unknown", defensive_patterns: "Unknown" },
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            behavioral_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContents = extractedFrames.map(frame => {
+          const base64Match = frame.match(/^data:image\/[a-z]+;base64,(.+)$/);
+          const base64Data = base64Match ? base64Match[1] : frame;
+          const mediaTypeMatch = frame.match(/^data:(image\/[a-z]+);base64,/);
+          const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType as any,
+              data: base64Data,
+            },
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: enneagramVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:"
+              },
+              ...imageContents
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Enneagram Video raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", behavioral_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            temporal_patterns: { consistency: "Unknown", energy_changes: "Unknown", defensive_patterns: "Unknown" },
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            behavioral_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        return res.status(400).json({ 
+          error: "DeepSeek does not support video analysis. Please use OpenAI or Anthropic for video-based Enneagram analysis." 
+        });
+      } else if (selectedModel === "perplexity") {
+        return res.status(400).json({ 
+          error: "Perplexity does not support video analysis. Please use OpenAI or Anthropic for video-based Enneagram analysis." 
+        });
+      }
+      
+      console.log("Enneagram video analysis complete");
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          // If it's an array, handle each item recursively
+          if (Array.isArray(value)) {
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Enneagram Personality Analysis\nMode: 9-Type Behavioral Video Framework\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Primary Type
+      if (analysisResult.primary_type) {
+        formattedContent += `Primary Type: ${analysisResult.primary_type.type}\n`;
+        formattedContent += `Confidence: ${analysisResult.primary_type.confidence}\n`;
+        formattedContent += `Core Motivation: ${safeStringify(analysisResult.primary_type.core_motivation)}\n`;
+        if (analysisResult.primary_type.behavioral_indicators && analysisResult.primary_type.behavioral_indicators.length > 0) {
+          formattedContent += `Behavioral Indicators:\n${safeStringify(analysisResult.primary_type.behavioral_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Secondary Possibilities
+      if (analysisResult.secondary_possibilities && analysisResult.secondary_possibilities.length > 0) {
+        formattedContent += `Secondary Possibilities:\n${safeStringify(analysisResult.secondary_possibilities)}\n\n`;
+      }
+      
+      // Wing Analysis
+      if (analysisResult.wing_analysis) {
+        formattedContent += `Wing Analysis:\n${safeStringify(analysisResult.wing_analysis)}\n\n`;
+      }
+      
+      // Temporal Patterns
+      if (analysisResult.temporal_patterns) {
+        formattedContent += `Temporal Patterns:\n`;
+        formattedContent += `Consistency: ${analysisResult.temporal_patterns.consistency || 'N/A'}\n`;
+        formattedContent += `Energy Changes: ${analysisResult.temporal_patterns.energy_changes || 'N/A'}\n`;
+        formattedContent += `Defensive Patterns: ${analysisResult.temporal_patterns.defensive_patterns || 'N/A'}\n\n`;
+      }
+      
+      // Triadic Analysis
+      if (analysisResult.triadic_analysis) {
+        formattedContent += `Triadic Analysis:\n`;
+        formattedContent += `Center: ${analysisResult.triadic_analysis.center || 'N/A'}\n`;
+        formattedContent += `Stance: ${analysisResult.triadic_analysis.stance || 'N/A'}\n\n`;
+      }
+      
+      // Behavioral Style Markers
+      if (analysisResult.behavioral_style_markers && analysisResult.behavioral_style_markers.length > 0) {
+        formattedContent += `Behavioral Style Markers:\n${safeStringify(analysisResult.behavioral_style_markers)}\n\n`;
+      }
+      
+      // Personality Summary
+      if (analysisResult.personality_summary) {
+        formattedContent += `Personality Summary:\n${safeStringify(analysisResult.personality_summary)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Enneagram Video Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Enneagram video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for Enneagram" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;

@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -116,6 +116,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const bigFiveVideoInputRef = useRef<HTMLInputElement>(null);
   const enneagramTextInputRef = useRef<HTMLInputElement>(null);
   const enneagramImageInputRef = useRef<HTMLInputElement>(null);
+  const enneagramVideoInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -773,6 +774,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Enneagram video analysis
+  const handleEnneagramVideoAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the video file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("video");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeEnneagramVideo(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Enneagram Video Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Enneagram video analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze video for Enneagram. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Enneagram Analysis Complete",
+        description: "Your video has been successfully analyzed for Enneagram personality type.",
+      });
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -1182,6 +1239,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               const files = e.target.files;
               if (files && files.length > 0) {
                 handleEnneagramImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "enneagram-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("enneagram-video");
+            enneagramVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-enneagram-video"
+        >
+          Enneagram (Video)
+          <input
+            ref={enneagramVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleEnneagramVideoAnalysis.mutate(files[0]);
               }
             }}
           />
