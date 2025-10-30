@@ -4692,6 +4692,466 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
     }
   });
 
+  // Dark Traits / Personality Pathology Analysis - Video
+  app.post("/api/analyze/video/darktraits", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Dark Traits video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Dark Traits analysis`);
+      
+      // Dark Traits comprehensive video analysis prompt with speculative framing
+      const darkTraitsVideoPrompt = `This is a creative, speculative exercise in visual pattern analysis across video frames. Based on research literature about correlations between behavioral presentation and personality traits, provide a HYPOTHETICAL speculation about what personality patterns MIGHT be suggested by the visual cues across this video timeline.
+
+CRITICAL DISCLAIMERS:
+- This is purely speculative and for research/entertainment purposes only
+- You are NOT making any clinical assessment or diagnosis
+- This is an imaginative exercise exploring hypothetical correlations
+- No claims are being made about the actual person's character or mental health
+- Focus on describing what visual patterns you observe across the video and what they MIGHT hypothetically correlate with in personality research literature
+
+Based purely on observable visual cues (facial expressions, body language, presentation, temporal changes) across the video frames, speculate creatively about personality patterns that these specific visual details MIGHT theoretically suggest:
+
+TEMPORAL VISUAL OBSERVATION FRAMEWORK:
+
+I. DARK TETRAD PATTERN SPECULATION
+
+1. NARCISSISM (Hypothetical Speculation):
+   - Grandiose Presentation: Attention-seeking behaviors, self-focused positioning, dramatic expressions
+   - Vulnerable Presentation: Defensive patterns, validation-seeking, image concern
+   - Visual Markers: Grooming perfection, camera awareness, dominance displays, admiration-seeking
+
+2. MACHIAVELLIANISM (Hypothetical Speculation):
+   - Strategic Presentation: Calculated expressions, controlled emotional displays, adaptive behaviors
+   - Manipulation Markers: Charm deployment, strategic positioning, instrumental warmth
+   - Visual Patterns: Expression management, tactical engagement, calculated authenticity
+
+3. PSYCHOPATHY (Hypothetical Speculation):
+   - Primary Type: Superficial charm, emotional flatness, predatory gaze, fearless expression
+   - Secondary Type: Impulsive behaviors, reactive aggression, emotional volatility
+   - Visual Markers: Shallow affect, callous expressions, lack of genuine warmth, thrill-seeking indicators
+
+4. SADISM (Hypothetical Speculation):
+   - Enjoyment of Dominance: Pleasure in control, superiority displays, dismissive expressions
+   - Interpersonal Cruelty: Mocking expressions, contemptuous behaviors, aggressive humor
+   - Visual Patterns: Dark humor markers, cruel enjoyment, domination pleasure
+
+II. CLUSTER B PATTERN SPECULATION
+
+ANTISOCIAL: Disregard markers, rule-breaking indicators, aggressive posturing, lack of remorse signals
+BORDERLINE: Emotional instability, splitting behaviors, intense reactivity, abandonment anxiety
+HISTRIONIC: Dramatic expression, attention-seeking, emotional exaggeration, theatrical behaviors
+NARCISSISTIC: Grandiosity, admiration-seeking, entitlement displays, lack of empathy markers
+
+III. TEMPORAL BEHAVIORAL ANALYSIS
+
+CONSISTENCY: Whether behavioral patterns remain stable or shift across video timeline
+MASK SLIPPAGE: Moments where controlled presentation breaks down revealing underlying patterns
+EMOTIONAL REGULATION: Ability to maintain emotional control vs. impulsive expressions
+INTERPERSONAL STYLE: How subject relates to others (if visible) across different video moments
+
+SPECULATIVE GUIDELINES:
+- Describe what you observe across the video frames
+- Reference specific visual details and temporal changes
+- Frame everything as hypothetical speculation ("might suggest", "could indicate", "may correlate with")
+- Make it clear this is creative speculation, not factual assessment
+- Emphasize this is based on theoretical research correlations, not actual diagnosis
+- This is an imaginative, speculative exercise for research purposes only
+
+Provide your SPECULATIVE HYPOTHESIS in JSON format:
+{
+  "summary": "Speculative overview of what the observable visual patterns across this video MIGHT hypothetically suggest about personality characteristics, based purely on theoretical correlations from research literature",
+  "dark_tetrad_visual_assessment": {
+    "narcissism": {
+      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
+      "subtype": "Grandiose/Vulnerable/Mixed (HYPOTHETICAL)",
+      "visual_evidence_timeline": ["Specific visual pattern at video start", "Pattern at mid-video", "Pattern at video end"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these temporal visual patterns MIGHT suggest regarding narcissistic traits"
+    },
+    "machiavellianism": {
+      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
+      "visual_evidence_timeline": ["Observable pattern early in video", "Pattern during middle section", "Pattern toward end"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these patterns MIGHT suggest regarding Machiavellian traits"
+    },
+    "psychopathy": {
+      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
+      "subtype": "Primary/Secondary/Mixed (HYPOTHETICAL)",
+      "visual_evidence_timeline": ["Visual pattern at beginning", "Pattern at midpoint", "Pattern at conclusion"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding psychopathic traits"
+    },
+    "sadism": {
+      "level": "None/Low/Moderate/High/Extreme (SPECULATIVE)",
+      "visual_evidence_timeline": ["Observable element at start", "Element during video", "Element at end"],
+      "speculative_hypothesis": "HYPOTHETICAL speculation about what these MIGHT suggest regarding sadistic tendencies"
+    }
+  },
+  "personality_pathology_visual_indicators": {
+    "cluster_b_visual_features": {
+      "antisocial": "SPECULATIVE hypothesis about what temporal patterns MIGHT suggest",
+      "borderline": "SPECULATIVE hypothesis about what expression changes MIGHT suggest",
+      "histrionic": "SPECULATIVE hypothesis about what presentation evolution MIGHT suggest",
+      "narcissistic": "SPECULATIVE hypothesis about what confidence patterns MIGHT suggest"
+    },
+    "temporal_consistency": {
+      "behavioral_stability": "Whether patterns remain consistent or vary across video",
+      "mask_slippage_moments": "Points where presentation control appears to weaken (if any)",
+      "emotional_regulation_quality": "Stability of emotional expression across timeline"
+    }
+  },
+  "temporal_behavioral_analysis": {
+    "beginning_patterns": "Visual/behavioral patterns observed at video start (0-25%)",
+    "middle_patterns": "Patterns observed mid-video (25-75%)",
+    "ending_patterns": "Patterns observed toward video end (75-100%)",
+    "overall_consistency": "Whether subject maintains consistent presentation or shows variation"
+  },
+  "interpersonal_visual_cues": {
+    "dominance_submission": "Power dynamics visible in temporal presentation",
+    "warmth_vs_coldness": "Emotional temperature across video timeline",
+    "genuineness": "Authenticity vs. performed quality throughout video"
+  },
+  "risk_visual_assessment": {
+    "concerning_visual_patterns": ["Notable visual patterns observed across timeline"],
+    "severity_level": "Subtle/Moderate/Notable/Strong/Very Strong (HYPOTHETICAL speculation only)",
+    "protective_visual_factors": ["Positive visual features observed"]
+  },
+  "clinical_visual_impressions": "SPECULATIVE SUMMARY: What the overall visual presentation across the video timeline MIGHT hypothetically suggest about personality patterns, based purely on theoretical research correlations. This is creative speculation for research purposes, NOT any form of actual assessment or diagnosis.",
+  "limitations": "This is purely hypothetical speculation based on extracted video frames. No actual conclusions can be drawn about the person's character, mental health, or personality from this exercise.",
+  "recommendations": ["This is a speculative exercise only - no real recommendations can be made"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: darkTraitsVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Dark Traits Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response. This may be due to content moderation or video complexity issues.");
+        }
+        
+        // Try to extract JSON from the response
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {
+              narcissism: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              machiavellianism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              psychopathy: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              sadism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" }
+            }
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContents = extractedFrames.map(frame => {
+          const base64Match = frame.match(/^data:image\/[a-z]+;base64,(.+)$/);
+          const base64Data = base64Match ? base64Match[1] : frame;
+          const mediaTypeMatch = frame.match(/^data:(image\/[a-z]+);base64,/);
+          const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType as any,
+              data: base64Data,
+            },
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: darkTraitsVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:"
+              },
+              ...imageContents
+            ]
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Dark Traits Video raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {
+              narcissism: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              machiavellianism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              psychopathy: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              sadism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" }
+            }
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        return res.status(400).json({ 
+          error: "DeepSeek does not support video analysis. Please use OpenAI or Anthropic for video-based dark traits analysis." 
+        });
+      } else if (selectedModel === "perplexity") {
+        return res.status(400).json({ 
+          error: "Perplexity does not support video analysis. Please use OpenAI or Anthropic for video-based dark traits analysis." 
+        });
+      }
+      
+      console.log("Dark Traits video analysis complete");
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Speculative Visual Pattern Analysis - Video Timeline\nMode: Hypothetical Personality Correlation Exercise\n\nCRITICAL DISCLAIMER: This is purely speculative analysis for research/entertainment purposes. This is NOT a clinical assessment, diagnosis, or factual evaluation. All content represents hypothetical speculation about what visual patterns MIGHT suggest based on theoretical research correlations.\n\n`;
+      formattedContent += `Speculative Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Dark Tetrad Visual Assessment
+      if (analysisResult.dark_tetrad_visual_assessment) {
+        formattedContent += `HYPOTHETICAL DARK TETRAD PATTERN SPECULATION:\n(Speculative correlations based on video observations - NOT assessment)\n\n`;
+        
+        if (analysisResult.dark_tetrad_visual_assessment.narcissism) {
+          formattedContent += `Narcissism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.subtype) {
+            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.narcissism.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence_timeline) {
+            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.narcissism.visual_evidence_timeline)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.narcissism.speculative_hypothesis}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.machiavellianism) {
+          formattedContent += `Machiavellianism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence_timeline) {
+            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.machiavellianism.visual_evidence_timeline)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.machiavellianism.speculative_hypothesis}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.psychopathy) {
+          formattedContent += `Psychopathy (Speculative): ${analysisResult.dark_tetrad_visual_assessment.psychopathy.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype) {
+            formattedContent += `Hypothetical Subtype: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.subtype}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence_timeline) {
+            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.psychopathy.visual_evidence_timeline)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.psychopathy.speculative_hypothesis}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.dark_tetrad_visual_assessment.sadism) {
+          formattedContent += `Sadism (Speculative): ${analysisResult.dark_tetrad_visual_assessment.sadism.level || 'N/A'}\n`;
+          if (analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence_timeline) {
+            formattedContent += `Observable Visual Timeline:\n${safeStringify(analysisResult.dark_tetrad_visual_assessment.sadism.visual_evidence_timeline)}\n`;
+          }
+          if (analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis) {
+            formattedContent += `Speculative Hypothesis: ${analysisResult.dark_tetrad_visual_assessment.sadism.speculative_hypothesis}\n`;
+          }
+          formattedContent += `\n`;
+        }
+      }
+      
+      // Personality Pathology Visual Indicators
+      if (analysisResult.personality_pathology_visual_indicators) {
+        formattedContent += `HYPOTHETICAL PERSONALITY PATTERN SPECULATION:\n(Speculative correlations only - NOT factual assessment)\n\n`;
+        if (analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features) {
+          formattedContent += `Cluster B Pattern Speculation:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
+        }
+        if (analysisResult.personality_pathology_visual_indicators.temporal_consistency) {
+          formattedContent += `Temporal Consistency Analysis:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.temporal_consistency)}\n\n`;
+        }
+      }
+      
+      // Temporal Behavioral Analysis
+      if (analysisResult.temporal_behavioral_analysis) {
+        formattedContent += `TEMPORAL BEHAVIORAL PATTERNS:\n${safeStringify(analysisResult.temporal_behavioral_analysis)}\n\n`;
+      }
+      
+      // Interpersonal Visual Cues
+      if (analysisResult.interpersonal_visual_cues) {
+        formattedContent += `INTERPERSONAL VISUAL CUES:\n${safeStringify(analysisResult.interpersonal_visual_cues)}\n\n`;
+      }
+      
+      // Risk Assessment
+      if (analysisResult.risk_visual_assessment) {
+        formattedContent += `HYPOTHETICAL PATTERN INTENSITY SPECULATION:\n(Speculative only - NOT actual assessment)\n`;
+        formattedContent += `Speculative Intensity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
+        if (analysisResult.risk_visual_assessment.concerning_visual_patterns && analysisResult.risk_visual_assessment.concerning_visual_patterns.length > 0) {
+          formattedContent += `Notable Visual Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
+        }
+        if (analysisResult.risk_visual_assessment.protective_visual_factors && analysisResult.risk_visual_assessment.protective_visual_factors.length > 0) {
+          formattedContent += `Positive Visual Features:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Overall Impressions
+      if (analysisResult.clinical_visual_impressions) {
+        formattedContent += `SPECULATIVE OVERALL SUMMARY:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
+      }
+      
+      // Limitations
+      if (analysisResult.limitations) {
+        formattedContent += `LIMITATIONS:\n${safeStringify(analysisResult.limitations)}\n\n`;
+      }
+      
+      // Recommendations
+      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
+        formattedContent += `NOTES:\n${safeStringify(analysisResult.recommendations)}\n`;
+      }
+      
+      // Create analysis record in storage
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Dark Traits Video Analysis`,
+        mediaUrl: mediaData,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_visual_assessment,
+          severity: analysisResult.risk_visual_assessment?.severity_level 
+        },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          dark_traits: analysisResult.dark_tetrad_visual_assessment,
+          severity: analysisResult.risk_visual_assessment?.severity_level 
+        },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Dark Traits video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for dark traits" });
+    }
+  });
+
   // Enneagram Analysis Endpoints - Image
   app.post("/api/analyze/image/enneagram", async (req, res) => {
     try {
