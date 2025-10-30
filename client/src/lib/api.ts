@@ -619,6 +619,53 @@ export async function analyzeEnneagramText(
   return data;
 }
 
+export async function analyzeEnneagramImage(
+  mediaData: string,
+  sessionId: string,
+  selectedModel: ModelType = "openai",
+  title?: string
+) {
+  console.log(`Analyzing image for Enneagram with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/image/enneagram", { 
+    mediaData, 
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("Enneagram image analysis response:", data);
+  
+  // Extract the analysis text into a proper message format if missing
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from Enneagram image analysis insights");
+      let analysisContent = '';
+      
+      // Try to extract analysis text from different possible formats
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+      
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
 // API status check
 export async function checkAPIStatus() {
   const res = await apiRequest("GET", "/api/status", null);

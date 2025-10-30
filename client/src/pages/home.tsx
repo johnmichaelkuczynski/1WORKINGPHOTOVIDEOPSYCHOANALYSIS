@@ -115,6 +115,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const bigFiveImageInputRef = useRef<HTMLInputElement>(null);
   const bigFiveVideoInputRef = useRef<HTMLInputElement>(null);
   const enneagramTextInputRef = useRef<HTMLInputElement>(null);
+  const enneagramImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -716,6 +717,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Enneagram image analysis
+  const handleEnneagramImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeEnneagramImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Enneagram Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Enneagram image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for Enneagram. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Enneagram Analysis Complete",
+        description: "Your image has been successfully analyzed for Enneagram personality type.",
+      });
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -1103,6 +1160,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-enneagram-text"
         >
           Enneagram (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "enneagram-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("enneagram-image");
+            enneagramImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-enneagram-image"
+        >
+          Enneagram (Image)
+          <input
+            ref={enneagramImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleEnneagramImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
       </div>
       

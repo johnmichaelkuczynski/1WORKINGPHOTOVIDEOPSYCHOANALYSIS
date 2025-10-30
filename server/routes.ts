@@ -3762,6 +3762,310 @@ Provide your analysis in JSON format:
     }
   });
 
+  // Enneagram Analysis Endpoints - Image
+  app.post("/api/analyze/image/enneagram", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Enneagram image analysis with model: ${selectedModel}`);
+      
+      // Enneagram image analysis prompt with 9 personality types
+      const enneagramImagePrompt = `You are an expert Enneagram analyst specializing in identifying personality types through visual analysis of photographs. Analyze this image comprehensively using the Enneagram framework, providing detailed evidence for the most likely type(s) with SPECIFIC VISUAL REFERENCES.
+
+The Enneagram 9 Types are:
+
+TYPE 1 - THE REFORMER (The Perfectionist)
+Core Fear: Being corrupt, evil, defective
+Core Desire: To be good, balanced, have integrity
+Visual Traits: Controlled posture, precise grooming, serious/concentrated expression, orderly surroundings, minimal frivolity
+
+TYPE 2 - THE HELPER (The Giver)
+Core Fear: Being unloved, unwanted
+Core Desire: To be loved, appreciated
+Visual Traits: Warm smile, open body language, positioned near others, nurturing gestures, friendly eye contact
+
+TYPE 3 - THE ACHIEVER (The Performer)
+Core Fear: Being worthless, without value
+Core Desire: To be valuable, admired
+Visual Traits: Confident stance, polished appearance, success symbols, camera-aware positioning, composed presentation
+
+TYPE 4 - THE INDIVIDUALIST (The Romantic)
+Core Fear: Having no identity or significance
+Core Desire: To be unique, authentic
+Visual Traits: Artistic styling, emotional depth in eyes, unique fashion choices, dramatic or melancholic expression, symbolic accessories
+
+TYPE 5 - THE INVESTIGATOR (The Observer)
+Core Fear: Being useless, incompetent
+Core Desire: To be capable, knowledgeable
+Visual Traits: Reserved demeanor, minimal expression, intellectual environment, solitary positioning, analytical gaze
+
+TYPE 6 - THE LOYALIST (The Skeptic)
+Core Fear: Being without support or guidance
+Core Desire: To have security, support
+Visual Traits: Cautious expression, protective stance, group affiliation markers, alert eyes, conservative styling
+
+TYPE 7 - THE ENTHUSIAST (The Epicure)
+Core Fear: Being deprived, trapped in pain
+Core Desire: To be happy, satisfied, free
+Visual Traits: Energetic expression, playful demeanor, active setting, bright colors, multiple interests visible
+
+TYPE 8 - THE CHALLENGER (The Protector)
+Core Fear: Being harmed, controlled by others
+Core Desire: To protect self, be in control
+Visual Traits: Strong stance, direct gaze, commanding presence, protective positioning, bold fashion
+
+TYPE 9 - THE PEACEMAKER (The Mediator)
+Core Fear: Loss, separation, conflict
+Core Desire: To have peace, harmony
+Visual Traits: Relaxed posture, gentle expression, harmonious colors, blending-in appearance, serene environment
+
+CRITICAL: Every indicator must reference SPECIFIC VISUAL DETAILS from the actual image.
+
+Provide your analysis in JSON format:
+{
+  "summary": "Overall Enneagram assessment with primary type, confidence level, and visual reasoning",
+  "primary_type": {
+    "type": "Type [Number] - [Name]",
+    "confidence": "High/Medium/Low",
+    "core_motivation": "Identified core fear and desire based on visual evidence",
+    "key_indicators": [
+      "Specific visual detail showing this type trait",
+      "Another visual observation demonstrating the core motivation",
+      "Physical cue with specific reference to what's visible"
+    ]
+  },
+  "secondary_possibilities": [
+    {
+      "type": "Type [Number] - [Name]",
+      "reasoning": "Why this type is also possible with specific visual evidence"
+    }
+  ],
+  "wing_analysis": "Analysis of likely wing (e.g., 4w3 or 4w5) based on visual patterns with evidence",
+  "triadic_analysis": {
+    "center": "Head/Heart/Body center based on dominant visual presentation",
+    "stance": "Aggressive/Dependent/Withdrawing based on interpersonal positioning in image"
+  },
+  "visual_style_markers": [
+    "Specific visual patterns observed (clothing, posture, expression)",
+    "Environmental cues visible in the image",
+    "Body language and facial expression indicators"
+  ],
+  "personality_summary": "Comprehensive Enneagram-based personality description integrating type, wing, and visual patterns"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: enneagramImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Enneagram Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            visual_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const base64Match = mediaData.match(/^data:image\/[a-z]+;base64,(.+)$/);
+        const base64Data = base64Match ? base64Match[1] : mediaData;
+        const mediaTypeMatch = mediaData.match(/^data:(image\/[a-z]+);base64,/);
+        const mimeType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
+
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: mimeType,
+                  data: base64Data,
+                },
+              },
+              {
+                type: "text",
+                text: enneagramImagePrompt
+              }
+            ],
+          }],
+        });
+
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Enneagram Image raw response:", rawResponse.substring(0, 500));
+
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            visual_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
+      } else if (selectedModel === "deepseek") {
+        return res.status(400).json({ 
+          error: "DeepSeek does not support image analysis. Please use OpenAI or Anthropic for image-based Enneagram analysis." 
+        });
+      } else if (selectedModel === "perplexity") {
+        return res.status(400).json({ 
+          error: "Perplexity does not support image analysis. Please use OpenAI or Anthropic for image-based Enneagram analysis." 
+        });
+      }
+      
+      console.log("Enneagram image analysis complete");
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          // If it's an array, handle each item recursively
+          if (Array.isArray(value)) {
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
+          }
+          // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          // If it's an object with named keys, format as key-value pairs
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Enneagram Personality Analysis\nMode: 9-Type Visual Framework\n\n`;
+      formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
+      
+      // Primary Type
+      if (analysisResult.primary_type) {
+        formattedContent += `Primary Type: ${analysisResult.primary_type.type}\n`;
+        formattedContent += `Confidence: ${analysisResult.primary_type.confidence}\n`;
+        formattedContent += `Core Motivation: ${safeStringify(analysisResult.primary_type.core_motivation)}\n`;
+        if (analysisResult.primary_type.key_indicators && analysisResult.primary_type.key_indicators.length > 0) {
+          formattedContent += `Key Indicators:\n${safeStringify(analysisResult.primary_type.key_indicators)}\n`;
+        }
+        formattedContent += `\n`;
+      }
+      
+      // Secondary Possibilities
+      if (analysisResult.secondary_possibilities && analysisResult.secondary_possibilities.length > 0) {
+        formattedContent += `Secondary Possibilities:\n${safeStringify(analysisResult.secondary_possibilities)}\n\n`;
+      }
+      
+      // Wing Analysis
+      if (analysisResult.wing_analysis) {
+        formattedContent += `Wing Analysis:\n${safeStringify(analysisResult.wing_analysis)}\n\n`;
+      }
+      
+      // Triadic Analysis
+      if (analysisResult.triadic_analysis) {
+        formattedContent += `Triadic Analysis:\n`;
+        formattedContent += `Center: ${analysisResult.triadic_analysis.center || 'N/A'}\n`;
+        formattedContent += `Stance: ${analysisResult.triadic_analysis.stance || 'N/A'}\n\n`;
+      }
+      
+      // Visual Style Markers
+      if (analysisResult.visual_style_markers && analysisResult.visual_style_markers.length > 0) {
+        formattedContent += `Visual Style Markers:\n${safeStringify(analysisResult.visual_style_markers)}\n\n`;
+      }
+      
+      // Personality Summary
+      if (analysisResult.personality_summary) {
+        formattedContent += `Personality Summary:\n${safeStringify(analysisResult.personality_summary)}\n\n`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Enneagram Image Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, enneagram_type: analysisResult.primary_type?.type },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Enneagram image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for Enneagram" });
+    }
+  });
+
   app.get("/api/messages", async (req, res) => {
     try {
       const { sessionId } = req.query;
