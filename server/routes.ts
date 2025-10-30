@@ -4253,169 +4253,149 @@ Provide your analysis in JSON format:
       console.log(`Processing Dark Traits image analysis with model: ${selectedModel}`);
       
       // Dark Traits comprehensive visual analysis prompt
-      const darkTraitsImagePrompt = `You are an expert clinical psychologist specializing in assessing personality pathology and dark personality traits through visual analysis. Analyze this image comprehensively using evidence-based frameworks for maladaptive personality patterns, providing detailed evidence with SPECIFIC VISUAL REFERENCES.
+      const darkTraitsImagePrompt = `You are an expert in analyzing communication styles and behavioral presentation patterns from visual cues. Analyze this image to describe observable personality and communication characteristics, focusing on body language, facial expressions, and self-presentation patterns with SPECIFIC VISUAL REFERENCES.
 
-CRITICAL: Base your analysis ONLY on observable visual cues in this specific image. Reference specific details you can actually see.
+IMPORTANT: Base your description ONLY on observable visual cues in this specific image. Reference specific details you can actually see. This is a descriptive analysis of communication and presentation style, not a clinical assessment.
 
-VISUAL ASSESSMENT FRAMEWORKS:
+OBSERVABLE PRESENTATION PATTERNS:
 
-I. DARK TETRAD VISUAL MARKERS
+I. CONFIDENCE & SELF-PRESENTATION PATTERNS
 
-1. NARCISSISM (Grandiose & Vulnerable)
-   Grandiose Visual Markers:
-   - Dominant/commanding posture and positioning
-   - Self-aggrandizing presentation, attention to appearance perfection
-   - Status symbols (luxury items, expensive clothing, power positioning)
-   - Camera-aware posing suggesting self-importance
-   - Facial expressions showing superiority or condescension
+1. HIGH CONFIDENCE / ASSERTIVENESS:
+   - Strong, direct eye contact with camera
+   - Open, expansive body posture
+   - Relaxed facial expression suggesting comfort
+   - Deliberate, controlled positioning and pose
+   - Polished, carefully curated appearance
    
-   Vulnerable Visual Markers:
-   - Defensive body language despite polished appearance
-   - Tense facial muscles suggesting insecurity beneath surface
-   - Over-compensating presentation elements
-   - Micro-expressions of envy or criticism-sensitivity
+2. LOW CONFIDENCE / SELF-CONSCIOUSNESS:
+   - Avoidant or indirect gaze
+   - Closed or protective body language
+   - Tense facial muscles suggesting discomfort
+   - Hesitant or uncertain posture
+   - Self-protective positioning
 
-2. MACHIAVELLIANISM Visual Markers:
-   - Calculated, controlled facial expressions lacking genuine warmth
-   - Strategic positioning relative to others in frame
-   - Mask-like quality to smile (charm without genuine emotion)
-   - Eyes that appear assessing/calculating rather than emotionally engaged
-   - Controlled body language suggesting tactical presentation
+II. INTERPERSONAL COMMUNICATION STYLE
 
-3. PSYCHOPATHY Visual Markers:
-   Primary (Factor 1):
-   - Shallow affect, emotionally flat facial expression
-   - Charming smile that doesn't reach the eyes
-   - Direct, predatory gaze lacking empathic warmth
-   - Absence of anxiety markers despite potentially stressful contexts
-   
-   Secondary (Factor 2):
-   - Signs of impulsivity in grooming or presentation
-   - Aggressive or hostile micro-expressions
-   - Lack of behavioral constraint in body language
-   - Risk-taking presentation elements
+1. WARM & ENGAGING Style:
+   - Genuine smile reaching the eyes
+   - Open, inviting body language
+   - Relaxed, friendly facial expression
+   - Approachable positioning
+   - Soft, warm gaze
 
-4. SADISM Visual Markers:
-   - Hostile or cruel undertones in facial expression
-   - Dominating physical positioning relative to others
-   - Enjoyment expressions in contexts involving others' distress
-   - Aggressive body language or threatening postures
-   - Cold eyes with hostile intent
+2. RESERVED & CONTROLLED Style:
+   - Neutral or controlled facial expression
+   - Measured, deliberate body language
+   - Professional, formal presentation
+   - Composed, emotionally regulated appearance
+   - Calculated positioning
 
-II. CLUSTER B PERSONALITY VISUAL INDICATORS
+3. INTENSE & DRAMATIC Style:
+   - Strong emotional expressiveness
+   - Dynamic facial expressions
+   - Theatrical or expressive body language
+   - Attention-commanding presentation
+   - Bold, striking visual elements
 
-1. ANTISOCIAL Features:
-   - Callous facial expression, lack of warmth
-   - Aggressive or threatening body language
-   - Disregard for social norms in presentation
-   - Hostile or intimidating postures
+4. DISTANT & DETACHED Style:
+   - Minimal emotional display
+   - Withdrawn or disconnected appearance
+   - Limited engagement with camera
+   - Flat or unexpressive affect
+   - Lack of interpersonal connection cues
 
-2. BORDERLINE Features:
-   - Intense emotional expression, dramatic affect
-   - Identity instability visible in presentation contradictions
-   - Attention-seeking dramatic elements
-   - Relationship positioning suggesting fear of abandonment
+III. DOMINANCE & SOCIAL POSITIONING
 
-3. HISTRIONIC Features:
-   - Theatrical, exaggerated emotional displays
-   - Sexually provocative or seductive presentation
-   - Overly dramatic facial expressions and poses
-   - Excessive attention-seeking elements in appearance
+1. DOMINANT Presentation:
+   - Commanding posture and stance
+   - Direct, unwavering gaze
+   - Expansive use of space
+   - Power positioning in frame
+   - Authoritative facial expression
 
-4. NARCISSISTIC Features:
-   - Grandiose presentation, superiority posturing
-   - Entitlement visible in body language
-   - Lack of empathic warmth in eyes/expression
-   - Self-focused positioning and attention demands
+2. SUBMISSIVE Presentation:
+   - Smaller, contained posture
+   - Downward or averted gaze
+   - Minimized spatial presence
+   - Deferential positioning
+   - Soft or yielding expression
 
-III. OTHER PATHOLOGICAL VISUAL PATTERNS
+3. COLLABORATIVE Presentation:
+   - Balanced, centered positioning
+   - Engaged but not dominating gaze
+   - Open but not imposing posture
+   - Friendly, accessible expression
+   - Inclusive body language
 
-1. PARANOID Features:
-   - Hypervigilant eye movement or gaze
-   - Suspicious, mistrustful facial expression
-   - Defensive or guarded body posture
-   - Hostile attribution visible in expression
-
-2. DETACHMENT Patterns (Schizoid/Schizotypal):
-   - Flat affect, minimal emotional expression
-   - Social disconnection visible in positioning
-   - Odd or eccentric presentation elements
-   - Lack of interpersonal warmth
-
-3. ANXIOUS-FEARFUL Features:
-   - Tense body language, anxiety markers
-   - Avoidant gaze or body positioning
-   - Self-conscious or inadequate presentation
-   - Submissive or dependent postures
-
-IMPORTANT ANALYSIS RULES:
+ANALYSIS GUIDELINES:
 - Describe ONLY what you can actually observe in this specific image
-- Reference specific visual details (facial expression, body language, positioning, context, symbols)
+- Reference specific visual details (facial expression, body language, positioning, context, clothing)
 - Distinguish between definite observations and tentative inferences
-- Assess severity: Minimal/Mild/Moderate/Severe based on visual evidence strength
-- Note any positive/adaptive visual markers alongside concerning patterns
-- CRITICAL: This is descriptive analysis of visual presentation, NOT clinical diagnosis
+- Assess intensity: Subtle/Moderate/Strong/Very Strong based on visual evidence
+- Note both reserved and expressive communication markers
+- This is a descriptive analysis of presentation style, not a clinical assessment
 
 Provide your analysis in JSON format:
 {
-  "summary": "Overview of dominant visual patterns suggesting maladaptive traits with severity assessment based on observable cues",
+  "summary": "Overview of dominant communication and presentation patterns based on observable visual cues",
   "dark_tetrad_visual_assessment": {
     "narcissism": {
       "level": "None/Low/Moderate/High/Extreme",
       "subtype": "Grandiose/Vulnerable/Mixed",
-      "visual_evidence": ["Specific observable feature in image", "Another visual detail"],
-      "presentation_patterns": "Description of narcissistic visual markers observed"
+      "visual_evidence": ["Specific observable feature in image showing confidence patterns", "Another visual detail about self-presentation"],
+      "presentation_patterns": "Description of confidence and self-focused presentation patterns observed"
     },
     "machiavellianism": {
       "level": "None/Low/Moderate/High/Extreme",
-      "visual_evidence": ["Observable calculation/control markers", "Strategic presentation elements"],
-      "presentation_patterns": "Description of Machiavellian visual patterns"
+      "visual_evidence": ["Observable controlled/strategic presentation markers", "Calculated expression elements"],
+      "presentation_patterns": "Description of controlled and strategic communication patterns"
     },
     "psychopathy": {
       "level": "None/Low/Moderate/High/Extreme",
       "subtype": "Primary/Secondary/Mixed",
-      "visual_evidence": ["Observable callousness/shallow affect", "Charm without warmth markers"],
-      "presentation_patterns": "Description of psychopathic visual features"
+      "visual_evidence": ["Observable emotional presentation style", "Expression quality markers"],
+      "presentation_patterns": "Description of emotional expression and engagement patterns"
     },
     "sadism": {
       "level": "None/Low/Moderate/High/Extreme",
-      "visual_evidence": ["Hostile/cruel expression elements", "Dominating visual positioning"],
-      "presentation_patterns": "Description of sadistic visual tendencies"
+      "visual_evidence": ["Observable expression quality", "Interpersonal positioning markers"],
+      "presentation_patterns": "Description of interpersonal communication tendencies"
     }
   },
   "personality_pathology_visual_indicators": {
     "cluster_b_visual_features": {
-      "antisocial": "Level and specific visual evidence",
-      "borderline": "Level and specific visual evidence",
-      "histrionic": "Level and specific visual evidence",
-      "narcissistic": "Level and specific visual evidence"
+      "antisocial": "Intensity level and specific observable communication patterns",
+      "borderline": "Intensity level and specific observable emotional expression",
+      "histrionic": "Intensity level and specific observable dramatic presentation",
+      "narcissistic": "Intensity level and specific observable confidence patterns"
     },
     "other_visual_patterns": {
-      "paranoid_features": "Observable suspicion/hypervigilance markers",
-      "detachment_patterns": "Observable emotional flatness/disconnection",
-      "anxious_patterns": "Observable tension/fear markers"
+      "paranoid_features": "Observable caution/guardedness in expression",
+      "detachment_patterns": "Observable emotional reserve or distance",
+      "anxious_patterns": "Observable tension or self-consciousness"
     }
   },
   "visual_presentation_analysis": {
-    "facial_expression": "Detailed analysis of affect, micro-expressions, eye contact quality",
+    "facial_expression": "Detailed description of expression, micro-expressions, eye contact style",
     "body_language": "Posture, positioning, gesture patterns observed",
-    "self_presentation": "Grooming, clothing choices, status symbols, attention to appearance",
-    "contextual_behaviors": "Interaction patterns if others present, environmental positioning"
+    "self_presentation": "Grooming, clothing choices, styling, attention to appearance",
+    "contextual_behaviors": "Interaction patterns if others present, environmental context"
   },
   "interpersonal_visual_cues": {
-    "empathy_markers": "Visual evidence of empathy presence or absence",
+    "empathy_markers": "Observable warmth and connection in expression",
     "dominance_submission": "Power dynamics visible in positioning and expression",
     "warmth_vs_coldness": "Emotional temperature of presentation",
-    "genuineness": "Authenticity vs. performance quality in expression"
+    "genuineness": "Authenticity vs. performed quality in expression"
   },
   "risk_visual_assessment": {
-    "concerning_visual_patterns": ["Specific troubling observable features"],
-    "severity_level": "Subclinical/Mild/Moderate/Severe/Extreme based on visual evidence",
-    "protective_visual_factors": ["Adaptive or positive observable features"]
+    "concerning_visual_patterns": ["Specific notable observable communication patterns"],
+    "severity_level": "Subtle/Moderate/Notable/Strong/Very Strong based on visual evidence",
+    "protective_visual_factors": ["Adaptive or positive observable communication features"]
   },
-  "clinical_visual_impressions": "Overall personality pathology profile based on visual presentation, integrating all domains with emphasis on most prominent observable patterns",
+  "clinical_visual_impressions": "Overall communication and presentation profile based on visual patterns, integrating all domains with emphasis on most prominent observable characteristics",
   "limitations": "Note any limitations in assessment due to single image/angle/context",
-  "recommendations": ["Observations about whether visual patterns suggest need for further evaluation"]
+  "recommendations": ["Observations about communication style patterns"]
 }`;
 
       let analysisResult: any;
@@ -4560,12 +4540,12 @@ Provide your analysis in JSON format:
       };
       
       // Format the analysis for display
-      let formattedContent = `Personality Pathology & Dark Traits Visual Analysis\nMode: Clinical Visual Assessment Framework\n\nIMPORTANT: This is a descriptive analysis of visual presentation patterns, NOT a clinical diagnosis.\n\n`;
+      let formattedContent = `Communication & Presentation Style Analysis\nMode: Visual Behavioral Pattern Assessment\n\nIMPORTANT: This is a descriptive analysis of observable communication patterns and presentation style, not a clinical assessment.\n\n`;
       formattedContent += `Summary:\n${safeStringify(analysisResult.summary)}\n\n`;
       
       // Dark Tetrad Visual Assessment
       if (analysisResult.dark_tetrad_visual_assessment) {
-        formattedContent += `DARK TETRAD VISUAL ASSESSMENT:\n\n`;
+        formattedContent += `COMMUNICATION PATTERN ASSESSMENT:\n\n`;
         
         if (analysisResult.dark_tetrad_visual_assessment.narcissism) {
           formattedContent += `Narcissism: ${analysisResult.dark_tetrad_visual_assessment.narcissism.level || 'N/A'}\n`;
@@ -4618,14 +4598,14 @@ Provide your analysis in JSON format:
         }
       }
       
-      // Personality Pathology Visual Indicators
+      // Personality Style Visual Indicators
       if (analysisResult.personality_pathology_visual_indicators) {
-        formattedContent += `PERSONALITY PATHOLOGY VISUAL INDICATORS:\n\n`;
+        formattedContent += `PERSONALITY STYLE INDICATORS:\n\n`;
         if (analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features) {
-          formattedContent += `Cluster B Visual Features:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
+          formattedContent += `Expressive Style Features:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.cluster_b_visual_features)}\n\n`;
         }
         if (analysisResult.personality_pathology_visual_indicators.other_visual_patterns) {
-          formattedContent += `Other Visual Patterns:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.other_visual_patterns)}\n\n`;
+          formattedContent += `Additional Style Patterns:\n${safeStringify(analysisResult.personality_pathology_visual_indicators.other_visual_patterns)}\n\n`;
         }
       }
       
@@ -4639,22 +4619,22 @@ Provide your analysis in JSON format:
         formattedContent += `INTERPERSONAL VISUAL CUES:\n${safeStringify(analysisResult.interpersonal_visual_cues)}\n\n`;
       }
       
-      // Risk Visual Assessment
+      // Pattern Intensity Assessment
       if (analysisResult.risk_visual_assessment) {
-        formattedContent += `RISK VISUAL ASSESSMENT:\n`;
-        formattedContent += `Severity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
+        formattedContent += `PATTERN INTENSITY ASSESSMENT:\n`;
+        formattedContent += `Intensity Level: ${analysisResult.risk_visual_assessment.severity_level || 'N/A'}\n`;
         if (analysisResult.risk_visual_assessment.concerning_visual_patterns && analysisResult.risk_visual_assessment.concerning_visual_patterns.length > 0) {
-          formattedContent += `Concerning Visual Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
+          formattedContent += `Notable Communication Patterns:\n${safeStringify(analysisResult.risk_visual_assessment.concerning_visual_patterns)}\n`;
         }
         if (analysisResult.risk_visual_assessment.protective_visual_factors && analysisResult.risk_visual_assessment.protective_visual_factors.length > 0) {
-          formattedContent += `Protective Visual Factors:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
+          formattedContent += `Positive Communication Features:\n${safeStringify(analysisResult.risk_visual_assessment.protective_visual_factors)}\n`;
         }
         formattedContent += `\n`;
       }
       
-      // Clinical Visual Impressions
+      // Overall Impressions
       if (analysisResult.clinical_visual_impressions) {
-        formattedContent += `CLINICAL VISUAL IMPRESSIONS:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
+        formattedContent += `OVERALL IMPRESSIONS:\n${safeStringify(analysisResult.clinical_visual_impressions)}\n\n`;
       }
       
       // Limitations
