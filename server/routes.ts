@@ -451,9 +451,18 @@ Return JSON:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
@@ -1478,9 +1487,18 @@ Provide your analysis in JSON format:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
@@ -1743,9 +1761,18 @@ Provide your analysis in JSON format:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
@@ -2023,9 +2050,18 @@ Provide your analysis in JSON format:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
@@ -2345,9 +2381,18 @@ Provide your analysis in JSON format:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
@@ -3607,9 +3652,18 @@ Provide your analysis in JSON format:
       const safeStringify = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          // If it's an array, join items
+          // If it's an array, handle each item recursively
           if (Array.isArray(value)) {
-            return value.map(item => String(item)).join('\n');
+            return value.map(item => {
+              if (typeof item === 'string') return item;
+              if (typeof item === 'object' && item !== null) {
+                // Format objects in arrays as key-value pairs
+                return Object.entries(item)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join('\n');
+              }
+              return String(item);
+            }).join('\n\n');
           }
           // If it's an object with numbered keys (like "1", "2", etc), format as numbered list
           const keys = Object.keys(value);
