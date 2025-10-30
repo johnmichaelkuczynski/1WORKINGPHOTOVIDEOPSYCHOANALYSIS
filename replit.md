@@ -9,6 +9,7 @@ An advanced AI-powered personality insights platform that provides sophisticated
 - MBTI personality analysis (text, images, videos)
 - Big Five/OCEAN personality analysis (text, images, videos)
 - Enneagram 9-Type personality analysis (text, images, videos)
+- Dark Traits / Personality Pathology analysis (text)
 - Facial analysis using AWS Rekognition and Face++
 - Audio transcription with OpenAI Whisper
 - Email sharing with SendGrid integration
@@ -37,6 +38,22 @@ An advanced AI-powered personality insights platform that provides sophisticated
 
 ## Recent Changes
 ### October 2025 (Latest)
+- **NEW DARK TRAITS / PERSONALITY PATHOLOGY ANALYSIS FEATURE**: Added comprehensive clinical assessment of maladaptive personality patterns
+  * Analyzes text for personality pathology and dark personality traits using evidence-based clinical frameworks
+  * Dark Tetrad assessment: Narcissism (Grandiose/Vulnerable), Machiavellianism, Psychopathy (Primary/Secondary), Sadism
+  * Cluster B personality patterns: Antisocial, Borderline, Histrionic, Narcissistic features
+  * Other maladaptive patterns: Paranoid, Schizoid/Schizotypal, Avoidant, Dependent, Obsessive-Compulsive features
+  * Comprehensive analysis domains: Interpersonal patterns, cognitive patterns, emotional regulation, risk assessment
+  * Severity ratings: Minimal/Mild/Moderate/Severe/Extreme for each trait domain
+  * Evidence-based with direct quotes from text supporting each identified pattern
+  * Includes protective factors and adaptive strengths alongside pathology
+  * Clinical impressions and recommendations (descriptive analysis, not diagnosis)
+  * Works with all AI models (OpenAI GPT-4o, Anthropic Claude, DeepSeek, Perplexity)
+  * New sidebar button for easy access
+  * Backend endpoint: /api/analyze/text/darktraits
+  * Frontend API function: analyzeDarkTraitsText
+  * Mutation handler: handleDarkTraitsTextAnalysis
+
 - **NEW ENNEAGRAM (VIDEO) ANALYSIS FEATURE**: Added behavioral Enneagram personality type detection through video analysis
   * Analyzes videos to identify 9 Enneagram personality types based on behavioral patterns across timeline
   * Comprehensive temporal framework covering all 9 types (Reformer, Helper, Achiever, Individualist, Investigator, Loyalist, Enthusiast, Challenger, Peacemaker)
