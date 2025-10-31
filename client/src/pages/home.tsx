@@ -1872,7 +1872,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-vocational-text"
         >
-          Vocational/Motivation
+          Motivational
         </Button>
         
         <Button
@@ -1885,7 +1885,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-vocational-image"
         >
-          Vocational/Motivation (Image)
+          Motivational (Image)
           <input
             ref={vocationalImageInputRef}
             type="file"
