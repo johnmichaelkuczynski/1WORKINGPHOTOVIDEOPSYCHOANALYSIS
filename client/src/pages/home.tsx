@@ -121,6 +121,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const darkTraitsVideoInputRef = useRef<HTMLInputElement>(null);
   const stanfordBinetImageInputRef = useRef<HTMLInputElement>(null);
   const stanfordBinetVideoInputRef = useRef<HTMLInputElement>(null);
+  const vocationalImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1095,6 +1096,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         description: "Your text has been successfully analyzed for career interests, work values, and motivational drivers.",
       });
       setTextInput("");
+    }
+  });
+
+  // Vocational / Motivation / Values image analysis
+  const handleVocationalImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeVocationalImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Vocational / Motivation / Values Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Vocational image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for Vocational/Motivation/Values. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Vocational Analysis Complete",
+        description: "Your image has been successfully analyzed for career interests, work values, and motivational drivers.",
+      });
     }
   });
 
