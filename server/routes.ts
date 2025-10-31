@@ -3374,6 +3374,352 @@ Provide a detailed cognitive assessment in JSON format:
     }
   });
 
+  // Stanford-Binet Intelligence Scale Analysis - Video
+  app.post("/api/analyze/video/stanford-binet", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Stanford-Binet video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Stanford-Binet analysis`);
+      
+      // Stanford-Binet Intelligence Scale video analysis prompt
+      const stanfordBinetVideoPrompt = `You are an expert psychologist specializing in cognitive assessment using the Stanford-Binet Intelligence Scale framework through video analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this video to assess cognitive abilities across the five factor indexes based on VISIBLE ELEMENTS and BEHAVIORAL PATTERNS across the video timeline.
+
+The Stanford-Binet Intelligence Scale evaluates five core cognitive domains:
+
+1. **Fluid Reasoning (FR)** - problem-solving ability, pattern recognition, logical thinking visible in work/environment/actions
+2. **Knowledge (KN)** - accumulated knowledge, vocabulary, general information evident through visual context and behaviors
+3. **Quantitative Reasoning (QR)** - numerical concepts, mathematical thinking visible in the setting or activities
+4. **Visual-Spatial Processing (VS)** - spatial organization, visual patterns, artistic/design elements, spatial awareness
+5. **Working Memory (WM)** - attention to detail, organization, mental focus evident through environment and behaviors
+
+IMPORTANT: Base your analysis on what you can observe in the visual reference material across the timeline. Use visible environmental cues, context, behavioral patterns, and temporal changes to inform your creative assessment of this hypothetical individual.
+
+Provide a detailed cognitive assessment in JSON format:
+{
+  "summary": "Overall cognitive profile based on visual evidence across video timeline with key findings about intellectual capabilities",
+  "full_scale_iq_estimate": "Estimated range: Below Average / Average / High Average / Superior / Very Superior",
+  "factor_analysis": {
+    "fluid_reasoning": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range (e.g., 90-100)",
+      "evidence": "Detailed analysis with specific visual examples showing logical reasoning, problem-solving, pattern recognition across video",
+      "visual_indicators": ["List of specific cognitive indicators observed in the video"],
+      "temporal_patterns": "How this ability is demonstrated across different moments in the video"
+    },
+    "knowledge": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Analysis based on visual context, books, educational materials, sophisticated environment elements across video",
+      "visual_indicators": ["Specific knowledge indicators from video"],
+      "temporal_patterns": "Knowledge demonstrated across video timeline"
+    },
+    "quantitative_reasoning": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Assessment based on numerical elements, mathematical tools, quantitative thinking visible across video",
+      "visual_indicators": ["Quantitative reasoning indicators from video"],
+      "temporal_patterns": "Quantitative abilities across video timeline"
+    },
+    "visual_spatial_processing": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Evaluation of spatial organization, visual patterns, artistic arrangements, design sophistication across video",
+      "visual_indicators": ["Visual-spatial indicators from video"],
+      "temporal_patterns": "Spatial abilities demonstrated across video timeline"
+    },
+    "working_memory": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Analysis of organizational systems, attention to detail, mental focus evident in environment and behaviors across video",
+      "visual_indicators": ["Working memory indicators from video"],
+      "temporal_patterns": "Working memory abilities across video timeline"
+    }
+  },
+  "cognitive_strengths": ["List of identified cognitive strengths with detailed explanations based on visual evidence across video"],
+  "areas_for_development": ["Areas where cognitive development could be enhanced with specific recommendations"],
+  "learning_style_assessment": "Detailed analysis of preferred learning modalities based on visual cues across video",
+  "intellectual_profile": "Comprehensive narrative describing the individual's cognitive pattern based on visual evidence across video timeline",
+  "recommendations": ["Specific suggestions for leveraging strengths and developing areas for growth"],
+  "video_timeline_analysis": "Description of how cognitive abilities are demonstrated and potentially change across the video"
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model with vision capability
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: stanfordBinetVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("OpenAI Stanford-Binet Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        // Try to extract JSON from the response
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate",
+            intellectual_profile: "Unable to generate",
+            recommendations: [],
+            video_timeline_analysis: "Unable to generate"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Stanford-Binet video analysis currently only supports OpenAI GPT-4o Vision model." 
+        });
+      }
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map((item, idx) => `${idx + 1}. ${String(item)}`).join('\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Stanford-Binet Intelligence Scale - Cognitive Assessment (Video Analysis)\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary}\n\n`;
+      formattedContent += `Full Scale IQ Estimate: ${analysisResult.full_scale_iq_estimate}\n\n`;
+      
+      // Factor Analysis
+      if (analysisResult.factor_analysis) {
+        formattedContent += `FACTOR INDEX SCORES:\n\n`;
+        
+        const factors = analysisResult.factor_analysis;
+        
+        if (factors.fluid_reasoning) {
+          formattedContent += `Fluid Reasoning (FR):\n`;
+          formattedContent += `Level: ${factors.fluid_reasoning.level}\n`;
+          formattedContent += `Score Estimate: ${factors.fluid_reasoning.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.fluid_reasoning.evidence}\n`;
+          if (factors.fluid_reasoning.visual_indicators && factors.fluid_reasoning.visual_indicators.length > 0) {
+            formattedContent += `Visual Indicators:\n${safeStringify(factors.fluid_reasoning.visual_indicators)}\n`;
+          }
+          if (factors.fluid_reasoning.temporal_patterns) {
+            formattedContent += `Temporal Patterns: ${factors.fluid_reasoning.temporal_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.knowledge) {
+          formattedContent += `Knowledge (KN):\n`;
+          formattedContent += `Level: ${factors.knowledge.level}\n`;
+          formattedContent += `Score Estimate: ${factors.knowledge.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.knowledge.evidence}\n`;
+          if (factors.knowledge.visual_indicators && factors.knowledge.visual_indicators.length > 0) {
+            formattedContent += `Visual Indicators:\n${safeStringify(factors.knowledge.visual_indicators)}\n`;
+          }
+          if (factors.knowledge.temporal_patterns) {
+            formattedContent += `Temporal Patterns: ${factors.knowledge.temporal_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.quantitative_reasoning) {
+          formattedContent += `Quantitative Reasoning (QR):\n`;
+          formattedContent += `Level: ${factors.quantitative_reasoning.level}\n`;
+          formattedContent += `Score Estimate: ${factors.quantitative_reasoning.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.quantitative_reasoning.evidence}\n`;
+          if (factors.quantitative_reasoning.visual_indicators && factors.quantitative_reasoning.visual_indicators.length > 0) {
+            formattedContent += `Visual Indicators:\n${safeStringify(factors.quantitative_reasoning.visual_indicators)}\n`;
+          }
+          if (factors.quantitative_reasoning.temporal_patterns) {
+            formattedContent += `Temporal Patterns: ${factors.quantitative_reasoning.temporal_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.visual_spatial_processing) {
+          formattedContent += `Visual-Spatial Processing (VS):\n`;
+          formattedContent += `Level: ${factors.visual_spatial_processing.level}\n`;
+          formattedContent += `Score Estimate: ${factors.visual_spatial_processing.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.visual_spatial_processing.evidence}\n`;
+          if (factors.visual_spatial_processing.visual_indicators && factors.visual_spatial_processing.visual_indicators.length > 0) {
+            formattedContent += `Visual Indicators:\n${safeStringify(factors.visual_spatial_processing.visual_indicators)}\n`;
+          }
+          if (factors.visual_spatial_processing.temporal_patterns) {
+            formattedContent += `Temporal Patterns: ${factors.visual_spatial_processing.temporal_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.working_memory) {
+          formattedContent += `Working Memory (WM):\n`;
+          formattedContent += `Level: ${factors.working_memory.level}\n`;
+          formattedContent += `Score Estimate: ${factors.working_memory.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.working_memory.evidence}\n`;
+          if (factors.working_memory.visual_indicators && factors.working_memory.visual_indicators.length > 0) {
+            formattedContent += `Visual Indicators:\n${safeStringify(factors.working_memory.visual_indicators)}\n`;
+          }
+          if (factors.working_memory.temporal_patterns) {
+            formattedContent += `Temporal Patterns: ${factors.working_memory.temporal_patterns}\n`;
+          }
+          formattedContent += `\n`;
+        }
+      }
+      
+      // Cognitive Strengths
+      if (analysisResult.cognitive_strengths && analysisResult.cognitive_strengths.length > 0) {
+        formattedContent += `COGNITIVE STRENGTHS:\n`;
+        formattedContent += `${safeStringify(analysisResult.cognitive_strengths)}\n\n`;
+      }
+      
+      // Areas for Development
+      if (analysisResult.areas_for_development && analysisResult.areas_for_development.length > 0) {
+        formattedContent += `AREAS FOR DEVELOPMENT:\n`;
+        formattedContent += `${safeStringify(analysisResult.areas_for_development)}\n\n`;
+      }
+      
+      // Learning Style
+      if (analysisResult.learning_style_assessment) {
+        formattedContent += `LEARNING STYLE ASSESSMENT:\n${analysisResult.learning_style_assessment}\n\n`;
+      }
+      
+      // Intellectual Profile
+      if (analysisResult.intellectual_profile) {
+        formattedContent += `INTELLECTUAL PROFILE:\n${analysisResult.intellectual_profile}\n\n`;
+      }
+      
+      // Video Timeline Analysis
+      if (analysisResult.video_timeline_analysis) {
+        formattedContent += `VIDEO TIMELINE ANALYSIS:\n${analysisResult.video_timeline_analysis}\n\n`;
+      }
+      
+      // Recommendations
+      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
+        formattedContent += `RECOMMENDATIONS:\n`;
+        formattedContent += `${safeStringify(analysisResult.recommendations)}`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Stanford-Binet Video Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, stanford_binet: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, stanford_binet: analysisResult },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Stanford-Binet video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for Stanford-Binet" });
+    }
+  });
+
   // Big Five (OCEAN) Analysis - Image
   app.post("/api/analyze/image/bigfive", async (req, res) => {
     try {
