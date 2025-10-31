@@ -3091,6 +3091,377 @@ Provide a detailed cognitive assessment in JSON format:
     }
   });
 
+  // Vocational / Motivation / Values Analysis - Text
+  app.post("/api/analyze/text/vocational", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Vocational/Motivation/Values text analysis with model: ${selectedModel}`);
+      
+      // Vocational / Motivation / Values comprehensive prompt
+      const vocationalPrompt = `You are an expert career counselor and organizational psychologist specializing in vocational assessment, motivation analysis, and values identification. Analyze the following text to provide detailed insights into career interests, work values, and motivational drivers.
+
+TEXT TO ANALYZE:
+${content}
+
+Provide a comprehensive vocational and motivational assessment in JSON format:
+{
+  "summary": "Overall assessment of career orientation, work values, and motivational profile with key findings",
+  "holland_code_assessment": {
+    "primary_types": [
+      {
+        "type": "Realistic/Investigative/Artistic/Social/Enterprising/Conventional",
+        "score": "High/Medium/Low",
+        "description": "Detailed explanation with specific evidence from text"
+      }
+    ],
+    "holland_code": "Three-letter code (e.g., ASE, RIA)",
+    "career_compatibility": "Analysis of suitable career fields based on Holland Code with specific examples"
+  },
+  "work_values": {
+    "achievement": {
+      "importance": "High/Medium/Low",
+      "evidence": "Specific indicators from text showing value on accomplishment and results",
+      "manifestations": ["How this value appears in work preferences"]
+    },
+    "autonomy": {
+      "importance": "High/Medium/Low",
+      "evidence": "Indicators of preference for independence and self-direction",
+      "manifestations": ["How autonomy needs appear"]
+    },
+    "creativity": {
+      "importance": "High/Medium/Low",
+      "evidence": "Value placed on innovation, originality, and creative expression",
+      "manifestations": ["Creative preferences and needs"]
+    },
+    "helping_others": {
+      "importance": "High/Medium/Low",
+      "evidence": "Indicators of altruism, service orientation, and helping behaviors",
+      "manifestations": ["How helping values appear"]
+    },
+    "security": {
+      "importance": "High/Medium/Low",
+      "evidence": "Need for stability, predictability, and job security",
+      "manifestations": ["Security preferences"]
+    },
+    "recognition": {
+      "importance": "High/Medium/Low",
+      "evidence": "Value on status, prestige, and being valued by others",
+      "manifestations": ["Recognition needs"]
+    },
+    "relationships": {
+      "importance": "High/Medium/Low",
+      "evidence": "Value on collaboration, teamwork, and interpersonal connections",
+      "manifestations": ["Relationship preferences in work"]
+    },
+    "work_life_balance": {
+      "importance": "High/Medium/Low",
+      "evidence": "Priority given to balance between work and personal life",
+      "manifestations": ["Balance preferences"]
+    }
+  },
+  "motivational_drivers": {
+    "intrinsic_motivation": {
+      "level": "High/Medium/Low",
+      "drivers": ["List of internal motivators: passion, curiosity, mastery, purpose, etc."],
+      "evidence": "Specific examples from text"
+    },
+    "extrinsic_motivation": {
+      "level": "High/Medium/Low",
+      "drivers": ["List of external motivators: rewards, recognition, advancement, etc."],
+      "evidence": "Specific examples from text"
+    },
+    "primary_motivators": ["Top 3-5 most powerful motivational forces identified"]
+  },
+  "work_style_preferences": {
+    "collaboration_vs_independence": "Preference for team vs individual work with evidence",
+    "structure_vs_flexibility": "Need for organization vs adaptability with evidence",
+    "detail_vs_big_picture": "Focus on specifics vs strategic thinking with evidence",
+    "pace_preference": "Fast-paced vs deliberate approach with evidence",
+    "risk_tolerance": "Comfort with uncertainty and innovation vs preference for stability"
+  },
+  "career_recommendations": [
+    {
+      "career_field": "Specific field or industry",
+      "fit_score": "Excellent/Good/Moderate",
+      "reasoning": "Why this field aligns with values, interests, and motivations",
+      "specific_roles": ["List of 3-5 specific job titles"]
+    }
+  ],
+  "development_opportunities": [
+    "Areas for professional growth based on values and motivations",
+    "Skills or experiences that would enhance career satisfaction",
+    "Potential blind spots or areas requiring attention"
+  ],
+  "ideal_work_environment": "Detailed description of optimal work setting, culture, and conditions based on analysis",
+  "key_strengths": ["Top vocational strengths and assets identified"],
+  "potential_challenges": ["Career-related challenges or considerations to be aware of"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are an expert career counselor and organizational psychologist specializing in vocational assessment." },
+            { role: "user", content: vocationalPrompt }
+          ],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("OpenAI Vocational raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            error: "Formatting error occurred"
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{ role: "user", content: vocationalPrompt }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Vocational raw response:", rawResponse.substring(0, 500));
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            error: "Formatting error occurred"
+          };
+        }
+      } else if (selectedModel === "perplexity" && perplexityApiKey) {
+        const response = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${perplexityApiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "llama-3.1-sonar-huge-128k-online",
+            messages: [
+              { role: "system", content: "You are an expert career counselor. Always respond with valid JSON." },
+              { role: "user", content: vocationalPrompt }
+            ]
+          })
+        });
+        
+        const data = await response.json();
+        const rawResponse = data.choices[0]?.message?.content || "";
+        console.log("Perplexity Vocational raw response:", rawResponse.substring(0, 500));
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            error: "Formatting error occurred"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Vocational text analysis currently only supports OpenAI, Anthropic, and Perplexity models." 
+        });
+      }
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map((item, idx) => `${idx + 1}. ${String(item)}`).join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Vocational / Motivation / Values Analysis\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary || 'No summary available'}\n\n`;
+      formattedContent += `${'─'.repeat(65)}\n\n`;
+      
+      // Holland Code Assessment
+      if (analysisResult.holland_code_assessment) {
+        formattedContent += `HOLLAND CODE ASSESSMENT:\n`;
+        formattedContent += `Holland Code: ${analysisResult.holland_code_assessment.holland_code || 'N/A'}\n\n`;
+        
+        if (analysisResult.holland_code_assessment.primary_types) {
+          formattedContent += `Primary Personality Types:\n`;
+          analysisResult.holland_code_assessment.primary_types.forEach((type: any, idx: number) => {
+            formattedContent += `${idx + 1}. ${type.type} (${type.score})\n`;
+            formattedContent += `   ${type.description}\n\n`;
+          });
+        }
+        
+        if (analysisResult.holland_code_assessment.career_compatibility) {
+          formattedContent += `Career Compatibility:\n${analysisResult.holland_code_assessment.career_compatibility}\n\n`;
+        }
+      }
+      
+      // Work Values
+      if (analysisResult.work_values) {
+        formattedContent += `WORK VALUES:\n\n`;
+        const values = analysisResult.work_values;
+        
+        Object.entries(values).forEach(([key, value]: [string, any]) => {
+          const valueName = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          formattedContent += `${valueName}: ${value.importance || 'N/A'}\n`;
+          if (value.evidence) {
+            formattedContent += `Evidence: ${value.evidence}\n`;
+          }
+          if (value.manifestations && value.manifestations.length > 0) {
+            formattedContent += `Manifestations:\n${safeStringify(value.manifestations)}\n`;
+          }
+          formattedContent += `\n`;
+        });
+      }
+      
+      // Motivational Drivers
+      if (analysisResult.motivational_drivers) {
+        formattedContent += `MOTIVATIONAL DRIVERS:\n\n`;
+        
+        if (analysisResult.motivational_drivers.intrinsic_motivation) {
+          const intrinsic = analysisResult.motivational_drivers.intrinsic_motivation;
+          formattedContent += `Intrinsic Motivation: ${intrinsic.level || 'N/A'}\n`;
+          if (intrinsic.drivers) {
+            formattedContent += `Drivers:\n${safeStringify(intrinsic.drivers)}\n`;
+          }
+          if (intrinsic.evidence) {
+            formattedContent += `Evidence: ${intrinsic.evidence}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.motivational_drivers.extrinsic_motivation) {
+          const extrinsic = analysisResult.motivational_drivers.extrinsic_motivation;
+          formattedContent += `Extrinsic Motivation: ${extrinsic.level || 'N/A'}\n`;
+          if (extrinsic.drivers) {
+            formattedContent += `Drivers:\n${safeStringify(extrinsic.drivers)}\n`;
+          }
+          if (extrinsic.evidence) {
+            formattedContent += `Evidence: ${extrinsic.evidence}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (analysisResult.motivational_drivers.primary_motivators) {
+          formattedContent += `Primary Motivators:\n${safeStringify(analysisResult.motivational_drivers.primary_motivators)}\n\n`;
+        }
+      }
+      
+      // Work Style Preferences
+      if (analysisResult.work_style_preferences) {
+        formattedContent += `WORK STYLE PREFERENCES:\n\n`;
+        Object.entries(analysisResult.work_style_preferences).forEach(([key, value]) => {
+          const prefName = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          formattedContent += `${prefName}:\n${value}\n\n`;
+        });
+      }
+      
+      // Career Recommendations
+      if (analysisResult.career_recommendations && analysisResult.career_recommendations.length > 0) {
+        formattedContent += `CAREER RECOMMENDATIONS:\n\n`;
+        analysisResult.career_recommendations.forEach((rec: any, idx: number) => {
+          formattedContent += `${idx + 1}. ${rec.career_field} (Fit: ${rec.fit_score})\n`;
+          formattedContent += `   Reasoning: ${rec.reasoning}\n`;
+          if (rec.specific_roles && rec.specific_roles.length > 0) {
+            formattedContent += `   Suggested Roles:\n${safeStringify(rec.specific_roles)}\n`;
+          }
+          formattedContent += `\n`;
+        });
+      }
+      
+      // Development Opportunities
+      if (analysisResult.development_opportunities && analysisResult.development_opportunities.length > 0) {
+        formattedContent += `DEVELOPMENT OPPORTUNITIES:\n${safeStringify(analysisResult.development_opportunities)}\n\n`;
+      }
+      
+      // Ideal Work Environment
+      if (analysisResult.ideal_work_environment) {
+        formattedContent += `IDEAL WORK ENVIRONMENT:\n${analysisResult.ideal_work_environment}\n\n`;
+      }
+      
+      // Key Strengths
+      if (analysisResult.key_strengths && analysisResult.key_strengths.length > 0) {
+        formattedContent += `KEY STRENGTHS:\n${safeStringify(analysisResult.key_strengths)}\n\n`;
+      }
+      
+      // Potential Challenges
+      if (analysisResult.potential_challenges && analysisResult.potential_challenges.length > 0) {
+        formattedContent += `POTENTIAL CHALLENGES:\n${safeStringify(analysisResult.potential_challenges)}`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Vocational / Motivation / Values Analysis`,
+        mediaUrl: `vocational-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, vocational: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, vocational: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Vocational text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Vocational/Motivation/Values" });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale Analysis - Image
   app.post("/api/analyze/image/stanford-binet", async (req, res) => {
     try {
