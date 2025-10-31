@@ -3107,7 +3107,11 @@ Provide a detailed cognitive assessment in JSON format:
       console.log(`Processing Stanford-Binet image analysis with model: ${selectedModel}`);
       
       // Stanford-Binet Intelligence Scale visual analysis prompt
-      const stanfordBinetImagePrompt = `You are an expert psychologist specializing in cognitive assessment using the Stanford-Binet Intelligence Scale framework through visual analysis. Analyze this image to assess cognitive abilities across the five factor indexes based on VISIBLE ELEMENTS ONLY.
+      const stanfordBinetImagePrompt = `You are an expert psychologist specializing in cognitive assessment using the Stanford-Binet Intelligence Scale framework through visual analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this image to assess cognitive abilities across the five factor indexes based on VISIBLE ELEMENTS in the reference material.
 
 The Stanford-Binet Intelligence Scale evaluates five core cognitive domains:
 
@@ -3117,7 +3121,7 @@ The Stanford-Binet Intelligence Scale evaluates five core cognitive domains:
 4. **Visual-Spatial Processing (VS)** - spatial organization, visual patterns, artistic/design elements
 5. **Working Memory (WM)** - attention to detail, organization, mental focus evident through environment
 
-IMPORTANT: Analyze ONLY what you can actually see in the image. Do not fabricate or assume details.
+IMPORTANT: Base your analysis on what you can observe in the visual reference material. Use visible environmental cues, context, and patterns to inform your creative assessment of this hypothetical individual.
 
 Provide a detailed cognitive assessment in JSON format:
 {
