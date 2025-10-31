@@ -1794,6 +1794,29 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             }}
           />
         </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "vocational-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("vocational-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            handleVocationalTextAnalysis.mutate(textInput);
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-vocational-text"
+        >
+          Vocational / Motivation / Values (Text)
+        </Button>
       </div>
       
       {/* Main Content Area */}
