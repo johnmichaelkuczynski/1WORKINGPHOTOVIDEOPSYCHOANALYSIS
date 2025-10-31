@@ -1718,6 +1718,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             }}
           />
         </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "stanford-binet-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("stanford-binet-video");
+            stanfordBinetVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-stanford-binet-video"
+        >
+          Stanford-Binet (Video)
+          <input
+            ref={stanfordBinetVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleStanfordBinetVideoAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
       </div>
       
       {/* Main Content Area */}
