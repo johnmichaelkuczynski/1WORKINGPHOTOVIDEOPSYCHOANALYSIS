@@ -1047,6 +1047,57 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Vocational / Motivation / Values text analysis
+  const handleVocationalTextAnalysis = useMutation({
+    mutationFn: async (text: string) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        if (!text.trim()) {
+          throw new Error("Please provide text to analyze");
+        }
+        
+        setAnalysisProgress(30);
+        
+        const response = await analyzeVocationalText(
+          text,
+          sessionId,
+          selectedModel,
+          `Vocational / Motivation / Values Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Vocational text analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze text for Vocational/Motivation/Values. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Vocational Analysis Complete",
+        description: "Your text has been successfully analyzed for career interests, work values, and motivational drivers.",
+      });
+      setTextInput("");
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
