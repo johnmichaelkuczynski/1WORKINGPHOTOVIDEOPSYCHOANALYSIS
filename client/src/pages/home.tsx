@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -994,6 +994,57 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Stanford-Binet Intelligence Scale text analysis
+  const handleStanfordBinetTextAnalysis = useMutation({
+    mutationFn: async (text: string) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        if (!text.trim()) {
+          throw new Error("Please provide text to analyze");
+        }
+        
+        setAnalysisProgress(30);
+        
+        const response = await analyzeStanfordBinetText(
+          text,
+          sessionId,
+          selectedModel,
+          `Stanford-Binet Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Stanford-Binet text analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze text for Stanford-Binet. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Stanford-Binet Analysis Complete",
+        description: "Your text has been successfully analyzed using the Stanford-Binet Intelligence Scale.",
+      });
+      setTextInput("");
+    }
+  });
+
   // Media upload and analysis
   const handleUploadMedia = useMutation({
     mutationFn: async (file: File) => {
@@ -1504,6 +1555,29 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               }
             }}
           />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "stanford-binet-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("stanford-binet-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            handleStanfordBinetTextAnalysis.mutate(textInput);
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-stanford-binet-text"
+        >
+          Stanford-Binet (Text)
         </Button>
       </div>
       
