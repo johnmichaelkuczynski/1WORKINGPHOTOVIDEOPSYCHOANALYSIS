@@ -3462,6 +3462,290 @@ Provide a comprehensive vocational and motivational assessment in JSON format:
     }
   });
 
+  // Vocational / Motivation / Values Analysis - Image
+  app.post("/api/analyze/image/vocational", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Vocational/Motivation image analysis with model: ${selectedModel}`);
+      
+      // Vocational / Motivation / Values visual analysis prompt
+      const vocationalImagePrompt = `You are an expert career counselor and vocational psychologist specializing in analyzing career interests, work values, and motivational drivers through visual assessment.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this image to assess career interests, work values, and motivational drivers based on VISIBLE ELEMENTS in the reference material.
+
+Key Areas to Assess:
+
+1. **Career Interests & Holland Code** - Identify RIASEC preferences based on visual cues:
+   - Realistic (hands-on, tools, physical work)
+   - Investigative (research, analysis, intellectual work)
+   - Artistic (creative, expressive, aesthetic elements)
+   - Social (helping, teaching, interpersonal elements)
+   - Enterprising (leadership, business, persuasion indicators)
+   - Conventional (organization, data, systematic work)
+
+2. **Work Values** - Identify what matters in work based on visual context:
+   - Achievement, Recognition, Independence, Support, Working Conditions, Relationships
+
+3. **Motivational Drivers** - What drives this hypothetical individual:
+   - Intrinsic vs Extrinsic motivation, Power, Affiliation, Achievement, Autonomy, Mastery, Purpose
+
+4. **Work Style Preferences** - Observable indicators of preferred work environment:
+   - Solo vs Team, Structured vs Flexible, Detail-oriented vs Big Picture
+
+IMPORTANT: Base your analysis on what you can observe in the visual reference material. Use visible environmental cues, objects, activities, settings, and patterns to inform your creative assessment of this hypothetical individual.
+
+Provide a detailed vocational assessment in JSON format:
+{
+  "summary": "Overall vocational profile based on visual evidence with key findings about career inclinations and work preferences",
+  "holland_code": {
+    "primary_type": "Letter (R/I/A/S/E/C)",
+    "secondary_type": "Letter",
+    "tertiary_type": "Letter",
+    "code_description": "Detailed explanation of the Holland Code profile",
+    "visual_evidence": "Specific observations from the image supporting this classification"
+  },
+  "career_interests": {
+    "primary_interests": ["List of main career interest areas with visual evidence"],
+    "potential_career_paths": ["Specific career suggestions based on visual indicators"],
+    "work_environment_preferences": "Description of ideal work settings based on visual cues"
+  },
+  "work_values": {
+    "top_values": ["List of prioritized work values with supporting visual evidence"],
+    "value_conflicts": "Any potential conflicts or tensions in values observable",
+    "value_based_recommendations": ["Career paths aligning with these values"]
+  },
+  "motivational_drivers": {
+    "intrinsic_motivators": ["Internal drivers based on visual cues"],
+    "extrinsic_motivators": ["External drivers based on visual evidence"],
+    "achievement_indicators": "Observable signs of achievement orientation",
+    "autonomy_indicators": "Signs of preference for independence/autonomy"
+  },
+  "work_style_analysis": {
+    "collaboration_preference": "Solo/Team/Hybrid with visual evidence",
+    "structure_preference": "Structured/Flexible/Balanced with supporting observations",
+    "detail_orientation": "Detail-focused/Big-picture/Balanced with visual indicators",
+    "pace_preference": "Fast-paced/Steady/Varied rhythm with evidence"
+  },
+  "recommended_careers": ["Top 5-10 specific career recommendations with detailed reasoning based on visual evidence"],
+  "development_areas": ["Areas for professional growth or skill development"],
+  "career_action_plan": "Specific next steps for career exploration based on the assessment"
+}`;
+
+      let analysisResult: any;
+      
+      // Only OpenAI GPT-4o Vision supports image analysis
+      if (selectedModel === "openai" && openai) {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: vocationalImagePrompt },
+                {
+                  type: "image_url",
+                  image_url: { url: mediaData }
+                }
+              ]
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("OpenAI Vocational Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Vocational analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            holland_code: { primary_type: "Unable to determine", secondary_type: "", tertiary_type: "", code_description: "Formatting error", visual_evidence: "" },
+            career_interests: { primary_interests: [], potential_career_paths: [], work_environment_preferences: "" },
+            work_values: { top_values: [], value_conflicts: "", value_based_recommendations: [] },
+            motivational_drivers: { intrinsic_motivators: [], extrinsic_motivators: [], achievement_indicators: "", autonomy_indicators: "" },
+            work_style_analysis: { collaboration_preference: "", structure_preference: "", detail_orientation: "", pace_preference: "" },
+            recommended_careers: [],
+            development_areas: [],
+            career_action_plan: "Unable to generate due to formatting error"
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Vocational/Motivation image analysis currently only supports OpenAI GPT-4o Vision model." 
+        });
+      }
+      
+      // Helper function to safely stringify any value into readable text
+      const safeStringify = (value: any): string => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            return value.map((item, idx) => `${idx + 1}. ${String(item)}`).join('\n');
+          }
+          const keys = Object.keys(value);
+          if (keys.length > 0 && keys.every(k => /^\d+$/.test(k))) {
+            return keys
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map(key => `${key}. ${value[key]}`)
+              .join('\n');
+          }
+          return Object.entries(value)
+            .map(([key, val]) => `${val}`)
+            .join('\n\n');
+        }
+        return String(value || '');
+      };
+      
+      // Format the analysis for display
+      let formattedContent = `Vocational / Motivation / Values Assessment (Image Analysis)\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary}\n\n`;
+      
+      // Holland Code
+      if (analysisResult.holland_code) {
+        formattedContent += `HOLLAND CODE ASSESSMENT:\n`;
+        const hc = analysisResult.holland_code;
+        formattedContent += `Primary Type: ${hc.primary_type || 'N/A'}\n`;
+        formattedContent += `Secondary Type: ${hc.secondary_type || 'N/A'}\n`;
+        formattedContent += `Tertiary Type: ${hc.tertiary_type || 'N/A'}\n`;
+        formattedContent += `Description: ${hc.code_description || 'N/A'}\n`;
+        formattedContent += `Visual Evidence: ${hc.visual_evidence || 'N/A'}\n\n`;
+      }
+      
+      // Career Interests
+      if (analysisResult.career_interests) {
+        formattedContent += `CAREER INTERESTS:\n`;
+        const ci = analysisResult.career_interests;
+        if (ci.primary_interests && ci.primary_interests.length > 0) {
+          formattedContent += `Primary Interests:\n${safeStringify(ci.primary_interests)}\n\n`;
+        }
+        if (ci.potential_career_paths && ci.potential_career_paths.length > 0) {
+          formattedContent += `Potential Career Paths:\n${safeStringify(ci.potential_career_paths)}\n\n`;
+        }
+        if (ci.work_environment_preferences) {
+          formattedContent += `Work Environment Preferences:\n${ci.work_environment_preferences}\n\n`;
+        }
+      }
+      
+      // Work Values
+      if (analysisResult.work_values) {
+        formattedContent += `WORK VALUES:\n`;
+        const wv = analysisResult.work_values;
+        if (wv.top_values && wv.top_values.length > 0) {
+          formattedContent += `Top Values:\n${safeStringify(wv.top_values)}\n\n`;
+        }
+        if (wv.value_conflicts) {
+          formattedContent += `Value Conflicts: ${wv.value_conflicts}\n\n`;
+        }
+        if (wv.value_based_recommendations && wv.value_based_recommendations.length > 0) {
+          formattedContent += `Value-Based Career Recommendations:\n${safeStringify(wv.value_based_recommendations)}\n\n`;
+        }
+      }
+      
+      // Motivational Drivers
+      if (analysisResult.motivational_drivers) {
+        formattedContent += `MOTIVATIONAL DRIVERS:\n`;
+        const md = analysisResult.motivational_drivers;
+        if (md.intrinsic_motivators && md.intrinsic_motivators.length > 0) {
+          formattedContent += `Intrinsic Motivators:\n${safeStringify(md.intrinsic_motivators)}\n\n`;
+        }
+        if (md.extrinsic_motivators && md.extrinsic_motivators.length > 0) {
+          formattedContent += `Extrinsic Motivators:\n${safeStringify(md.extrinsic_motivators)}\n\n`;
+        }
+        if (md.achievement_indicators) {
+          formattedContent += `Achievement Indicators: ${md.achievement_indicators}\n\n`;
+        }
+        if (md.autonomy_indicators) {
+          formattedContent += `Autonomy Indicators: ${md.autonomy_indicators}\n\n`;
+        }
+      }
+      
+      // Work Style Analysis
+      if (analysisResult.work_style_analysis) {
+        formattedContent += `WORK STYLE ANALYSIS:\n`;
+        const ws = analysisResult.work_style_analysis;
+        if (ws.collaboration_preference) {
+          formattedContent += `Collaboration Preference: ${ws.collaboration_preference}\n`;
+        }
+        if (ws.structure_preference) {
+          formattedContent += `Structure Preference: ${ws.structure_preference}\n`;
+        }
+        if (ws.detail_orientation) {
+          formattedContent += `Detail Orientation: ${ws.detail_orientation}\n`;
+        }
+        if (ws.pace_preference) {
+          formattedContent += `Pace Preference: ${ws.pace_preference}\n\n`;
+        }
+      }
+      
+      // Recommended Careers
+      if (analysisResult.recommended_careers && analysisResult.recommended_careers.length > 0) {
+        formattedContent += `RECOMMENDED CAREERS:\n${safeStringify(analysisResult.recommended_careers)}\n\n`;
+      }
+      
+      // Development Areas
+      if (analysisResult.development_areas && analysisResult.development_areas.length > 0) {
+        formattedContent += `DEVELOPMENT AREAS:\n${safeStringify(analysisResult.development_areas)}\n\n`;
+      }
+      
+      // Career Action Plan
+      if (analysisResult.career_action_plan) {
+        formattedContent += `CAREER ACTION PLAN:\n${analysisResult.career_action_plan}`;
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Vocational / Motivation / Values Image Analysis`,
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, vocational: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, vocational: analysisResult },
+        messages: [message],
+        mediaUrl: mediaData,
+      });
+    } catch (error) {
+      console.error("Vocational image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for Vocational/Motivation/Values" });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale Analysis - Image
   app.post("/api/analyze/image/stanford-binet", async (req, res) => {
     try {
