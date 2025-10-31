@@ -2756,6 +2756,341 @@ Provide detailed analysis in JSON format:
     }
   });
 
+  // Stanford-Binet Intelligence Scale Analysis - Text
+  app.post("/api/analyze/text/stanford-binet", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Stanford-Binet text analysis with model: ${selectedModel}`);
+      
+      // Stanford-Binet Intelligence Scale comprehensive prompt
+      const stanfordBinetPrompt = `You are an expert psychologist specializing in cognitive assessment using the Stanford-Binet Intelligence Scale framework. Analyze the following text to assess cognitive abilities across the five factor indexes.
+
+The Stanford-Binet Intelligence Scale evaluates five core cognitive domains:
+
+1. **Fluid Reasoning (FR)** - ability to solve novel problems, identify patterns, think logically and abstractly
+2. **Knowledge (KN)** - accumulated knowledge, vocabulary, general information, verbal comprehension
+3. **Quantitative Reasoning (QR)** - numerical problem-solving, mathematical concepts, quantitative thinking
+4. **Visual-Spatial Processing (VS)** - spatial reasoning, mental imagery, visual pattern recognition
+5. **Working Memory (WM)** - attention, concentration, mental manipulation of information, recall
+
+TEXT TO ANALYZE:
+${content}
+
+Provide a detailed cognitive assessment in JSON format:
+{
+  "summary": "Overall cognitive profile with key findings about intellectual capabilities",
+  "full_scale_iq_estimate": "Estimated range: Below Average / Average / High Average / Superior / Very Superior",
+  "factor_analysis": {
+    "fluid_reasoning": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range (e.g., 90-100)",
+      "evidence": "Detailed analysis with specific examples from text showing logical reasoning, pattern recognition, problem-solving approach",
+      "indicators": ["List of specific cognitive indicators observed in the text"]
+    },
+    "knowledge": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Analysis of vocabulary sophistication, breadth of knowledge, verbal comprehension demonstrated",
+      "indicators": ["Specific knowledge indicators from text"]
+    },
+    "quantitative_reasoning": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Assessment of numerical reasoning, mathematical concepts, quantitative logic",
+      "indicators": ["Quantitative reasoning indicators from text"]
+    },
+    "visual_spatial_processing": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Evaluation of spatial descriptions, mental imagery, visual thinking patterns",
+      "indicators": ["Visual-spatial indicators from text"]
+    },
+    "working_memory": {
+      "level": "Below Average / Average / High Average / Superior / Very Superior",
+      "score_estimate": "Estimated standard score range",
+      "evidence": "Analysis of attention to detail, information retention, mental organization",
+      "indicators": ["Working memory indicators from text"]
+    }
+  },
+  "cognitive_strengths": ["List of identified cognitive strengths with detailed explanations"],
+  "areas_for_development": ["Areas where cognitive development could be enhanced with specific recommendations"],
+  "learning_style_assessment": "Detailed analysis of preferred learning modalities and cognitive processing style",
+  "intellectual_profile": "Comprehensive narrative describing the individual's cognitive pattern and intellectual capabilities",
+  "recommendations": ["Specific suggestions for leveraging strengths and developing areas for growth"]
+}`;
+
+      let analysisResult: any;
+      
+      // Call the appropriate AI model
+      if (selectedModel === "openai" && openai) {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are an expert psychologist specializing in cognitive assessment." },
+            { role: "user", content: stanfordBinetPrompt }
+          ],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("OpenAI Stanford-Binet raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("OpenAI returned an empty response");
+        }
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Stanford-Binet analysis. Please try again with different text.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate due to formatting error",
+            intellectual_profile: "Unable to generate profile due to formatting error",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{ role: "user", content: stanfordBinetPrompt }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Stanford-Binet raw response:", rawResponse.substring(0, 500));
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic response:", parseError);
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Stanford-Binet analysis.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate due to formatting error",
+            intellectual_profile: "Unable to generate profile due to formatting error",
+            recommendations: []
+          };
+        }
+      } else if (selectedModel === "perplexity" && perplexityApiKey) {
+        const response = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${perplexityApiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "llama-3.1-sonar-huge-128k-online",
+            messages: [
+              { role: "system", content: "You are an expert psychologist specializing in cognitive assessment. Always respond with valid JSON." },
+              { role: "user", content: stanfordBinetPrompt }
+            ]
+          })
+        });
+        
+        const data = await response.json();
+        const rawResponse = data.choices[0]?.message?.content || "";
+        console.log("Perplexity Stanford-Binet raw response:", rawResponse.substring(0, 500));
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity response:", parseError);
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Stanford-Binet analysis.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate due to formatting error",
+            intellectual_profile: "Unable to generate profile due to formatting error",
+            recommendations: []
+          };
+        }
+      } else {
+        throw new Error(`Model ${selectedModel} is not available or not configured`);
+      }
+      
+      // Format the analysis for display
+      let formattedContent = `Stanford-Binet Intelligence Scale - Cognitive Assessment\n\n`;
+      formattedContent += `Summary:\n${analysisResult.summary}\n\n`;
+      formattedContent += `Full Scale IQ Estimate: ${analysisResult.full_scale_iq_estimate}\n\n`;
+      
+      // Factor Analysis
+      if (analysisResult.factor_analysis) {
+        formattedContent += `FACTOR INDEX SCORES:\n\n`;
+        
+        const factors = analysisResult.factor_analysis;
+        
+        if (factors.fluid_reasoning) {
+          formattedContent += `Fluid Reasoning (FR):\n`;
+          formattedContent += `Level: ${factors.fluid_reasoning.level}\n`;
+          formattedContent += `Score Estimate: ${factors.fluid_reasoning.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.fluid_reasoning.evidence}\n`;
+          if (factors.fluid_reasoning.indicators && factors.fluid_reasoning.indicators.length > 0) {
+            formattedContent += `Indicators: ${factors.fluid_reasoning.indicators.join(', ')}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.knowledge) {
+          formattedContent += `Knowledge (KN):\n`;
+          formattedContent += `Level: ${factors.knowledge.level}\n`;
+          formattedContent += `Score Estimate: ${factors.knowledge.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.knowledge.evidence}\n`;
+          if (factors.knowledge.indicators && factors.knowledge.indicators.length > 0) {
+            formattedContent += `Indicators: ${factors.knowledge.indicators.join(', ')}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.quantitative_reasoning) {
+          formattedContent += `Quantitative Reasoning (QR):\n`;
+          formattedContent += `Level: ${factors.quantitative_reasoning.level}\n`;
+          formattedContent += `Score Estimate: ${factors.quantitative_reasoning.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.quantitative_reasoning.evidence}\n`;
+          if (factors.quantitative_reasoning.indicators && factors.quantitative_reasoning.indicators.length > 0) {
+            formattedContent += `Indicators: ${factors.quantitative_reasoning.indicators.join(', ')}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.visual_spatial_processing) {
+          formattedContent += `Visual-Spatial Processing (VS):\n`;
+          formattedContent += `Level: ${factors.visual_spatial_processing.level}\n`;
+          formattedContent += `Score Estimate: ${factors.visual_spatial_processing.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.visual_spatial_processing.evidence}\n`;
+          if (factors.visual_spatial_processing.indicators && factors.visual_spatial_processing.indicators.length > 0) {
+            formattedContent += `Indicators: ${factors.visual_spatial_processing.indicators.join(', ')}\n`;
+          }
+          formattedContent += `\n`;
+        }
+        
+        if (factors.working_memory) {
+          formattedContent += `Working Memory (WM):\n`;
+          formattedContent += `Level: ${factors.working_memory.level}\n`;
+          formattedContent += `Score Estimate: ${factors.working_memory.score_estimate}\n`;
+          formattedContent += `Evidence: ${factors.working_memory.evidence}\n`;
+          if (factors.working_memory.indicators && factors.working_memory.indicators.length > 0) {
+            formattedContent += `Indicators: ${factors.working_memory.indicators.join(', ')}\n`;
+          }
+          formattedContent += `\n`;
+        }
+      }
+      
+      // Cognitive Strengths
+      if (analysisResult.cognitive_strengths && analysisResult.cognitive_strengths.length > 0) {
+        formattedContent += `COGNITIVE STRENGTHS:\n`;
+        analysisResult.cognitive_strengths.forEach((strength: string, index: number) => {
+          formattedContent += `${index + 1}. ${strength}\n`;
+        });
+        formattedContent += `\n`;
+      }
+      
+      // Areas for Development
+      if (analysisResult.areas_for_development && analysisResult.areas_for_development.length > 0) {
+        formattedContent += `AREAS FOR DEVELOPMENT:\n`;
+        analysisResult.areas_for_development.forEach((area: string, index: number) => {
+          formattedContent += `${index + 1}. ${area}\n`;
+        });
+        formattedContent += `\n`;
+      }
+      
+      // Learning Style
+      if (analysisResult.learning_style_assessment) {
+        formattedContent += `LEARNING STYLE ASSESSMENT:\n${analysisResult.learning_style_assessment}\n\n`;
+      }
+      
+      // Intellectual Profile
+      if (analysisResult.intellectual_profile) {
+        formattedContent += `INTELLECTUAL PROFILE:\n${analysisResult.intellectual_profile}\n\n`;
+      }
+      
+      // Recommendations
+      if (analysisResult.recommendations && analysisResult.recommendations.length > 0) {
+        formattedContent += `RECOMMENDATIONS:\n`;
+        analysisResult.recommendations.forEach((rec: string, index: number) => {
+          formattedContent += `${index + 1}. ${rec}\n`;
+        });
+      }
+      
+      // Create analysis record
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || `Stanford-Binet Text Analysis`,
+        mediaUrl: `stanford-binet-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, stanford_binet: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      // Create message with formatted analysis
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, stanford_binet: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Stanford-Binet text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Stanford-Binet" });
+    }
+  });
+
   // Big Five (OCEAN) Analysis - Image
   app.post("/api/analyze/image/bigfive", async (req, res) => {
     try {
