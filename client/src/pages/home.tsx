@@ -1636,6 +1636,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         >
           Stanford-Binet (Text)
         </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "stanford-binet-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("stanford-binet-image");
+            stanfordBinetImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-stanford-binet-image"
+        >
+          Stanford-Binet (Image)
+          <input
+            ref={stanfordBinetImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleStanfordBinetImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
       </div>
       
       {/* Main Content Area */}
