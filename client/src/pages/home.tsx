@@ -1815,7 +1815,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-vocational-text"
         >
-          Vocational / Motivation / Values (Text)
+          Vocational/Motivation
         </Button>
       </div>
       
