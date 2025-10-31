@@ -1869,7 +1869,11 @@ Provide your analysis in JSON format:
       console.log(`Processing MBTI image analysis with model: ${selectedModel}`);
       
       // MBTI image analysis prompt with 30 questions
-      const mbtiImagePrompt = `You are an expert MBTI analyst specializing in visual cues. Analyze this image comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below WITH DIRECT VISUAL EVIDENCE.
+      const mbtiImagePrompt = `You are an expert MBTI analyst specializing in visual cues.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this image using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below based on VISIBLE ELEMENTS ONLY.
 
 CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS from the image. Do not use generic descriptions.
 
@@ -2194,7 +2198,11 @@ Provide your analysis in JSON format:
       await unlinkAsync(tempVideoPath);
       
       // MBTI video analysis prompt with 30 questions
-      const mbtiVideoPrompt = `You are an expert MBTI analyst specializing in behavioral cues. Analyze these video frames comprehensively using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below WITH DIRECT VISUAL AND BEHAVIORAL EVIDENCE with timestamps.
+      const mbtiVideoPrompt = `You are an expert MBTI analyst specializing in behavioral cues.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze these video frames using the MBTI framework, providing specific evidence-based answers to ALL 30 questions below based on OBSERVABLE BEHAVIORS and VISIBLE PATTERNS with timestamps.
 
 CRITICAL: Every answer must reference SPECIFIC VISUAL DETAILS, BEHAVIORS, and TEMPORAL CHANGES across the frames. Do not use generic descriptions.
 
@@ -4741,7 +4749,11 @@ Provide a detailed cognitive assessment in JSON format:
       console.log(`Processing Big Five image analysis with model: ${selectedModel}`);
       
       // Big Five (OCEAN) visual analysis prompt
-      const bigFiveImagePrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through visual analysis. Analyze this image comprehensively using the Big Five framework, providing detailed evidence for each dimension based on VISIBLE ELEMENTS ONLY.
+      const bigFiveImagePrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through visual analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this image using the Big Five framework, providing detailed evidence for each dimension based on VISIBLE ELEMENTS ONLY.
 
 The Big Five dimensions are:
 1. **Openness to Experience** - creativity, artistic expression, unconventional elements, symbolic imagery, variety
@@ -5025,7 +5037,11 @@ Provide detailed analysis in JSON format:
       console.log(`Extracted ${extractedFrames.length} frames from video`);
       
       // Big Five (OCEAN) video analysis prompt
-      const bigFiveVideoPrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through behavioral video analysis. Analyze this video comprehensively using the Big Five framework, providing detailed evidence for each dimension based on OBSERVABLE BEHAVIORS AND VISUAL ELEMENTS across the video timeline.
+      const bigFiveVideoPrompt = `You are an expert personality psychologist specializing in the Big Five (OCEAN) personality assessment through behavioral video analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this video using the Big Five framework, providing detailed evidence for each dimension based on OBSERVABLE BEHAVIORS AND VISIBLE PATTERNS across the video timeline.
 
 The Big Five dimensions are:
 1. **Openness to Experience** - creative expression, unconventional behaviors, variety in gestures, exploratory movements
@@ -7256,7 +7272,11 @@ Provide your hypothetical case study analysis in JSON format:
       console.log(`Processing Enneagram image analysis with model: ${selectedModel}`);
       
       // Enneagram image analysis prompt with 9 personality types
-      const enneagramImagePrompt = `You are an expert Enneagram analyst specializing in identifying personality types through visual analysis of photographs. Analyze this image comprehensively using the Enneagram framework, providing detailed evidence for the most likely type(s) with SPECIFIC VISUAL REFERENCES.
+      const enneagramImagePrompt = `You are an expert Enneagram analyst specializing in identifying personality types through visual analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this image using the Enneagram framework, providing detailed evidence for the most likely type(s) based on VISIBLE ELEMENTS ONLY.
 
 The Enneagram 9 Types are:
 
@@ -7605,7 +7625,11 @@ Provide your analysis in JSON format:
       console.log(`Extracted ${extractedFrames.length} frames from video for Enneagram analysis`);
       
       // Enneagram video analysis prompt
-      const enneagramVideoPrompt = `You are an expert Enneagram analyst specializing in identifying personality types through behavioral video analysis. Analyze this video comprehensively using the Enneagram framework, providing detailed evidence for the most likely type(s) with SPECIFIC BEHAVIORAL PATTERNS across the video timeline.
+      const enneagramVideoPrompt = `You are an expert Enneagram analyst specializing in identifying personality types through behavioral video analysis.
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material. Feel free to take creative liberties in your assessment while basing observations on the visual elements provided.
+
+Analyze this video using the Enneagram framework, providing detailed evidence for the most likely type(s) based on OBSERVABLE BEHAVIORS and VISIBLE PATTERNS across the video timeline.
 
 The Enneagram 9 Types with behavioral markers:
 
