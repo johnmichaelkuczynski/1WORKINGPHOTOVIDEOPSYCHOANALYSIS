@@ -2696,53 +2696,57 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 
                 {/* Re-analyze with current model button */}
                 <Button 
-                  onClick={() => {
-                    if (mediaData) {
-                      // Clear messages for new analysis
-                      setMessages([]);
-                      setIsAnalyzing(true);
-                      setAnalysisProgress(0);
+                  onClick={async () => {
+                    if (!mediaData) return;
+                    
+                    // Clear messages for new analysis
+                    setMessages([]);
+                    setIsAnalyzing(true);
+                    setAnalysisProgress(0);
+                    
+                    try {
+                      let response;
                       
-                      // Use the stored media data directly
-                      uploadMedia(
-                        mediaData, 
-                        "image", 
-                        sessionId, 
-                        { 
-                          selectedModel, 
-                          maxPeople: 5 
-                        }
-                      ).then(response => {
-                        setAnalysisProgress(100);
-                        
-                        if (response && response.analysisId) {
-                          setAnalysisId(response.analysisId);
-                        }
-                        
-                        if (response && response.messages && Array.isArray(response.messages)) {
-                          setMessages(response.messages);
-                        }
-                        
-                        toast({
-                          title: "Analysis Complete",
-                          description: "Your image has been re-analyzed with " + 
-                            (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
-                        });
-                      }).catch(error => {
-                        toast({
-                          variant: "destructive",
-                          title: "Error",
-                          description: "Failed to re-analyze image. Please try again.",
-                        });
-                      }).finally(() => {
-                        setIsAnalyzing(false);
+                      // Check which type of analysis to run based on selectedAnalysisType
+                      if (selectedAnalysisType === "clinical-image") {
+                        response = await analyzeClinicalImage(mediaData, sessionId, selectedModel);
+                      } else if (selectedAnalysisType === "personality-structure-image") {
+                        response = await analyzePersonalityStructureImage(mediaData, sessionId, selectedModel);
+                      } else {
+                        // Default to general image analysis
+                        response = await uploadMedia(mediaData, "image", sessionId, { selectedModel, maxPeople: 5 });
+                      }
+                      
+                      setAnalysisProgress(100);
+                      
+                      if (response && response.analysisId) {
+                        setAnalysisId(response.analysisId);
+                      }
+                      
+                      if (response && response.messages && Array.isArray(response.messages)) {
+                        setMessages(response.messages);
+                      }
+                      
+                      toast({
+                        title: "Analysis Complete",
+                        description: "Your image has been analyzed with " + 
+                          (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                       });
+                    } catch (error) {
+                      console.error("Image analysis error:", error);
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to analyze image. Please try again.",
+                      });
+                    } finally {
+                      setIsAnalyzing(false);
                     }
                   }}
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
+                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
                 <div className="pt-4 mt-4 border-t">
                   <p className="text-sm font-semibold mb-2">MBTI Analysis (Image)</p>
@@ -2809,53 +2813,57 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 
                 {/* Re-analyze with current model button */}
                 <Button 
-                  onClick={() => {
-                    if (mediaData) {
-                      // Clear messages for new analysis
-                      setMessages([]);
-                      setIsAnalyzing(true);
-                      setAnalysisProgress(0);
+                  onClick={async () => {
+                    if (!mediaData) return;
+                    
+                    // Clear messages for new analysis
+                    setMessages([]);
+                    setIsAnalyzing(true);
+                    setAnalysisProgress(0);
+                    
+                    try {
+                      let response;
                       
-                      // Use the stored media data directly
-                      uploadMedia(
-                        mediaData, 
-                        "video", 
-                        sessionId, 
-                        { 
-                          selectedModel, 
-                          maxPeople: 5 
-                        }
-                      ).then(response => {
-                        setAnalysisProgress(100);
-                        
-                        if (response && response.analysisId) {
-                          setAnalysisId(response.analysisId);
-                        }
-                        
-                        if (response && response.messages && Array.isArray(response.messages)) {
-                          setMessages(response.messages);
-                        }
-                        
-                        toast({
-                          title: "Analysis Complete",
-                          description: "Your video has been re-analyzed with " + 
-                            (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
-                        });
-                      }).catch(error => {
-                        toast({
-                          variant: "destructive",
-                          title: "Error",
-                          description: "Failed to re-analyze video. Please try again.",
-                        });
-                      }).finally(() => {
-                        setIsAnalyzing(false);
+                      // Check which type of analysis to run based on selectedAnalysisType
+                      if (selectedAnalysisType === "clinical-video") {
+                        response = await analyzeClinicalVideo(mediaData, sessionId, selectedModel);
+                      } else if (selectedAnalysisType === "personality-structure-video") {
+                        response = await analyzePersonalityStructureVideo(mediaData, sessionId, selectedModel);
+                      } else {
+                        // Default to general video analysis
+                        response = await uploadMedia(mediaData, "video", sessionId, { selectedModel, maxPeople: 5 });
+                      }
+                      
+                      setAnalysisProgress(100);
+                      
+                      if (response && response.analysisId) {
+                        setAnalysisId(response.analysisId);
+                      }
+                      
+                      if (response && response.messages && Array.isArray(response.messages)) {
+                        setMessages(response.messages);
+                      }
+                      
+                      toast({
+                        title: "Analysis Complete",
+                        description: "Your video has been analyzed with " + 
+                          (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                       });
+                    } catch (error) {
+                      console.error("Video analysis error:", error);
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to analyze video. Please try again.",
+                      });
+                    } finally {
+                      setIsAnalyzing(false);
                     }
                   }}
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
+                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
                 <div className="pt-4 mt-4 border-t">
                   <p className="text-sm font-semibold mb-2">MBTI Analysis (Video)</p>

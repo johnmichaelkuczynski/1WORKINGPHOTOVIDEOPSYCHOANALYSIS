@@ -8870,9 +8870,11 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
       
       const analysis = await storage.createAnalysis({
         sessionId,
-        type: "clinical_text",
-        content: formattedContent,
         title: title || "Clinical Analysis",
+        mediaUrl: `clinical-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, clinical_assessment: analysisResult },
+        modelUsed: selectedModel,
       });
       
       const message = await storage.createMessage({
@@ -9069,9 +9071,11 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
       
       const analysis = await storage.createAnalysis({
         sessionId,
-        type: "clinical_image",
-        content: formattedContent,
         title: title || "Clinical Analysis (Image)",
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, clinical_assessment: analysisResult },
+        modelUsed: selectedModel,
       });
       
       const message = await storage.createMessage({
@@ -9324,9 +9328,11 @@ Provide thorough behavioral analysis across timeline framed as hypothetical educ
       
       const analysis = await storage.createAnalysis({
         sessionId,
-        type: "clinical_video",
-        content: formattedContent,
         title: title || "Clinical Analysis (Video)",
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, clinical_assessment: analysisResult },
+        modelUsed: selectedModel,
       });
       
       const message = await storage.createMessage({
