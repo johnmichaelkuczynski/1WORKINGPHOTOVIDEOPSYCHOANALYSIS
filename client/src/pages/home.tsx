@@ -85,7 +85,16 @@ async function resizeImage(file: File, maxWidth: number): Promise<string> {
 
 export default function Home({ isShareMode = false, shareId }: { isShareMode?: boolean, shareId?: string }) {
   const { toast } = useToast();
-  const [sessionId] = useState(() => nanoid());
+  // Persist sessionId to localStorage so it survives page reloads
+  const [sessionId] = useState(() => {
+    const stored = localStorage.getItem('personality-analysis-session-id');
+    if (stored) {
+      return stored;
+    }
+    const newId = nanoid();
+    localStorage.setItem('personality-analysis-session-id', newId);
+    return newId;
+  });
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [textInput, setTextInput] = useState("");
@@ -161,7 +170,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             }
             
             // Set messages
-            setMessages(data.messages);
+            setMessages(prev => [...prev, ...data.messages]);
             
             // Set email service status
             setEmailServiceAvailable(data.emailServiceAvailable);
@@ -194,7 +203,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         const response = await analyzeText(text, sessionId, selectedModel);
         
@@ -202,7 +211,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -249,7 +258,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         setDocumentName(file.name);
         setAnalysisProgress(30);
@@ -279,7 +288,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -325,7 +334,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         setDocumentName(file.name);
         setAnalysisProgress(30);
@@ -355,7 +364,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -401,7 +410,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         setAnalysisProgress(30);
         
@@ -432,7 +441,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -464,7 +473,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         setAnalysisProgress(30);
         
@@ -490,7 +499,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -522,7 +531,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         if (!text.trim()) {
           throw new Error("Please provide text to analyze");
@@ -540,7 +549,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -573,7 +582,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -597,7 +606,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -629,7 +638,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -653,7 +662,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -685,7 +694,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         if (!text.trim()) {
           throw new Error("Please provide text to analyze");
@@ -703,7 +712,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -735,7 +744,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -759,7 +768,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -791,7 +800,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -815,7 +824,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -847,7 +856,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         if (!text.trim()) {
           throw new Error("Please provide text to analyze");
@@ -865,7 +874,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -897,7 +906,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -921,7 +930,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -953,7 +962,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -977,7 +986,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1009,7 +1018,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         if (!text.trim()) {
           throw new Error("Please provide text to analyze");
@@ -1027,7 +1036,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1060,7 +1069,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         if (!text.trim()) {
           throw new Error("Please provide text to analyze");
@@ -1078,7 +1087,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1111,7 +1120,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -1135,7 +1144,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1167,7 +1176,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -1191,7 +1200,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1223,7 +1232,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -1247,7 +1256,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1279,7 +1288,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -1303,7 +1312,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1335,7 +1344,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -1359,7 +1368,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1391,7 +1400,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -1415,7 +1424,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1447,7 +1456,6 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
         
         // Read the image file
         const reader = new FileReader();
@@ -1471,7 +1479,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1503,7 +1511,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the image file
         const reader = new FileReader();
@@ -1527,7 +1535,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1559,7 +1567,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(10);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Read the video file
         const reader = new FileReader();
@@ -1583,7 +1591,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisId(response.analysisId);
         
         if (response.messages && response.messages.length > 0) {
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         }
         
         setAnalysisProgress(100);
@@ -1615,7 +1623,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       try {
         setIsAnalyzing(true);
         setAnalysisProgress(0);
-        setMessages([]);
+        // Messages now append instead of clear
         
         // Determine media type and set it
         const fileType = file.type.split('/')[0];
@@ -1669,7 +1677,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         // Make sure we update the messages state with the response
         if (response && response.messages && Array.isArray(response.messages) && response.messages.length > 0) {
           console.log("Setting messages from response:", response.messages);
-          setMessages(response.messages);
+          setMessages(prev => [...prev, ...response.messages]);
         } else {
           // If no messages were returned, let's add a default message
           console.warn("No messages returned from analysis");
@@ -1925,7 +1933,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               const data = await analyzePersonalityStructureText(textInput, sessionId, selectedModel);
               
               if (data.messages && data.messages.length > 0) {
-                setMessages(data.messages);
+                setMessages(prev => [...prev, ...data.messages]);
                 setAnalysisId(data.analysisId);
                 setAnalysisProgress(100);
                 toast({
@@ -2017,13 +2025,13 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             setIsAnalyzing(true);
             setAnalysisProgress(10);
-            setMessages([]);
+            // Messages now append instead of clear
             
             try {
               const data = await analyzeClinicalText(textInput, sessionId, selectedModel);
               
               if (data.messages && data.messages.length > 0) {
-                setMessages(data.messages);
+                setMessages(prev => [...prev, ...data.messages]);
                 setAnalysisId(data.analysisId);
                 setAnalysisProgress(100);
                 toast({
@@ -2115,13 +2123,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             setIsAnalyzing(true);
             setAnalysisProgress(10);
-            setMessages([]);
             
             try {
               const data = await analyzeAnxietyText(textInput, sessionId, selectedModel);
               
               if (data.messages && data.messages.length > 0) {
-                setMessages(data.messages);
+                setMessages(prev => [...prev, ...data.messages]);
                 setAnalysisId(data.analysisId);
                 setAnalysisProgress(100);
                 toast({
@@ -2642,13 +2649,13 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   
                   setIsAnalyzing(true);
                   setAnalysisProgress(0);
-                  setMessages([]);
+                  // Messages now append instead of clear
                   
                   try {
                     const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
                     
                     if (data.messages && data.messages.length > 0) {
-                      setMessages(data.messages);
+                      setMessages(prev => [...prev, ...data.messages]);
                       setAnalysisId(data.analysisId);
                       setAnalysisProgress(100);
                       toast({
@@ -2830,7 +2837,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                     if (!mediaData) return;
                     
                     // Clear messages for new analysis
-                    setMessages([]);
+                    // Messages now append instead of clear
                     setIsAnalyzing(true);
                     setAnalysisProgress(0);
                     
@@ -2854,7 +2861,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       }
                       
                       if (response && response.messages && Array.isArray(response.messages)) {
-                        setMessages(response.messages);
+                        setMessages(prev => [...prev, ...response.messages]);
                       }
                       
                       toast({
@@ -2893,13 +2900,13 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       
                       setIsAnalyzing(true);
                       setAnalysisProgress(0);
-                      setMessages([]);
+                      // Messages now append instead of clear
                       
                       try {
                         const data = await analyzeMBTIImage(mediaData, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -2947,7 +2954,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                     if (!mediaData) return;
                     
                     // Clear messages for new analysis
-                    setMessages([]);
+                    // Messages now append instead of clear
                     setIsAnalyzing(true);
                     setAnalysisProgress(0);
                     
@@ -2971,7 +2978,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       }
                       
                       if (response && response.messages && Array.isArray(response.messages)) {
-                        setMessages(response.messages);
+                        setMessages(prev => [...prev, ...response.messages]);
                       }
                       
                       toast({
@@ -3010,13 +3017,13 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       
                       setIsAnalyzing(true);
                       setAnalysisProgress(0);
-                      setMessages([]);
+                      // Messages now append instead of clear
                       
                       try {
                         const data = await analyzeMBTIVideo(mediaData, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -3196,7 +3203,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         const data = await analyzePersonalityStructureText(textInput, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -3242,7 +3249,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -3288,7 +3295,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         const data = await analyzeBigFiveText(textInput, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -3334,7 +3341,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                         const data = await analyzeEnneagramText(textInput, sessionId, selectedModel);
                         
                         if (data.messages && data.messages.length > 0) {
-                          setMessages(data.messages);
+                          setMessages(prev => [...prev, ...data.messages]);
                           setAnalysisId(data.analysisId);
                           setAnalysisProgress(100);
                           toast({
@@ -3388,7 +3395,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       window.location.href = `/?session=${newSessionId}`;
                       
                       // Clear all current state to start a new analysis
-                      setMessages([]);
+                      // Messages now append instead of clear
                       setUploadedMedia(null);
                       setMediaData(null);
                       setDocumentName("");
