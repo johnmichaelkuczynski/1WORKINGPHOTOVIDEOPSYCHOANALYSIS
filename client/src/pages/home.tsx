@@ -1667,75 +1667,43 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         </Button>
         
         <Button
-          variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
+          variant={selectedAnalysisType === "bigfive" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3"
           onClick={() => {
-            setSelectedAnalysisType("bigfive-text");
+            setSelectedAnalysisType("bigfive");
             
-            if (!textInput.trim()) {
-              toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
-              });
-              return;
+            if (textInput.trim()) {
+              handleBigFiveTextAnalysis.mutate(textInput);
+            } else {
+              bigFiveImageInputRef.current?.click();
             }
-            
-            handleBigFiveTextAnalysis.mutate(textInput);
           }}
           disabled={isAnalyzing}
-          data-testid="button-bigfive-text"
+          data-testid="button-bigfive"
         >
-          Big Five (Text)
-        </Button>
-        
-        <Button
-          variant={selectedAnalysisType === "bigfive-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
-          onClick={() => {
-            setSelectedAnalysisType("bigfive-image");
-            bigFiveImageInputRef.current?.click();
-          }}
-          disabled={isAnalyzing}
-          data-testid="button-bigfive-image"
-        >
-          Big Five (Image)
+          Big Five
           <input
             ref={bigFiveImageInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             style={{ display: 'none' }}
             onChange={(e) => {
               const files = e.target.files;
               if (files && files.length > 0) {
-                handleBigFiveImageAnalysis.mutate(files[0]);
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                  handleBigFiveImageAnalysis.mutate(file);
+                } else if (file.type.startsWith('video/')) {
+                  handleBigFiveVideoAnalysis.mutate(file);
+                }
               }
             }}
           />
-        </Button>
-        
-        <Button
-          variant={selectedAnalysisType === "bigfive-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
-          onClick={() => {
-            setSelectedAnalysisType("bigfive-video");
-            bigFiveVideoInputRef.current?.click();
-          }}
-          disabled={isAnalyzing}
-          data-testid="button-bigfive-video"
-        >
-          Big Five (Video)
           <input
             ref={bigFiveVideoInputRef}
             type="file"
             accept="video/*"
             style={{ display: 'none' }}
-            onChange={(e) => {
-              const files = e.target.files;
-              if (files && files.length > 0) {
-                handleBigFiveVideoAnalysis.mutate(files[0]);
-              }
-            }}
           />
         </Button>
         
