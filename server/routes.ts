@@ -8770,6 +8770,340 @@ Provide exceptionally thorough visual analysis with rich detail and specific evi
     }
   });
 
+  // Consolidated General Personality Structure Analysis - Video
+  app.post("/api/analyze/video/personality-structure", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Consolidated Personality Structure video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Personality Structure analysis`);
+      
+      // Comprehensive consolidated personality structure prompt for video analysis
+      const personalityStructureVideoPrompt = `You are an expert personality psychologist with deep knowledge across multiple personality assessment frameworks. Analyze the provided video frames comprehensively by synthesizing insights from ALL of the following established personality frameworks:
+
+1. **Big Five / OCEAN** (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+2. **HEXACO** (adds Honesty-Humility dimension to Big Five)
+3. **16PF** (Cattell's 16 Personality Factors)
+4. **MBTI** (Myers-Briggs Type Indicator - 16 types based on 4 dichotomies)
+5. **Keirsey Temperament Sorter** (4 temperaments: Guardian, Artisan, Idealist, Rational)
+6. **Socionics** (16 socionic types, information metabolism)
+7. **Hogan Personality Inventory** (Normal personality, bright-side traits)
+8. **DISC** (Dominance, Influence, Steadiness, Conscientiousness)
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+
+CRITICAL INSTRUCTIONS:
+- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
+- Show how the different frameworks complement and reinforce each other
+- Identify consistent patterns across multiple frameworks
+- Base ALL observations on VISIBLE ELEMENTS from the video frames (facial expressions, body language, grooming, setting, posture, clothing, objects, environment, social context, movement patterns, gestures)
+- Note specific visual evidence for every assessment, citing frame timing (0%, 25%, 50%, 75%)
+- Analyze temporal patterns - how behaviors evolve or remain consistent across the video
+- Provide rich, detailed analysis (minimum 2-3 paragraphs per major section)
+- Analyze ONLY what you can actually see - do not fabricate details
+
+Visual elements to consider across frames:
+- Facial features, expressions, eye contact, smile patterns
+- Body language, posture, gestures, movement dynamics
+- Grooming, personal presentation, attention to detail
+- Clothing style, colors, formality level
+- Environment, setting, objects present
+- Social context, interactions with others if visible
+- Energy level changes, emotional expression patterns
+- Artistic or creative elements
+- Temporal consistency or variation in behavior
+
+Analyze the video frames and provide your comprehensive assessment in JSON format matching this exact structure:
+
+{
+  "executive_summary": "2-3 paragraph overview synthesizing the most significant personality insights across all frameworks based on video frame analysis",
+  
+  "temporal_overview": "Analysis of how behaviors and patterns evolve or remain consistent across the video timeline (0%, 25%, 50%, 75% frames)",
+  
+  "framework_synthesis": {
+    "big_five_ocean": {
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis citing specific frames"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis citing specific frames"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis citing specific frames"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis citing specific frames"},
+      "neuroticism": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis citing specific frames"}
+    },
+    
+    "hexaco": {
+      "honesty_humility": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"},
+      "emotionality": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"},
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis with frame references"}
+    },
+    
+    "sixteen_pf": {
+      "primary_factors": {
+        "warmth": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "reasoning": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "emotional_stability": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "dominance": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "liveliness": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "rule_consciousness": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "social_boldness": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "sensitivity": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "vigilance": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "abstractedness": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "privateness": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "apprehension": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "openness_to_change": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "self_reliance": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "perfectionism": {"score": "Low/Medium/High", "description": "Visual evidence across frames"},
+        "tension": {"score": "Low/Medium/High", "description": "Visual evidence across frames"}
+      },
+      "global_factors": {
+        "extraversion": "Visual analysis across video timeline",
+        "anxiety": "Visual analysis across video timeline",
+        "tough_mindedness": "Visual analysis across video timeline",
+        "independence": "Visual analysis across video timeline",
+        "self_control": "Visual analysis across video timeline"
+      }
+    },
+    
+    "mbti": {
+      "predicted_type": "Four-letter type (e.g., INTJ, ENFP)",
+      "confidence": "High/Medium/Low",
+      "dimension_analysis": {
+        "introversion_extraversion": {"preference": "I or E", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis with frame citations"},
+        "sensing_intuition": {"preference": "S or N", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis with frame citations"},
+        "thinking_feeling": {"preference": "T or F", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis with frame citations"},
+        "judging_perceiving": {"preference": "J or P", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis with frame citations"}
+      },
+      "cognitive_functions": "Analysis of dominant, auxiliary functions based on visual presentation across frames",
+      "type_description": "Comprehensive description of this MBTI type with visual evidence"
+    },
+    
+    "keirsey": {
+      "temperament": "Guardian/Artisan/Idealist/Rational",
+      "variant": "Specific variant within temperament",
+      "description": "Detailed analysis of temperament expression in visual presentation across frames",
+      "core_needs": "What drives this temperament",
+      "values": "Key values evident in visual presentation"
+    },
+    
+    "socionics": {
+      "predicted_type": "Three-letter type (e.g., ILI, ESE)",
+      "quadra": "Alpha/Beta/Gamma/Delta",
+      "information_elements": {
+        "dominant": "Analysis of dominant function from visual cues across frames",
+        "creative": "Analysis of creative function from visual cues across frames",
+        "role": "Analysis of role function",
+        "vulnerable": "Analysis of vulnerable function"
+      },
+      "intertype_relations": "How this type typically relates to others"
+    },
+    
+    "hogan": {
+      "adjustment": {"score": "Low/Medium/High", "description": "Stress tolerance visible in presentation across frames"},
+      "ambition": {"score": "Low/Medium/High", "description": "Leadership presence and drive visible across frames"},
+      "sociability": {"score": "Low/Medium/High", "description": "Interpersonal warmth visible across frames"},
+      "interpersonal_sensitivity": {"score": "Low/Medium/High", "description": "Tact and perceptiveness visible across frames"},
+      "prudence": {"score": "Low/Medium/High", "description": "Conscientiousness in presentation across frames"},
+      "inquisitive": {"score": "Low/Medium/High", "description": "Intellectual curiosity markers across frames"},
+      "learning_approach": {"score": "Low/Medium/High", "description": "Achievement orientation visible across frames"}
+    },
+    
+    "disc": {
+      "dominance": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Direct, forceful visual presence across frames"},
+      "influence": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Enthusiastic, expressive presentation across frames"},
+      "steadiness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Patient, supportive demeanor across frames"},
+      "conscientiousness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Precise, systematic in presentation across frames"},
+      "primary_style": "D/I/S/C or combination",
+      "behavioral_tendencies": "DISC-based behaviors visible in video"
+    }
+  },
+  
+  "cross_framework_integration": {
+    "converging_patterns": "2-3 paragraphs describing where ALL frameworks agree based on visual evidence from video",
+    "complementary_insights": "How different frameworks add unique nuances from video analysis",
+    "framework_alignment": "Analysis of consistency across trait-based vs type-based vs behavioral approaches from video data"
+  },
+  
+  "comprehensive_profile": {
+    "core_personality": "2-3 paragraphs integrating all frameworks into cohesive description from video analysis",
+    "cognitive_style": "Thinking and decision-making style inferred from visual presentation across frames",
+    "emotional_patterns": "Emotional stability and affect visible across video timeline",
+    "interpersonal_style": "How they relate to others based on visual cues across frames",
+    "work_style": "Professional approach visible in presentation",
+    "values_and_motivation": "Core drivers evident in visual choices"
+  },
+  
+  "behavioral_dynamics": {
+    "movement_patterns": "Analysis of movement quality, energy level, gesture patterns across frames",
+    "expression_evolution": "How facial expressions and emotional displays change or remain consistent",
+    "interaction_style": "Social engagement patterns visible in video",
+    "environmental_adaptation": "How they interact with their environment across frames"
+  },
+  
+  "strengths_and_challenges": {
+    "key_strengths": ["List of 6-8 major strengths with supporting visual evidence from multiple frameworks"],
+    "potential_blind_spots": ["List of 4-6 areas for growth with framework-based visual evidence"],
+    "stress_triggers": ["What tends to cause stress based on visible patterns"],
+    "optimal_conditions": ["Environments where this personality thrives"]
+  },
+  
+  "practical_applications": {
+    "career_fit": "Ideal career paths based on integrated video assessment",
+    "leadership_style": "Natural leadership approach if visible",
+    "communication_preferences": "Inferred communication style from presentation",
+    "relationship_dynamics": "Patterns in relationships from video analysis",
+    "growth_recommendations": "Specific development suggestions"
+  },
+  
+  "methodology_note": "Brief note on how this synthesis integrated 8 different frameworks from video analysis for maximum insight"
+}
+
+Provide exceptionally thorough video analysis with rich detail and specific evidence from the frames. This should be the most comprehensive personality assessment possible from video data.`;
+
+      // Analyze with selected model
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: personalityStructureVideoPrompt
+          }, {
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps):` },
+              ...extractedFrames.map((frame, idx) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContent = extractedFrames.map((frame, idx) => {
+          const base64Data = frame.split(',')[1] || frame;
+          const mediaType = frame.includes('image/png') ? 'image/png' : 
+                           frame.includes('image/gif') ? 'image/gif' :
+                           frame.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType,
+              data: base64Data,
+            }
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: personalityStructureVideoPrompt,
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps):` },
+              ...imageContent
+            ]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "personality_structure_video",
+        content: formattedContent,
+        title: title || "General Personality Structure Analysis (Video)",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          personality_structure: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Consolidated Personality Structure video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for consolidated personality structure" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
