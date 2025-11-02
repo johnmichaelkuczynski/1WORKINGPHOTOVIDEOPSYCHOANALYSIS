@@ -15,13 +15,14 @@ The platform is built with a React.js frontend (TypeScript, Tailwind CSS, shadcn
 **Key Features:**
 - **Multi-modal Analysis:** Supports analysis across text, images, videos, and documents.
 - **Personality Frameworks:** Offers MBTI, Big Five/OCEAN, Enneagram (9-Type), and Dark Traits / Personality Pathology analysis across multiple modalities.
+- **Personality Structure Analysis:** Comprehensive consolidated analysis synthesizing 8 major personality frameworks (Big Five/OCEAN, HEXACO, 16PF, MBTI, Keirsey, Socionics, Hogan, DISC) in both text and image modalities for maximum insight depth.
 - **Dark Traits Visual Assessment:** Analyzes personality pathology through visual cues including Dark Tetrad (narcissism, Machiavellianism, psychopathy, sadism), Cluster B patterns, and other maladaptive traits using facial expressions, body language, grooming patterns, and interpersonal markers.
 - **Facial Analysis:** Integrates AWS Rekognition and Face++ for detailed facial feature detection.
 - **Audio Transcription:** Utilizes OpenAI Whisper for transcribing audio content.
 - **Session Management:** Provides session-based storage of analysis history with clear state management to prevent analysis stacking.
-- **UI/UX:** Features a clean interface with capabilities for re-analysis and email sharing.
+- **UI/UX:** Features a clean interface with capabilities for re-analysis and email sharing. Sidebar width optimized to 14rem (56) for full button text visibility.
 - **Comprehensive Analysis Frameworks:** Implements detailed 50-question frameworks for image, video, and text analysis, and a 100-question framework for comprehensive text analysis, ensuring evidence-based results with specific references.
-- **Robust Error Handling:** Includes `safeStringify` for consistent result formatting and error prevention.
+- **Robust Error Handling:** Consistent JSON.stringify usage for result formatting.
 - **AI Model Naming:** Displays AI models elegantly as 知 1-4 using the Chinese character for "knowledge" for enhanced user experience.
 - **Grounded Analysis:** AI prompts are designed to receive structured visual data and scene context, preventing fabrication and ensuring analysis is based on actual visual evidence.
 

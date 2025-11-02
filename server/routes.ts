@@ -8231,6 +8231,544 @@ Provide your analysis in JSON format:
       }
     }
   });
+  app.post("/api/analyze/text/personality-structure", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Consolidated Personality Structure text analysis with model: ${selectedModel}`);
+      
+      // Comprehensive consolidated personality structure prompt
+      const personalityStructurePrompt = `You are an expert personality psychologist with deep knowledge across multiple personality assessment frameworks. Analyze the provided text comprehensively by synthesizing insights from ALL of the following established personality frameworks:
+
+1. **Big Five / OCEAN** (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+2. **HEXACO** (adds Honesty-Humility dimension to Big Five)
+3. **16PF** (Cattell's 16 Personality Factors)
+4. **MBTI** (Myers-Briggs Type Indicator - 16 types based on 4 dichotomies)
+5. **Keirsey Temperament Sorter** (4 temperaments: Guardian, Artisan, Idealist, Rational)
+6. **Socionics** (16 socionic types, information metabolism)
+7. **Hogan Personality Inventory** (Normal personality, bright-side traits)
+8. **DISC** (Dominance, Influence, Steadiness, Conscientiousness)
+
+CRITICAL INSTRUCTIONS:
+- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
+- Show how the different frameworks complement and reinforce each other
+- Identify consistent patterns across multiple frameworks
+- Note any interesting contrasts or nuances between frameworks
+- Base ALL observations on SPECIFIC EVIDENCE from the text provided
+- Quote relevant passages to support your assessment
+- Provide rich, detailed analysis (minimum 3-4 paragraphs per major section)
+
+Analyze the following text and provide your comprehensive assessment in JSON format:
+
+{
+  "executive_summary": "2-3 paragraph overview synthesizing the most significant personality insights across all frameworks",
+  
+  "framework_synthesis": {
+    "big_five_ocean": {
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "neuroticism": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"}
+    },
+    
+    "hexaco": {
+      "honesty_humility": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "emotionality": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"}
+    },
+    
+    "sixteen_pf": {
+      "primary_factors": {
+        "warmth": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "reasoning": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "emotional_stability": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "dominance": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "liveliness": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "rule_consciousness": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "social_boldness": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "sensitivity": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "vigilance": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "abstractedness": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "privateness": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "apprehension": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "openness_to_change": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "self_reliance": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "perfectionism": {"score": "Low/Medium/High", "description": "Evidence from text"},
+        "tension": {"score": "Low/Medium/High", "description": "Evidence from text"}
+      },
+      "global_factors": {
+        "extraversion": "Analysis",
+        "anxiety": "Analysis",
+        "tough_mindedness": "Analysis",
+        "independence": "Analysis",
+        "self_control": "Analysis"
+      }
+    },
+    
+    "mbti": {
+      "predicted_type": "Four-letter type (e.g., INTJ, ENFP)",
+      "confidence": "High/Medium/Low",
+      "dimension_analysis": {
+        "introversion_extraversion": {"preference": "I or E", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
+        "sensing_intuition": {"preference": "S or N", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
+        "thinking_feeling": {"preference": "T or F", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
+        "judging_perceiving": {"preference": "J or P", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"}
+      },
+      "cognitive_functions": "Analysis of dominant, auxiliary, tertiary, and inferior functions",
+      "type_description": "Comprehensive description of this MBTI type with evidence from text"
+    },
+    
+    "keirsey": {
+      "temperament": "Guardian/Artisan/Idealist/Rational",
+      "variant": "Specific variant within temperament (e.g., Mastermind, Champion)",
+      "description": "Detailed analysis of temperament expression in the text",
+      "core_needs": "What drives this temperament",
+      "values": "Key values evident in the text"
+    },
+    
+    "socionics": {
+      "predicted_type": "Three-letter type (e.g., ILI, ESE)",
+      "quadra": "Alpha/Beta/Gamma/Delta",
+      "information_elements": {
+        "dominant": "Analysis of dominant function",
+        "creative": "Analysis of creative function",
+        "role": "Analysis of role function",
+        "vulnerable": "Analysis of vulnerable function"
+      },
+      "intertype_relations": "How this type typically relates to others"
+    },
+    
+    "hogan": {
+      "adjustment": {"score": "Low/Medium/High", "description": "Stress tolerance and emotional stability"},
+      "ambition": {"score": "Low/Medium/High", "description": "Leadership and competitive drive"},
+      "sociability": {"score": "Low/Medium/High", "description": "Interpersonal warmth and engagement"},
+      "interpersonal_sensitivity": {"score": "Low/Medium/High", "description": "Tact and perceptiveness"},
+      "prudence": {"score": "Low/Medium/High", "description": "Conscientiousness and self-control"},
+      "inquisitive": {"score": "Low/Medium/High", "description": "Intellectual curiosity and creativity"},
+      "learning_approach": {"score": "Low/Medium/High", "description": "Valuing education and achievement"}
+    },
+    
+    "disc": {
+      "dominance": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Results-focused, direct, forceful"},
+      "influence": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Enthusiastic, optimistic, persuasive"},
+      "steadiness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Patient, loyal, supportive"},
+      "conscientiousness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Analytical, precise, systematic"},
+      "primary_style": "D/I/S/C or combination (e.g., DI, SC)",
+      "behavioral_tendencies": "Comprehensive description of DISC-based behaviors"
+    }
+  },
+  
+  "cross_framework_integration": {
+    "converging_patterns": "3-4 paragraphs describing where ALL frameworks agree and reinforce the same traits",
+    "complementary_insights": "How different frameworks add unique nuances to understanding this personality",
+    "framework_alignment": "Analysis of consistency across trait-based (Big Five, HEXACO, 16PF, Hogan) vs type-based (MBTI, Keirsey, Socionics) vs behavioral (DISC) approaches"
+  },
+  
+  "comprehensive_profile": {
+    "core_personality": "3-4 paragraphs integrating all frameworks into a cohesive personality description",
+    "cognitive_style": "How this person thinks, processes information, and makes decisions (synthesizing MBTI functions, Socionics, 16PF reasoning)",
+    "emotional_patterns": "Emotional stability, stress response, affect (from Big Five neuroticism, HEXACO emotionality, Hogan adjustment, 16PF factors)",
+    "interpersonal_style": "How they relate to others (DISC, MBTI, Keirsey, extraversion across frameworks)",
+    "work_style": "Professional approach and productivity patterns (conscientiousness, DISC, Hogan, 16PF)",
+    "values_and_motivation": "Core drivers and what matters most (Keirsey needs, HEXACO honesty-humility, openness factors)"
+  },
+  
+  "strengths_and_challenges": {
+    "key_strengths": ["List of 8-10 major strengths with supporting evidence from multiple frameworks"],
+    "potential_blind_spots": ["List of 6-8 areas for growth with framework-based evidence"],
+    "stress_triggers": ["What tends to cause stress based on vulnerability patterns across frameworks"],
+    "optimal_conditions": ["Environments and situations where this personality thrives"]
+  },
+  
+  "practical_applications": {
+    "career_fit": "Ideal career paths and work environments based on integrated assessment",
+    "leadership_style": "Natural leadership approach if applicable",
+    "communication_preferences": "How they prefer to communicate and be communicated with",
+    "relationship_dynamics": "Patterns in personal relationships",
+    "growth_recommendations": "Specific development suggestions based on the comprehensive analysis"
+  },
+  
+  "methodology_note": "Brief note on how this synthesis integrated 8 different frameworks for maximum insight"
+}
+
+Provide exceptionally thorough analysis with rich detail and extensive text evidence. This should be the most comprehensive personality assessment possible.`;
+
+      // Analyze with selected model
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: personalityStructurePrompt
+          }, {
+            role: "user",
+            content: `Analyze this text comprehensively:\n\n${textContent}`
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: personalityStructurePrompt,
+          messages: [{
+            role: "user",
+            content: `Analyze this text comprehensively:\n\n${textContent}`
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
+        const response = await perplexity.query({
+          model: "sonar-pro",
+          query: `${personalityStructurePrompt}\n\nAnalyze this text:\n\n${textContent}`,
+        });
+        
+        const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Perplexity response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available" });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "personality_structure",
+        content: formattedContent,
+        title: title || "General Personality Structure Analysis",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          personality_structure: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Consolidated Personality Structure text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for consolidated personality structure" });
+    }
+  });
+
+  // Consolidated General Personality Structure Analysis - Image
+  app.post("/api/analyze/image/personality-structure", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Consolidated Personality Structure image analysis with model: ${selectedModel}`);
+      
+      // Comprehensive consolidated personality structure prompt for image analysis
+      const personalityStructureImagePrompt = `You are an expert personality psychologist with deep knowledge across multiple personality assessment frameworks. Analyze the provided image comprehensively by synthesizing insights from ALL of the following established personality frameworks:
+
+1. **Big Five / OCEAN** (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+2. **HEXACO** (adds Honesty-Humility dimension to Big Five)
+3. **16PF** (Cattell's 16 Personality Factors)
+4. **MBTI** (Myers-Briggs Type Indicator - 16 types based on 4 dichotomies)
+5. **Keirsey Temperament Sorter** (4 temperaments: Guardian, Artisan, Idealist, Rational)
+6. **Socionics** (16 socionic types, information metabolism)
+7. **Hogan Personality Inventory** (Normal personality, bright-side traits)
+8. **DISC** (Dominance, Influence, Steadiness, Conscientiousness)
+
+IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+
+CRITICAL INSTRUCTIONS:
+- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
+- Show how the different frameworks complement and reinforce each other
+- Identify consistent patterns across multiple frameworks
+- Base ALL observations on VISIBLE ELEMENTS from the image (facial expressions, body language, grooming, setting, posture, clothing, objects, environment, social context)
+- Note specific visual evidence for every assessment
+- Provide rich, detailed analysis (minimum 2-3 paragraphs per major section)
+- Analyze ONLY what you can actually see - do not fabricate details
+
+Visual elements to consider:
+- Facial features, expressions, eye contact, smile
+- Body language, posture, gesture
+- Grooming, personal presentation, attention to detail
+- Clothing style, colors, formality level
+- Environment, setting, objects present
+- Social context, interactions with others if visible
+- Energy level, emotional expression
+- Artistic or creative elements
+
+Analyze the image and provide your comprehensive assessment in JSON format matching this exact structure:
+
+{
+  "executive_summary": "2-3 paragraph overview synthesizing the most significant personality insights across all frameworks based on visual analysis",
+  
+  "framework_synthesis": {
+    "big_five_ocean": {
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "neuroticism": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"}
+    },
+    
+    "hexaco": {
+      "honesty_humility": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "emotionality": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
+      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"}
+    },
+    
+    "sixteen_pf": {
+      "primary_factors": {
+        "warmth": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "reasoning": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "emotional_stability": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "dominance": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "liveliness": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "rule_consciousness": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "social_boldness": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "sensitivity": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "vigilance": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "abstractedness": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "privateness": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "apprehension": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "openness_to_change": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "self_reliance": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "perfectionism": {"score": "Low/Medium/High", "description": "Visual evidence"},
+        "tension": {"score": "Low/Medium/High", "description": "Visual evidence"}
+      },
+      "global_factors": {
+        "extraversion": "Visual analysis",
+        "anxiety": "Visual analysis",
+        "tough_mindedness": "Visual analysis",
+        "independence": "Visual analysis",
+        "self_control": "Visual analysis"
+      }
+    },
+    
+    "mbti": {
+      "predicted_type": "Four-letter type (e.g., INTJ, ENFP)",
+      "confidence": "High/Medium/Low",
+      "dimension_analysis": {
+        "introversion_extraversion": {"preference": "I or E", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
+        "sensing_intuition": {"preference": "S or N", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
+        "thinking_feeling": {"preference": "T or F", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
+        "judging_perceiving": {"preference": "J or P", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"}
+      },
+      "cognitive_functions": "Analysis of dominant, auxiliary functions based on visual presentation",
+      "type_description": "Comprehensive description of this MBTI type with visual evidence"
+    },
+    
+    "keirsey": {
+      "temperament": "Guardian/Artisan/Idealist/Rational",
+      "variant": "Specific variant within temperament",
+      "description": "Detailed analysis of temperament expression in visual presentation",
+      "core_needs": "What drives this temperament",
+      "values": "Key values evident in visual presentation"
+    },
+    
+    "socionics": {
+      "predicted_type": "Three-letter type (e.g., ILI, ESE)",
+      "quadra": "Alpha/Beta/Gamma/Delta",
+      "information_elements": {
+        "dominant": "Analysis of dominant function from visual cues",
+        "creative": "Analysis of creative function from visual cues",
+        "role": "Analysis of role function",
+        "vulnerable": "Analysis of vulnerable function"
+      },
+      "intertype_relations": "How this type typically relates to others"
+    },
+    
+    "hogan": {
+      "adjustment": {"score": "Low/Medium/High", "description": "Stress tolerance visible in presentation"},
+      "ambition": {"score": "Low/Medium/High", "description": "Leadership presence and drive"},
+      "sociability": {"score": "Low/Medium/High", "description": "Interpersonal warmth visible"},
+      "interpersonal_sensitivity": {"score": "Low/Medium/High", "description": "Tact and perceptiveness"},
+      "prudence": {"score": "Low/Medium/High", "description": "Conscientiousness in presentation"},
+      "inquisitive": {"score": "Low/Medium/High", "description": "Intellectual curiosity markers"},
+      "learning_approach": {"score": "Low/Medium/High", "description": "Achievement orientation"}
+    },
+    
+    "disc": {
+      "dominance": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Direct, forceful visual presence"},
+      "influence": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Enthusiastic, expressive presentation"},
+      "steadiness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Patient, supportive demeanor"},
+      "conscientiousness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Precise, systematic in presentation"},
+      "primary_style": "D/I/S/C or combination",
+      "behavioral_tendencies": "DISC-based behaviors visible in image"
+    }
+  },
+  
+  "cross_framework_integration": {
+    "converging_patterns": "2-3 paragraphs describing where ALL frameworks agree based on visual evidence",
+    "complementary_insights": "How different frameworks add unique nuances from visual analysis",
+    "framework_alignment": "Analysis of consistency across trait-based vs type-based vs behavioral approaches from visual data"
+  },
+  
+  "comprehensive_profile": {
+    "core_personality": "2-3 paragraphs integrating all frameworks into cohesive description from visual analysis",
+    "cognitive_style": "Thinking and decision-making style inferred from visual presentation",
+    "emotional_patterns": "Emotional stability and affect visible in image",
+    "interpersonal_style": "How they relate to others based on visual cues",
+    "work_style": "Professional approach visible in presentation",
+    "values_and_motivation": "Core drivers evident in visual choices"
+  },
+  
+  "strengths_and_challenges": {
+    "key_strengths": ["List of 6-8 major strengths with supporting visual evidence from multiple frameworks"],
+    "potential_blind_spots": ["List of 4-6 areas for growth with framework-based visual evidence"],
+    "stress_triggers": ["What tends to cause stress based on visible patterns"],
+    "optimal_conditions": ["Environments where this personality thrives"]
+  },
+  
+  "practical_applications": {
+    "career_fit": "Ideal career paths based on integrated visual assessment",
+    "leadership_style": "Natural leadership approach if visible",
+    "communication_preferences": "Inferred communication style from presentation",
+    "relationship_dynamics": "Patterns in relationships from visual analysis",
+    "growth_recommendations": "Specific development suggestions"
+  },
+  
+  "methodology_note": "Brief note on how this synthesis integrated 8 different frameworks from visual analysis for maximum insight"
+}
+
+Provide exceptionally thorough visual analysis with rich detail and specific evidence from the image. This should be the most comprehensive personality assessment possible from visual data.`;
+
+      // Analyze with selected model
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: personalityStructureImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: {
+                url: mediaData
+              }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const mediaType = mediaData.includes('image/png') ? 'image/png' : 
+                         mediaData.includes('image/gif') ? 'image/gif' :
+                         mediaData.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: personalityStructureImagePrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaType,
+                data: base64Data,
+              }
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "personality_structure_image",
+        content: formattedContent,
+        title: title || "General Personality Structure Analysis (Image)",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          personality_structure: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Consolidated Personality Structure image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for consolidated personality structure" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
@@ -8939,542 +9477,4 @@ Important: Pay careful attention to gender, facial expressions, emotional indica
   }
 
   // Consolidated General Personality Structure Analysis - Text
-  app.post("/api/analyze/text/personality-structure", async (req, res) => {
-    try {
-      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
-      
-      if (!textContent || typeof textContent !== 'string') {
-        return res.status(400).json({ error: "Text content is required" });
-      }
-      
-      if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
-      }
-      
-      console.log(`Processing Consolidated Personality Structure text analysis with model: ${selectedModel}`);
-      
-      // Comprehensive consolidated personality structure prompt
-      const personalityStructurePrompt = `You are an expert personality psychologist with deep knowledge across multiple personality assessment frameworks. Analyze the provided text comprehensively by synthesizing insights from ALL of the following established personality frameworks:
-
-1. **Big Five / OCEAN** (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
-2. **HEXACO** (adds Honesty-Humility dimension to Big Five)
-3. **16PF** (Cattell's 16 Personality Factors)
-4. **MBTI** (Myers-Briggs Type Indicator - 16 types based on 4 dichotomies)
-5. **Keirsey Temperament Sorter** (4 temperaments: Guardian, Artisan, Idealist, Rational)
-6. **Socionics** (16 socionic types, information metabolism)
-7. **Hogan Personality Inventory** (Normal personality, bright-side traits)
-8. **DISC** (Dominance, Influence, Steadiness, Conscientiousness)
-
-CRITICAL INSTRUCTIONS:
-- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
-- Show how the different frameworks complement and reinforce each other
-- Identify consistent patterns across multiple frameworks
-- Note any interesting contrasts or nuances between frameworks
-- Base ALL observations on SPECIFIC EVIDENCE from the text provided
-- Quote relevant passages to support your assessment
-- Provide rich, detailed analysis (minimum 3-4 paragraphs per major section)
-
-Analyze the following text and provide your comprehensive assessment in JSON format:
-
-{
-  "executive_summary": "2-3 paragraph overview synthesizing the most significant personality insights across all frameworks",
-  
-  "framework_synthesis": {
-    "big_five_ocean": {
-      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "neuroticism": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"}
-    },
-    
-    "hexaco": {
-      "honesty_humility": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "emotionality": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"},
-      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed analysis with text quotes"}
-    },
-    
-    "sixteen_pf": {
-      "primary_factors": {
-        "warmth": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "reasoning": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "emotional_stability": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "dominance": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "liveliness": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "rule_consciousness": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "social_boldness": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "sensitivity": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "vigilance": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "abstractedness": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "privateness": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "apprehension": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "openness_to_change": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "self_reliance": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "perfectionism": {"score": "Low/Medium/High", "description": "Evidence from text"},
-        "tension": {"score": "Low/Medium/High", "description": "Evidence from text"}
-      },
-      "global_factors": {
-        "extraversion": "Analysis",
-        "anxiety": "Analysis",
-        "tough_mindedness": "Analysis",
-        "independence": "Analysis",
-        "self_control": "Analysis"
-      }
-    },
-    
-    "mbti": {
-      "predicted_type": "Four-letter type (e.g., INTJ, ENFP)",
-      "confidence": "High/Medium/Low",
-      "dimension_analysis": {
-        "introversion_extraversion": {"preference": "I or E", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
-        "sensing_intuition": {"preference": "S or N", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
-        "thinking_feeling": {"preference": "T or F", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"},
-        "judging_perceiving": {"preference": "J or P", "strength": "Clear/Moderate/Slight", "evidence": "Detailed analysis"}
-      },
-      "cognitive_functions": "Analysis of dominant, auxiliary, tertiary, and inferior functions",
-      "type_description": "Comprehensive description of this MBTI type with evidence from text"
-    },
-    
-    "keirsey": {
-      "temperament": "Guardian/Artisan/Idealist/Rational",
-      "variant": "Specific variant within temperament (e.g., Mastermind, Champion)",
-      "description": "Detailed analysis of temperament expression in the text",
-      "core_needs": "What drives this temperament",
-      "values": "Key values evident in the text"
-    },
-    
-    "socionics": {
-      "predicted_type": "Three-letter type (e.g., ILI, ESE)",
-      "quadra": "Alpha/Beta/Gamma/Delta",
-      "information_elements": {
-        "dominant": "Analysis of dominant function",
-        "creative": "Analysis of creative function",
-        "role": "Analysis of role function",
-        "vulnerable": "Analysis of vulnerable function"
-      },
-      "intertype_relations": "How this type typically relates to others"
-    },
-    
-    "hogan": {
-      "adjustment": {"score": "Low/Medium/High", "description": "Stress tolerance and emotional stability"},
-      "ambition": {"score": "Low/Medium/High", "description": "Leadership and competitive drive"},
-      "sociability": {"score": "Low/Medium/High", "description": "Interpersonal warmth and engagement"},
-      "interpersonal_sensitivity": {"score": "Low/Medium/High", "description": "Tact and perceptiveness"},
-      "prudence": {"score": "Low/Medium/High", "description": "Conscientiousness and self-control"},
-      "inquisitive": {"score": "Low/Medium/High", "description": "Intellectual curiosity and creativity"},
-      "learning_approach": {"score": "Low/Medium/High", "description": "Valuing education and achievement"}
-    },
-    
-    "disc": {
-      "dominance": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Results-focused, direct, forceful"},
-      "influence": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Enthusiastic, optimistic, persuasive"},
-      "steadiness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Patient, loyal, supportive"},
-      "conscientiousness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Analytical, precise, systematic"},
-      "primary_style": "D/I/S/C or combination (e.g., DI, SC)",
-      "behavioral_tendencies": "Comprehensive description of DISC-based behaviors"
-    }
-  },
-  
-  "cross_framework_integration": {
-    "converging_patterns": "3-4 paragraphs describing where ALL frameworks agree and reinforce the same traits",
-    "complementary_insights": "How different frameworks add unique nuances to understanding this personality",
-    "framework_alignment": "Analysis of consistency across trait-based (Big Five, HEXACO, 16PF, Hogan) vs type-based (MBTI, Keirsey, Socionics) vs behavioral (DISC) approaches"
-  },
-  
-  "comprehensive_profile": {
-    "core_personality": "3-4 paragraphs integrating all frameworks into a cohesive personality description",
-    "cognitive_style": "How this person thinks, processes information, and makes decisions (synthesizing MBTI functions, Socionics, 16PF reasoning)",
-    "emotional_patterns": "Emotional stability, stress response, affect (from Big Five neuroticism, HEXACO emotionality, Hogan adjustment, 16PF factors)",
-    "interpersonal_style": "How they relate to others (DISC, MBTI, Keirsey, extraversion across frameworks)",
-    "work_style": "Professional approach and productivity patterns (conscientiousness, DISC, Hogan, 16PF)",
-    "values_and_motivation": "Core drivers and what matters most (Keirsey needs, HEXACO honesty-humility, openness factors)"
-  },
-  
-  "strengths_and_challenges": {
-    "key_strengths": ["List of 8-10 major strengths with supporting evidence from multiple frameworks"],
-    "potential_blind_spots": ["List of 6-8 areas for growth with framework-based evidence"],
-    "stress_triggers": ["What tends to cause stress based on vulnerability patterns across frameworks"],
-    "optimal_conditions": ["Environments and situations where this personality thrives"]
-  },
-  
-  "practical_applications": {
-    "career_fit": "Ideal career paths and work environments based on integrated assessment",
-    "leadership_style": "Natural leadership approach if applicable",
-    "communication_preferences": "How they prefer to communicate and be communicated with",
-    "relationship_dynamics": "Patterns in personal relationships",
-    "growth_recommendations": "Specific development suggestions based on the comprehensive analysis"
-  },
-  
-  "methodology_note": "Brief note on how this synthesis integrated 8 different frameworks for maximum insight"
-}
-
-Provide exceptionally thorough analysis with rich detail and extensive text evidence. This should be the most comprehensive personality assessment possible.`;
-
-      // Analyze with selected model
-      let analysisResult: any;
-      
-      if (selectedModel === "openai" && openai) {
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [{
-            role: "system",
-            content: personalityStructurePrompt
-          }, {
-            role: "user",
-            content: `Analyze this text comprehensively:\n\n${textContent}`
-          }],
-          response_format: { type: "json_object" },
-          temperature: 0.7,
-        });
-        
-        const rawResponse = response.choices[0]?.message.content || "";
-        analysisResult = JSON.parse(rawResponse);
-        
-      } else if (selectedModel === "anthropic" && anthropic) {
-        const response = await anthropic.messages.create({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 16000,
-          temperature: 0.7,
-          system: personalityStructurePrompt,
-          messages: [{
-            role: "user",
-            content: `Analyze this text comprehensively:\n\n${textContent}`
-          }]
-        });
-        
-        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
-        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysisResult = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("Could not extract JSON from Anthropic response");
-        }
-        
-      } else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
-        const response = await perplexity.query({
-          model: "sonar-pro",
-          query: `${personalityStructurePrompt}\n\nAnalyze this text:\n\n${textContent}`,
-        });
-        
-        const jsonMatch = response.text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysisResult = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("Could not extract JSON from Perplexity response");
-        }
-        
-      } else {
-        return res.status(400).json({ error: "Selected AI model is not available" });
-      }
-      
-      const formattedContent = safeStringify(analysisResult);
-      
-      const analysis = await storage.createAnalysis({
-        sessionId,
-        type: "personality_structure",
-        content: formattedContent,
-        title: title || "General Personality Structure Analysis",
-      });
-      
-      const message = await storage.createMessage({
-        sessionId,
-        analysisId: analysis.id,
-        content: formattedContent,
-        role: "assistant",
-      });
-      
-      res.json({
-        analysisId: analysis.id,
-        personalityInsights: { 
-          analysis: formattedContent, 
-          personality_structure: analysisResult 
-        },
-        messages: [message],
-      });
-    } catch (error) {
-      console.error("Consolidated Personality Structure text analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze text for consolidated personality structure" });
-    }
-  });
-
-  // Consolidated General Personality Structure Analysis - Image
-  app.post("/api/analyze/image/personality-structure", async (req, res) => {
-    try {
-      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
-      
-      if (!mediaData || typeof mediaData !== 'string') {
-        return res.status(400).json({ error: "Image data is required" });
-      }
-      
-      if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
-      }
-      
-      console.log(`Processing Consolidated Personality Structure image analysis with model: ${selectedModel}`);
-      
-      // Comprehensive consolidated personality structure prompt for image analysis
-      const personalityStructureImagePrompt = `You are an expert personality psychologist with deep knowledge across multiple personality assessment frameworks. Analyze the provided image comprehensively by synthesizing insights from ALL of the following established personality frameworks:
-
-1. **Big Five / OCEAN** (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
-2. **HEXACO** (adds Honesty-Humility dimension to Big Five)
-3. **16PF** (Cattell's 16 Personality Factors)
-4. **MBTI** (Myers-Briggs Type Indicator - 16 types based on 4 dichotomies)
-5. **Keirsey Temperament Sorter** (4 temperaments: Guardian, Artisan, Idealist, Rational)
-6. **Socionics** (16 socionic types, information metabolism)
-7. **Hogan Personality Inventory** (Normal personality, bright-side traits)
-8. **DISC** (Dominance, Influence, Steadiness, Conscientiousness)
-
-IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
-
-CRITICAL INSTRUCTIONS:
-- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
-- Show how the different frameworks complement and reinforce each other
-- Identify consistent patterns across multiple frameworks
-- Base ALL observations on VISIBLE ELEMENTS from the image (facial expressions, body language, grooming, setting, posture, clothing, objects, environment, social context)
-- Note specific visual evidence for every assessment
-- Provide rich, detailed analysis (minimum 2-3 paragraphs per major section)
-- Analyze ONLY what you can actually see - do not fabricate details
-
-Visual elements to consider:
-- Facial features, expressions, eye contact, smile
-- Body language, posture, gesture
-- Grooming, personal presentation, attention to detail
-- Clothing style, colors, formality level
-- Environment, setting, objects present
-- Social context, interactions with others if visible
-- Energy level, emotional expression
-- Artistic or creative elements
-
-Analyze the image and provide your comprehensive assessment in JSON format matching this exact structure:
-
-{
-  "executive_summary": "2-3 paragraph overview synthesizing the most significant personality insights across all frameworks based on visual analysis",
-  
-  "framework_synthesis": {
-    "big_five_ocean": {
-      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "neuroticism": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"}
-    },
-    
-    "hexaco": {
-      "honesty_humility": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "emotionality": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "extraversion": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "agreeableness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "conscientiousness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"},
-      "openness": {"score": "Very Low/Low/Medium/High/Very High", "evidence": "Detailed visual analysis"}
-    },
-    
-    "sixteen_pf": {
-      "primary_factors": {
-        "warmth": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "reasoning": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "emotional_stability": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "dominance": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "liveliness": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "rule_consciousness": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "social_boldness": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "sensitivity": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "vigilance": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "abstractedness": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "privateness": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "apprehension": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "openness_to_change": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "self_reliance": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "perfectionism": {"score": "Low/Medium/High", "description": "Visual evidence"},
-        "tension": {"score": "Low/Medium/High", "description": "Visual evidence"}
-      },
-      "global_factors": {
-        "extraversion": "Visual analysis",
-        "anxiety": "Visual analysis",
-        "tough_mindedness": "Visual analysis",
-        "independence": "Visual analysis",
-        "self_control": "Visual analysis"
-      }
-    },
-    
-    "mbti": {
-      "predicted_type": "Four-letter type (e.g., INTJ, ENFP)",
-      "confidence": "High/Medium/Low",
-      "dimension_analysis": {
-        "introversion_extraversion": {"preference": "I or E", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
-        "sensing_intuition": {"preference": "S or N", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
-        "thinking_feeling": {"preference": "T or F", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"},
-        "judging_perceiving": {"preference": "J or P", "strength": "Clear/Moderate/Slight", "evidence": "Detailed visual analysis"}
-      },
-      "cognitive_functions": "Analysis of dominant, auxiliary functions based on visual presentation",
-      "type_description": "Comprehensive description of this MBTI type with visual evidence"
-    },
-    
-    "keirsey": {
-      "temperament": "Guardian/Artisan/Idealist/Rational",
-      "variant": "Specific variant within temperament",
-      "description": "Detailed analysis of temperament expression in visual presentation",
-      "core_needs": "What drives this temperament",
-      "values": "Key values evident in visual presentation"
-    },
-    
-    "socionics": {
-      "predicted_type": "Three-letter type (e.g., ILI, ESE)",
-      "quadra": "Alpha/Beta/Gamma/Delta",
-      "information_elements": {
-        "dominant": "Analysis of dominant function from visual cues",
-        "creative": "Analysis of creative function from visual cues",
-        "role": "Analysis of role function",
-        "vulnerable": "Analysis of vulnerable function"
-      },
-      "intertype_relations": "How this type typically relates to others"
-    },
-    
-    "hogan": {
-      "adjustment": {"score": "Low/Medium/High", "description": "Stress tolerance visible in presentation"},
-      "ambition": {"score": "Low/Medium/High", "description": "Leadership presence and drive"},
-      "sociability": {"score": "Low/Medium/High", "description": "Interpersonal warmth visible"},
-      "interpersonal_sensitivity": {"score": "Low/Medium/High", "description": "Tact and perceptiveness"},
-      "prudence": {"score": "Low/Medium/High", "description": "Conscientiousness in presentation"},
-      "inquisitive": {"score": "Low/Medium/High", "description": "Intellectual curiosity markers"},
-      "learning_approach": {"score": "Low/Medium/High", "description": "Achievement orientation"}
-    },
-    
-    "disc": {
-      "dominance": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Direct, forceful visual presence"},
-      "influence": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Enthusiastic, expressive presentation"},
-      "steadiness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Patient, supportive demeanor"},
-      "conscientiousness": {"score": "Low/Medium/High", "percentage": "0-100%", "description": "Precise, systematic in presentation"},
-      "primary_style": "D/I/S/C or combination",
-      "behavioral_tendencies": "DISC-based behaviors visible in image"
-    }
-  },
-  
-  "cross_framework_integration": {
-    "converging_patterns": "2-3 paragraphs describing where ALL frameworks agree based on visual evidence",
-    "complementary_insights": "How different frameworks add unique nuances from visual analysis",
-    "framework_alignment": "Analysis of consistency across trait-based vs type-based vs behavioral approaches from visual data"
-  },
-  
-  "comprehensive_profile": {
-    "core_personality": "2-3 paragraphs integrating all frameworks into cohesive description from visual analysis",
-    "cognitive_style": "Thinking and decision-making style inferred from visual presentation",
-    "emotional_patterns": "Emotional stability and affect visible in image",
-    "interpersonal_style": "How they relate to others based on visual cues",
-    "work_style": "Professional approach visible in presentation",
-    "values_and_motivation": "Core drivers evident in visual choices"
-  },
-  
-  "strengths_and_challenges": {
-    "key_strengths": ["List of 6-8 major strengths with supporting visual evidence from multiple frameworks"],
-    "potential_blind_spots": ["List of 4-6 areas for growth with framework-based visual evidence"],
-    "stress_triggers": ["What tends to cause stress based on visible patterns"],
-    "optimal_conditions": ["Environments where this personality thrives"]
-  },
-  
-  "practical_applications": {
-    "career_fit": "Ideal career paths based on integrated visual assessment",
-    "leadership_style": "Natural leadership approach if visible",
-    "communication_preferences": "Inferred communication style from presentation",
-    "relationship_dynamics": "Patterns in relationships from visual analysis",
-    "growth_recommendations": "Specific development suggestions"
-  },
-  
-  "methodology_note": "Brief note on how this synthesis integrated 8 different frameworks from visual analysis for maximum insight"
-}
-
-Provide exceptionally thorough visual analysis with rich detail and specific evidence from the image. This should be the most comprehensive personality assessment possible from visual data.`;
-
-      // Analyze with selected model
-      let analysisResult: any;
-      
-      if (selectedModel === "openai" && openai) {
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [{
-            role: "system",
-            content: personalityStructureImagePrompt
-          }, {
-            role: "user",
-            content: [{
-              type: "image_url",
-              image_url: {
-                url: mediaData
-              }
-            }]
-          }],
-          response_format: { type: "json_object" },
-          temperature: 0.7,
-        });
-        
-        const rawResponse = response.choices[0]?.message.content || "";
-        analysisResult = JSON.parse(rawResponse);
-        
-      } else if (selectedModel === "anthropic" && anthropic) {
-        const base64Data = mediaData.split(',')[1] || mediaData;
-        const mediaType = mediaData.includes('image/png') ? 'image/png' : 
-                         mediaData.includes('image/gif') ? 'image/gif' :
-                         mediaData.includes('image/webp') ? 'image/webp' : 'image/jpeg';
-        
-        const response = await anthropic.messages.create({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 16000,
-          temperature: 0.7,
-          system: personalityStructureImagePrompt,
-          messages: [{
-            role: "user",
-            content: [{
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: mediaType,
-                data: base64Data,
-              }
-            }]
-          }]
-        });
-        
-        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
-        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysisResult = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("Could not extract JSON from Anthropic response");
-        }
-        
-      } else {
-        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
-      }
-      
-      const formattedContent = safeStringify(analysisResult);
-      
-      const analysis = await storage.createAnalysis({
-        sessionId,
-        type: "personality_structure_image",
-        content: formattedContent,
-        title: title || "General Personality Structure Analysis (Image)",
-      });
-      
-      const message = await storage.createMessage({
-        sessionId,
-        analysisId: analysis.id,
-        content: formattedContent,
-        role: "assistant",
-      });
-      
-      res.json({
-        analysisId: analysis.id,
-        personalityInsights: { 
-          analysis: formattedContent, 
-          personality_structure: analysisResult 
-        },
-        messages: [message],
-      });
-    } catch (error) {
-      console.error("Consolidated Personality Structure image analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze image for consolidated personality structure" });
-    }
-  });
 }
