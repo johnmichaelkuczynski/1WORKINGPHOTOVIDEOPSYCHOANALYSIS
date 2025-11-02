@@ -671,6 +671,57 @@ Provide a comprehensive analysis of this document, including:
     }
   });
   
+  // Extract text from document endpoint
+  app.post("/api/extract-text", async (req, res) => {
+    try {
+      const { fileData, fileName, fileType } = req.body;
+      
+      if (!fileData || typeof fileData !== 'string') {
+        return res.status(400).json({ error: "Document data is required" });
+      }
+      
+      console.log(`Extracting text from document: ${fileName} (${fileType})`);
+      
+      // Extract base64 content from data URL
+      const base64Data = fileData.split(',')[1];
+      if (!base64Data) {
+        return res.status(400).json({ error: "Invalid document data format" });
+      }
+      
+      const fileBuffer = Buffer.from(base64Data, 'base64');
+      let extractedText = "";
+      
+      if (fileType === 'pdf') {
+        // Use pdf-parse for PDF files
+        const pdfParse = (await import('pdf-parse')).default;
+        const pdfData = await pdfParse(fileBuffer);
+        extractedText = pdfData.text;
+      } else if (fileType === 'docx') {
+        // Use mammoth for DOCX files
+        const mammoth = await import('mammoth');
+        const result = await mammoth.extractRawText({ buffer: fileBuffer });
+        extractedText = result.value;
+      } else if (fileType === 'txt') {
+        // Plain text files - just decode
+        extractedText = fileBuffer.toString('utf-8');
+      } else {
+        return res.status(400).json({ error: `Unsupported file type: ${fileType}` });
+      }
+      
+      res.json({
+        text: extractedText,
+        fileName: fileName
+      });
+    } catch (error) {
+      console.error("Text extraction error:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Failed to extract text from document" });
+      }
+    }
+  });
+  
   // Chat endpoint to continue conversation with AI
   app.post("/api/chat", async (req, res) => {
     try {
