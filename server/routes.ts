@@ -18,8 +18,8 @@ import * as os from 'os';
 import { promisify } from 'util';
 import ffmpeg from 'fluent-ffmpeg';
 import Anthropic from '@anthropic-ai/sdk';
-import pdfParse from 'pdf-parse';
-import mammoth from 'mammoth';
+import * as pdfParse from 'pdf-parse';
+import * as mammoth from 'mammoth';
 
 // Initialize API clients with proper error handling for missing keys
 let openai: OpenAI | null = null;
