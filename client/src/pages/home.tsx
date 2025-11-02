@@ -3000,11 +3000,89 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             {!uploadedMedia && !documentName && (
               <form onSubmit={handleTextSubmit} className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium">Text Input</label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = '.pdf,.docx,.txt';
+                      input.onchange = async (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (!file) return;
+                        
+                        const fileExt = file.name.split('.').pop()?.toLowerCase();
+                        if (!fileExt || !['pdf', 'docx', 'txt'].includes(fileExt)) {
+                          toast({
+                            variant: "destructive",
+                            title: "Unsupported File",
+                            description: "Please upload a PDF, DOCX, or TXT file",
+                          });
+                          return;
+                        }
+                        
+                        try {
+                          toast({
+                            title: "Extracting Text",
+                            description: `Reading ${file.name}...`,
+                          });
+                          
+                          // Read file as base64
+                          const reader = new FileReader();
+                          const fileData = await new Promise<string>((resolve) => {
+                            reader.onload = (e) => resolve(e.target?.result as string);
+                            reader.readAsDataURL(file);
+                          });
+                          
+                          // Call extract-text API
+                          const response = await fetch('/api/extract-text', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              fileData,
+                              fileName: file.name,
+                              fileType: fileExt
+                            })
+                          });
+                          
+                          if (!response.ok) {
+                            throw new Error('Failed to extract text');
+                          }
+                          
+                          const data = await response.json();
+                          setTextInput(data.text);
+                          
+                          toast({
+                            title: "Text Extracted",
+                            description: `Successfully extracted text from ${file.name}`,
+                          });
+                        } catch (error) {
+                          console.error('Document extraction error:', error);
+                          toast({
+                            variant: "destructive",
+                            title: "Extraction Failed",
+                            description: "Could not extract text from the document. Please try again.",
+                          });
+                        }
+                      };
+                      input.click();
+                    }}
+                    className="text-xs"
+                    disabled={isAnalyzing}
+                    data-testid="button-upload-document"
+                  >
+                    <FileText className="w-4 h-4 mr-1" />
+                    Upload Document
+                  </Button>
+                </div>
                 <Textarea
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   onKeyDown={(e) => handleKeyPress(e, handleTextSubmit)}
-                  placeholder="Type or paste text to analyze..."
+                  placeholder="Type, paste, or upload a document to analyze..."
                   className="min-h-[250px] resize-y"
                   disabled={isAnalyzing}
                 />
