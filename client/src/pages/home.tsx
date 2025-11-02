@@ -1662,7 +1662,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-personality-structure-text"
         >
-          🌟 Personality Structure
+          🌟 Personality Structure (Text)
         </Button>
         
         <Button
