@@ -9174,52 +9174,107 @@ Provide exceptionally thorough affective/anxiety analysis with rich detail and m
         return res.status(400).json({ error: "Selected AI model is not available" });
       }
       
-      // Format analysis
+      // Format analysis - properly formatted text, no JSON
       let formattedContent = "";
       
       if (analysisResult.beck_depression_inventory) {
+        const bdi = analysisResult.beck_depression_inventory;
         formattedContent += "Beck Depression Inventory (BDI):\n";
-        formattedContent += `Score: ${analysisResult.beck_depression_inventory.total_score_estimate}\n`;
-        formattedContent += `Severity: ${analysisResult.beck_depression_inventory.severity_interpretation}\n\n`;
-        if (analysisResult.beck_depression_inventory.item_analysis) {
-          formattedContent += JSON.stringify(analysisResult.beck_depression_inventory.item_analysis, null, 2) + "\n\n";
+        formattedContent += `Score: ${bdi.total_score_estimate}\n`;
+        formattedContent += `Severity: ${bdi.severity_interpretation}\n\n`;
+        
+        if (bdi.cognitive_triad_analysis) {
+          formattedContent += `Cognitive Triad Analysis:\n${bdi.cognitive_triad_analysis}\n\n`;
+        }
+        if (bdi.vegetative_symptoms) {
+          formattedContent += `Vegetative Symptoms:\n${bdi.vegetative_symptoms}\n\n`;
+        }
+        if (bdi.affective_symptoms) {
+          formattedContent += `Affective Symptoms:\n${bdi.affective_symptoms}\n\n`;
         }
       }
       
       if (analysisResult.hamilton_depression_rating_scale) {
-        formattedContent += "Hamilton Depression Rating Scale:\n";
-        formattedContent += `Score: ${analysisResult.hamilton_depression_rating_scale.total_score_estimate}\n`;
-        formattedContent += `Severity: ${analysisResult.hamilton_depression_rating_scale.severity_interpretation}\n\n`;
+        const hdrs = analysisResult.hamilton_depression_rating_scale;
+        formattedContent += "Hamilton Depression Rating Scale (HDRS):\n";
+        formattedContent += `Score: ${hdrs.total_score_estimate}\n`;
+        formattedContent += `Severity: ${hdrs.severity_interpretation}\n\n`;
+        
+        if (hdrs.symptom_clusters) {
+          formattedContent += `Symptom Clusters:\n${hdrs.symptom_clusters}\n\n`;
+        }
       }
       
       if (analysisResult.beck_anxiety_inventory) {
+        const bai = analysisResult.beck_anxiety_inventory;
         formattedContent += "Beck Anxiety Inventory (BAI):\n";
-        formattedContent += `Score: ${analysisResult.beck_anxiety_inventory.total_score_estimate}\n`;
-        formattedContent += `Severity: ${analysisResult.beck_anxiety_inventory.severity_interpretation}\n\n`;
+        formattedContent += `Score: ${bai.total_score_estimate}\n`;
+        formattedContent += `Severity: ${bai.severity_interpretation}\n\n`;
+        
+        if (bai.somatic_vs_cognitive) {
+          formattedContent += `Somatic vs Cognitive:\n${bai.somatic_vs_cognitive}\n\n`;
+        }
+        if (bai.panic_features) {
+          formattedContent += `Panic Features:\n${bai.panic_features}\n\n`;
+        }
       }
       
       if (analysisResult.gad_7) {
+        const gad = analysisResult.gad_7;
         formattedContent += "GAD-7:\n";
-        formattedContent += `Score: ${analysisResult.gad_7.total_score_estimate}\n`;
-        formattedContent += `Severity: ${analysisResult.gad_7.severity_interpretation}\n\n`;
+        formattedContent += `Score: ${gad.total_score_estimate}\n`;
+        formattedContent += `Severity: ${gad.severity_interpretation}\n\n`;
+        
+        if (gad.generalized_anxiety_features) {
+          formattedContent += `Generalized Anxiety Features:\n${gad.generalized_anxiety_features}\n\n`;
+        }
+        if (gad.functional_impairment) {
+          formattedContent += `Functional Impairment:\n${gad.functional_impairment}\n\n`;
+        }
       }
       
       if (analysisResult.phq_9) {
+        const phq = analysisResult.phq_9;
         formattedContent += "PHQ-9:\n";
-        formattedContent += `Score: ${analysisResult.phq_9.total_score_estimate}\n`;
-        formattedContent += `Severity: ${analysisResult.phq_9.severity_interpretation}\n\n`;
+        formattedContent += `Score: ${phq.total_score_estimate}\n`;
+        formattedContent += `Severity: ${phq.severity_interpretation}\n\n`;
+        
+        if (phq.dsm_5_alignment) {
+          formattedContent += `DSM-5 Alignment:\n${phq.dsm_5_alignment}\n\n`;
+        }
+        if (phq.functional_impairment) {
+          formattedContent += `Functional Impairment:\n${phq.functional_impairment}\n\n`;
+        }
       }
       
       if (analysisResult.cross_scale_integration) {
-        formattedContent += "Cross-Scale Integration:\n" + JSON.stringify(analysisResult.cross_scale_integration, null, 2) + "\n\n";
+        const csi = analysisResult.cross_scale_integration;
+        formattedContent += "Cross-Scale Integration:\n";
+        if (csi.convergent_findings) formattedContent += `Convergent Findings:\n${csi.convergent_findings}\n\n`;
+        if (csi.divergent_patterns) formattedContent += `Divergent Patterns:\n${csi.divergent_patterns}\n\n`;
+        if (csi.depression_vs_anxiety) formattedContent += `Depression vs Anxiety:\n${csi.depression_vs_anxiety}\n\n`;
+        if (csi.comorbidity_indicators) formattedContent += `Comorbidity Indicators:\n${csi.comorbidity_indicators}\n\n`;
+        if (csi.severity_consensus) formattedContent += `Severity Consensus:\n${csi.severity_consensus}\n\n`;
       }
       
       if (analysisResult.affective_profile) {
-        formattedContent += "Affective Profile:\n" + JSON.stringify(analysisResult.affective_profile, null, 2) + "\n\n";
+        const ap = analysisResult.affective_profile;
+        formattedContent += "Affective Profile:\n";
+        if (ap.predominant_mood_state) formattedContent += `Predominant Mood State:\n${ap.predominant_mood_state}\n\n`;
+        if (ap.cognitive_patterns) formattedContent += `Cognitive Patterns:\n${ap.cognitive_patterns}\n\n`;
+        if (ap.somatic_manifestations) formattedContent += `Somatic Manifestations:\n${ap.somatic_manifestations}\n\n`;
+        if (ap.functional_impact) formattedContent += `Functional Impact:\n${ap.functional_impact}\n\n`;
+        if (ap.risk_factors) formattedContent += `Risk Factors:\n${ap.risk_factors}\n\n`;
+        if (ap.protective_factors) formattedContent += `Protective Factors:\n${ap.protective_factors}\n\n`;
       }
       
       if (analysisResult.clinical_interpretation) {
-        formattedContent += "Clinical Interpretation:\n" + JSON.stringify(analysisResult.clinical_interpretation, null, 2) + "\n";
+        const ci = analysisResult.clinical_interpretation;
+        formattedContent += "Clinical Interpretation:\n";
+        if (ci.primary_affective_syndrome) formattedContent += `Primary Affective Syndrome:\n${ci.primary_affective_syndrome}\n\n`;
+        if (ci.symptom_severity) formattedContent += `Symptom Severity:\n${ci.symptom_severity}\n\n`;
+        if (ci.treatment_implications) formattedContent += `Treatment Implications:\n${ci.treatment_implications}\n\n`;
+        if (ci.monitoring_priorities) formattedContent += `Monitoring Priorities:\n${ci.monitoring_priorities}\n`;
       }
       
       const analysis = await storage.createAnalysis({
@@ -9651,7 +9706,12 @@ Provide thorough visual affective analysis framed as hypothetical educational in
       }
       
       if (analysisResult.cross_scale_visual_integration) {
-        formattedContent += `Cross-Scale Integration:\n${JSON.stringify(analysisResult.cross_scale_visual_integration, null, 2)}\n\n`;
+        const csvi = analysisResult.cross_scale_visual_integration;
+        formattedContent += "Cross-Scale Visual Integration:\n";
+        if (csvi.convergent_findings) formattedContent += `Convergent Findings:\n${csvi.convergent_findings}\n\n`;
+        if (csvi.divergent_patterns) formattedContent += `Divergent Patterns:\n${csvi.divergent_patterns}\n\n`;
+        if (csvi.depression_vs_anxiety) formattedContent += `Depression vs Anxiety:\n${csvi.depression_vs_anxiety}\n\n`;
+        if (csvi.severity_assessment) formattedContent += `Severity Assessment:\n${csvi.severity_assessment}\n\n`;
       }
       
       if (analysisResult.integrated_affective_impression) {
