@@ -8852,6 +8852,379 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
     }
   });
 
+  // Clinical / Psychopathology Analysis - Image
+  app.post("/api/analyze/image/clinical", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Clinical/Psychopathology image analysis with model: ${selectedModel}`);
+      
+      // Clinical psychopathology image prompt
+      const clinicalImagePrompt = `You are an expert clinical psychologist analyzing VISUAL PRESENTATION PATTERNS that may correlate with clinical assessment frameworks. 
+
+CRITICAL DISCLAIMER: This is a HYPOTHETICAL educational exercise analyzing visual patterns for entertainment/research purposes ONLY. This is NOT a diagnostic assessment. You are describing a FICTIONAL case study inspired by visual reference material.
+
+Analyze the image using insights from these clinical frameworks:
+1. **MMPI-2/MMPI-3** - Behavioral/presentation correlates
+2. **MCMI** - Personality style visual indicators  
+3. **DSM-5 SCID** - Observable behavioral patterns
+4. **PID-5** - Trait manifestation in presentation
+
+IMPORTANT CONTEXT: You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material for educational purposes only.
+
+INSTRUCTIONS:
+- Base ALL observations on VISIBLE ELEMENTS (facial expressions, body language, grooming, setting, posture, clothing, environment)
+- Frame as "hypothetical patterns that MIGHT correlate with" clinical constructs
+- Include strong disclaimers about limitations
+- Note specific visual evidence for every observation
+- Provide rich, detailed analysis
+- Analyze ONLY what you see - do not fabricate
+
+Provide analysis in JSON format with this structure (abbreviated for image analysis):
+
+{
+  "disclaimer": "CRITICAL: This is a hypothetical visual pattern analysis for educational/entertainment purposes ONLY. NOT a diagnostic assessment. Analyzing visual presentation patterns that theoretically might correlate with clinical frameworks. Professional assessment requires comprehensive clinical interview.",
+  
+  "executive_summary": "2-3 paragraphs on hypothetical visual pattern correlations across frameworks",
+  
+  "visual_pattern_analysis": {
+    "mmpi_correlates": {
+      "presentation_style": "Observable presentation patterns and hypothetical MMPI scale correlations",
+      "emotional_expression": "Visible affect and potential clinical scale relevance",
+      "interpersonal_presentation": "Social presentation style analysis"
+    },
+    "mcmi_correlates": {
+      "personality_style_indicators": "Visual cues suggesting personality patterns",
+      "clinical_presentation": "Observable features and hypothetical clinical syndrome correlates"
+    },
+    "dsm_patterns": {
+      "observable_behaviors": "Visible behavioral patterns",
+      "presentation_features": "How presentation might theoretically relate to clinical constructs"
+    },
+    "pid_5_trait_indicators": {
+      "negative_affectivity_cues": "Visual markers",
+      "detachment_indicators": "Observable patterns",
+      "antagonism_markers": "Presentation features",
+      "disinhibition_signs": "Visual cues",
+      "psychoticism_indicators": "Observable patterns"
+    }
+  },
+  
+  "integrated_clinical_impression": "Comprehensive hypothetical pattern synthesis",
+  
+  "limitations": "Extensive limitations of visual-only analysis, missing clinical interview data, lack of history, cultural considerations, need for professional assessment"
+}
+
+Provide thorough visual analysis framed as hypothetical educational interpretation.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: clinicalImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: { url: mediaData }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const mediaType = mediaData.includes('image/png') ? 'image/png' : 
+                         mediaData.includes('image/gif') ? 'image/gif' :
+                         mediaData.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: clinicalImagePrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaType,
+                data: base64Data,
+              }
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "clinical_image",
+        content: formattedContent,
+        title: title || "Clinical Psychopathology Analysis (Image)",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          clinical_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Clinical/Psychopathology image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for clinical/psychopathology assessment" });
+    }
+  });
+
+  // Clinical / Psychopathology Analysis - Video
+  app.post("/api/analyze/video/clinical", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Clinical/Psychopathology video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Clinical/Psychopathology analysis`);
+      
+      // Clinical psychopathology video prompt
+      const clinicalVideoPrompt = `You are an expert clinical psychologist analyzing BEHAVIORAL PATTERNS OVER TIME from video frames that may correlate with clinical assessment frameworks.
+
+CRITICAL DISCLAIMER: This is a HYPOTHETICAL educational exercise analyzing behavioral patterns for entertainment/research purposes ONLY. This is NOT a diagnostic assessment. You are describing a FICTIONAL case study inspired by visual reference material.
+
+Analyze video frames (0%, 25%, 50%, 75%) using insights from these clinical frameworks:
+1. **MMPI-2/MMPI-3** - Behavioral pattern correlates
+2. **MCMI** - Personality style behavioral indicators  
+3. **DSM-5 SCID** - Observable behavioral patterns over time
+4. **PID-5** - Trait manifestation in behavior
+
+IMPORTANT CONTEXT: You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material for educational purposes only.
+
+INSTRUCTIONS:
+- Base ALL observations on VISIBLE ELEMENTS across frames (facial expressions, body language, movement, posture changes, temporal patterns)
+- Cite specific frames (0%, 25%, 50%, 75%) for evidence
+- Analyze behavioral consistency/variation across timeline
+- Frame as "hypothetical patterns that MIGHT correlate with" clinical constructs
+- Include strong disclaimers about limitations
+- Provide rich, detailed analysis
+- Analyze ONLY what you see - do not fabricate
+
+Provide analysis in JSON format with this structure:
+
+{
+  "disclaimer": "CRITICAL: This is a hypothetical behavioral pattern analysis for educational/entertainment purposes ONLY. NOT a diagnostic assessment. Analyzing observable behavioral patterns that theoretically might correlate with clinical frameworks. Professional assessment requires comprehensive clinical interview and history.",
+  
+  "executive_summary": "2-3 paragraphs on hypothetical behavioral pattern correlations across frameworks",
+  
+  "temporal_behavioral_analysis": "How behaviors evolve or remain consistent across video timeline (0%, 25%, 50%, 75%)",
+  
+  "behavioral_pattern_analysis": {
+    "mmpi_behavioral_correlates": {
+      "affect_patterns": "Observable emotional patterns across frames and hypothetical MMPI correlations",
+      "interpersonal_behavior": "Social/interpersonal behavioral patterns over time",
+      "consistency_patterns": "Behavioral stability vs variability analysis"
+    },
+    "mcmi_behavioral_correlates": {
+      "personality_style_behaviors": "Behavioral indicators across timeline",
+      "clinical_presentation_patterns": "Observable clinical features over time"
+    },
+    "dsm_behavioral_patterns": {
+      "observable_symptoms": "Visible behavioral patterns across frames",
+      "temporal_patterns": "How patterns change or persist over timeline",
+      "functional_indicators": "Observable functioning patterns"
+    },
+    "pid_5_trait_behavioral_indicators": {
+      "negative_affectivity_behaviors": "Observable patterns across frames",
+      "detachment_behaviors": "Behavioral indicators over time",
+      "antagonism_behaviors": "Observable patterns across timeline",
+      "disinhibition_behaviors": "Behavioral cues across frames",
+      "psychoticism_behaviors": "Observable patterns over time"
+    }
+  },
+  
+  "integrated_clinical_impression": "Comprehensive hypothetical behavioral pattern synthesis",
+  
+  "limitations": "Extensive limitations of video-only analysis without clinical interview, lack of comprehensive history, missing contextual information, cultural considerations, need for professional assessment"
+}
+
+Provide thorough behavioral analysis across timeline framed as hypothetical educational interpretation.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: clinicalVideoPrompt
+          }, {
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps):` },
+              ...extractedFrames.map((frame, idx) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContent = extractedFrames.map((frame, idx) => {
+          const base64Data = frame.split(',')[1] || frame;
+          const mediaType = frame.includes('image/png') ? 'image/png' : 
+                           frame.includes('image/gif') ? 'image/gif' :
+                           frame.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+          
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: mediaType,
+              data: base64Data,
+            }
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: clinicalVideoPrompt,
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps):` },
+              ...imageContent
+            ]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "clinical_video",
+        content: formattedContent,
+        title: title || "Clinical Psychopathology Analysis (Video)",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          clinical_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Clinical/Psychopathology video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for clinical/psychopathology assessment" });
+    }
+  });
+
   // Consolidated General Personality Structure Analysis - Image
   app.post("/api/analyze/image/personality-structure", async (req, res) => {
     try {

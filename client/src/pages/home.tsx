@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -125,6 +125,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const vocationalVideoInputRef = useRef<HTMLInputElement>(null);
   const personalityStructureImageInputRef = useRef<HTMLInputElement>(null);
   const personalityStructureVideoInputRef = useRef<HTMLInputElement>(null);
+  const clinicalImageInputRef = useRef<HTMLInputElement>(null);
+  const clinicalVideoInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1326,6 +1328,118 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Clinical image analysis
+  const handleClinicalImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeClinicalImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Clinical Psychopathology Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Clinical image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for clinical/psychopathology assessment. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Clinical Analysis Complete",
+        description: "Your image has been analyzed across 4 major clinical frameworks (MMPI, MCMI, DSM-5 SCID, PID-5).",
+      });
+    }
+  });
+
+  // Clinical video analysis
+  const handleClinicalVideoAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the video file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("video");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeClinicalVideo(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Clinical Psychopathology Video Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Clinical video analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze video for clinical/psychopathology assessment. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Clinical Analysis Complete",
+        description: "Your video has been analyzed across 4 major clinical frameworks (MMPI, MCMI, DSM-5 SCID, PID-5).",
+      });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
@@ -1875,6 +1989,56 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-clinical-text"
         >
           🏥 Clinical / Psychopathology (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "clinical-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-600/90 hover:to-orange-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("clinical-image");
+            clinicalImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-clinical-image"
+        >
+          🏥 Clinical / Psychopathology (Image)
+          <input
+            ref={clinicalImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleClinicalImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "clinical-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-600/90 hover:to-orange-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("clinical-video");
+            clinicalVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-clinical-video"
+        >
+          🏥 Clinical / Psychopathology (Video)
+          <input
+            ref={clinicalVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleClinicalVideoAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
         
         <Button
