@@ -3009,17 +3009,17 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                     onClick={() => {
                       const input = document.createElement('input');
                       input.type = 'file';
-                      input.accept = '.pdf,.docx,.txt';
+                      input.accept = '.pdf,.doc,.docx,.txt';
                       input.onchange = async (e) => {
                         const file = (e.target as HTMLInputElement).files?.[0];
                         if (!file) return;
                         
                         const fileExt = file.name.split('.').pop()?.toLowerCase();
-                        if (!fileExt || !['pdf', 'docx', 'txt'].includes(fileExt)) {
+                        if (!fileExt || !['pdf', 'doc', 'docx', 'txt'].includes(fileExt)) {
                           toast({
                             variant: "destructive",
                             title: "Unsupported File",
-                            description: "Please upload a PDF, DOCX, or TXT file",
+                            description: "Please upload a PDF, DOC, DOCX, or TXT file",
                           });
                           return;
                         }

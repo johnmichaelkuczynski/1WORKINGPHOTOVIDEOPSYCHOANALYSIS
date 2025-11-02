@@ -697,8 +697,8 @@ Provide a comprehensive analysis of this document, including:
         // Use pdf-parse for PDF files
         const pdfData = await pdfParse(fileBuffer);
         extractedText = pdfData.text;
-      } else if (fileType === 'docx') {
-        // Use mammoth for DOCX files
+      } else if (fileType === 'docx' || fileType === 'doc') {
+        // Use mammoth for DOCX and DOC files
         const result = await mammoth.extractRawText({ buffer: fileBuffer });
         extractedText = result.value;
       } else if (fileType === 'txt') {
