@@ -18,6 +18,8 @@ import * as os from 'os';
 import { promisify } from 'util';
 import ffmpeg from 'fluent-ffmpeg';
 import Anthropic from '@anthropic-ai/sdk';
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
 
 // Initialize API clients with proper error handling for missing keys
 let openai: OpenAI | null = null;
@@ -693,12 +695,10 @@ Provide a comprehensive analysis of this document, including:
       
       if (fileType === 'pdf') {
         // Use pdf-parse for PDF files
-        const pdfParse = (await import('pdf-parse')).default;
         const pdfData = await pdfParse(fileBuffer);
         extractedText = pdfData.text;
       } else if (fileType === 'docx') {
         // Use mammoth for DOCX files
-        const mammoth = await import('mammoth');
         const result = await mammoth.extractRawText({ buffer: fileBuffer });
         extractedText = result.value;
       } else if (fileType === 'txt') {
