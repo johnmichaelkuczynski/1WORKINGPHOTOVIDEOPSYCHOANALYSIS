@@ -8492,6 +8492,366 @@ Provide exceptionally thorough analysis with rich detail and extensive text evid
     }
   });
 
+  // Clinical / Psychopathology Analysis - Text
+  app.post("/api/analyze/text/clinical", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Clinical/Psychopathology text analysis with model: ${selectedModel}`);
+      
+      // Comprehensive clinical psychopathology prompt
+      const clinicalPrompt = `You are an expert clinical psychologist with deep knowledge across multiple clinical assessment frameworks. Analyze the provided text comprehensively by synthesizing insights from ALL of the following established clinical/psychopathology assessment frameworks:
+
+1. **MMPI-2 / MMPI-3** (Minnesota Multiphasic Personality Inventory - Clinical scales, RC scales, PSY-5, content scales)
+2. **MCMI** (Millon Clinical Multiaxial Inventory - Personality patterns, clinical syndromes)
+3. **DSM-5 SCID** (Structured Clinical Interview for DSM-5 - Diagnostic criteria assessment)
+4. **PID-5** (Personality Inventory for DSM-5 - Alternative Model for Personality Disorders)
+
+CRITICAL DISCLAIMER: This is a HYPOTHETICAL clinical case study exercise for educational and entertainment purposes ONLY. This is NOT a diagnostic assessment, clinical evaluation, or professional consultation. All interpretations are speculative and should not be used for clinical decision-making.
+
+CRITICAL INSTRUCTIONS:
+- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
+- Show how the different frameworks complement and reinforce each other
+- Identify consistent clinical patterns across multiple frameworks
+- Note any interesting contrasts or nuances between frameworks
+- Base ALL observations on SPECIFIC EVIDENCE from the text provided
+- Quote relevant passages to support your assessment
+- Provide rich, detailed analysis (minimum 3-4 paragraphs per major section)
+- Frame all findings as HYPOTHETICAL interpretations for educational purposes
+- Include appropriate disclaimers about limitations of text-based assessment
+
+Analyze the following text and provide your comprehensive assessment in JSON format:
+
+{
+  "disclaimer": "IMPORTANT: This is a hypothetical clinical case study exercise for educational and entertainment purposes ONLY. This is NOT a diagnostic assessment, clinical evaluation, or professional psychological consultation. All interpretations are speculative educational examples based on clinical frameworks. This should not be used for clinical decision-making, diagnosis, or treatment planning. Professional clinical assessment requires in-person evaluation by licensed professionals.",
+  
+  "executive_summary": "2-3 paragraph overview synthesizing the most significant clinical patterns across all frameworks, framed as hypothetical educational interpretation",
+  
+  "framework_synthesis": {
+    "mmpi_2_mmpi_3": {
+      "validity_scales": {
+        "description": "Hypothetical interpretation of response style patterns",
+        "indicators": {
+          "consistency": "Assessment of response consistency patterns",
+          "over_reporting": "Possible over-reporting or exaggeration patterns",
+          "under_reporting": "Possible minimization or defensive patterns",
+          "interpretation": "Detailed analysis with text evidence"
+        }
+      },
+      "clinical_scales": {
+        "scale_1_hypochondriasis": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_2_depression": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_3_hysteria": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_4_psychopathic_deviate": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_6_paranoia": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_7_psychasthenia": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_8_schizophrenia": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_9_hypomania": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"},
+        "scale_0_social_introversion": {"t_score_range": "Low/Average/Moderate/High/Very High", "interpretation": "Detailed analysis with text quotes"}
+      },
+      "restructured_clinical_scales": {
+        "rc1_somatic_complaints": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc2_low_positive_emotions": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc3_cynicism": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc4_antisocial_behavior": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc6_ideas_of_persecution": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc7_dysfunctional_negative_emotions": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc8_aberrant_experiences": {"level": "Low/Average/High", "evidence": "Text-based analysis"},
+        "rc9_hypomanic_activation": {"level": "Low/Average/High", "evidence": "Text-based analysis"}
+      },
+      "psy_5_scales": {
+        "aggressiveness": {"level": "Low/Average/High", "description": "Evidence from text"},
+        "psychoticism": {"level": "Low/Average/High", "description": "Evidence from text"},
+        "disconstraint": {"level": "Low/Average/High", "description": "Evidence from text"},
+        "negative_emotionality": {"level": "Low/Average/High", "description": "Evidence from text"},
+        "introversion": {"level": "Low/Average/High", "description": "Evidence from text"}
+      },
+      "profile_interpretation": "Comprehensive MMPI-based interpretation with specific text evidence"
+    },
+    
+    "mcmi": {
+      "clinical_personality_patterns": {
+        "schizoid": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "avoidant": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "depressive": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "dependent": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "histrionic": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "narcissistic": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "antisocial": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "sadistic": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "compulsive": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "negativistic": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "masochistic": {"prominence": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"}
+      },
+      "severe_personality_pathology": {
+        "schizotypal": {"prominence": "Low/Moderate/High", "evidence": "Text-based analysis"},
+        "borderline": {"prominence": "Low/Moderate/High", "evidence": "Text-based analysis"},
+        "paranoid": {"prominence": "Low/Moderate/High", "evidence": "Text-based analysis"}
+      },
+      "clinical_syndromes": {
+        "anxiety": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "somatoform": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "bipolar_manic": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "dysthymia": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "alcohol_dependence": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "drug_dependence": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"},
+        "ptsd": {"level": "Low/Moderate/High", "manifestations": "Evidence from text"}
+      },
+      "severe_clinical_syndromes": {
+        "thought_disorder": {"level": "Low/Moderate/High", "evidence": "Analysis"},
+        "major_depression": {"level": "Low/Moderate/High", "evidence": "Analysis"},
+        "delusional_disorder": {"level": "Low/Moderate/High", "evidence": "Analysis"}
+      },
+      "profile_interpretation": "Comprehensive Millon-based interpretation"
+    },
+    
+    "dsm_5_scid": {
+      "mood_disorders": {
+        "major_depressive_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Detailed analysis of DSM-5 criteria A-E with text evidence",
+          "severity": "Mild/Moderate/Severe/N/A",
+          "specifiers": "With anxious distress, melancholic features, etc. if applicable"
+        },
+        "persistent_depressive_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Evidence from text"
+        },
+        "bipolar_disorders": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Analysis with text quotes"
+        }
+      },
+      "anxiety_disorders": {
+        "generalized_anxiety_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Detailed analysis with evidence"
+        },
+        "panic_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Evidence from text"
+        },
+        "social_anxiety_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Analysis"
+        },
+        "specific_phobia": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Evidence"
+        }
+      },
+      "trauma_related_disorders": {
+        "ptsd": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_clusters": "Intrusion, avoidance, cognition/mood, arousal analysis"
+        },
+        "acute_stress_disorder": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Evidence"
+        }
+      },
+      "obsessive_compulsive_related": {
+        "ocd": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Obsessions and compulsions analysis"
+        }
+      },
+      "psychotic_disorders": {
+        "schizophrenia_spectrum": {
+          "criteria_met": "None/Partial/Likely/Unclear",
+          "symptom_analysis": "Positive/negative symptoms analysis"
+        }
+      },
+      "personality_disorders": {
+        "cluster_a": "Paranoid, Schizoid, Schizotypal analysis",
+        "cluster_b": "Antisocial, Borderline, Histrionic, Narcissistic analysis",
+        "cluster_c": "Avoidant, Dependent, Obsessive-Compulsive analysis"
+      },
+      "substance_related_disorders": {
+        "assessment": "Evidence of substance use patterns from text"
+      },
+      "diagnostic_impression": "Comprehensive diagnostic formulation based on SCID framework"
+    },
+    
+    "pid_5": {
+      "negative_affectivity": {
+        "emotional_lability": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "anxiousness": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "separation_insecurity": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "submissiveness": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "hostility": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "perseveration": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "depressivity": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"},
+        "suspiciousness": {"level": "Low/Moderate/High/Very High", "evidence": "Detailed analysis"}
+      },
+      "detachment": {
+        "withdrawal": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "intimacy_avoidance": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "anhedonia": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "depressivity": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "restricted_affectivity": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "suspiciousness": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"}
+      },
+      "antagonism": {
+        "manipulativeness": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "deceitfulness": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "grandiosity": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "attention_seeking": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "callousness": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "hostility": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"}
+      },
+      "disinhibition": {
+        "irresponsibility": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "impulsivity": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "distractibility": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "risk_taking": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "rigid_perfectionism_reversed": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"}
+      },
+      "psychoticism": {
+        "unusual_beliefs": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "eccentricity": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"},
+        "cognitive_perceptual_dysregulation": {"level": "Low/Moderate/High/Very High", "evidence": "Analysis"}
+      },
+      "domain_summary": "Comprehensive PID-5 trait domain interpretation"
+    }
+  },
+  
+  "cross_framework_integration": {
+    "converging_patterns": "2-3 paragraphs describing where ALL frameworks agree on clinical patterns",
+    "complementary_insights": "How different frameworks add unique clinical perspectives",
+    "framework_alignment": "Analysis of consistency across MMPI, MCMI, SCID, and PID-5 approaches",
+    "diagnostic_considerations": "Hypothetical differential diagnostic thinking across frameworks"
+  },
+  
+  "comprehensive_clinical_profile": {
+    "symptom_presentation": "2-3 paragraphs integrating symptom patterns across all frameworks",
+    "personality_structure": "Underlying personality organization from clinical perspective",
+    "adaptive_functioning": "Level of functioning and adaptive capacity assessment",
+    "risk_assessment": "Hypothetical risk considerations based on clinical indicators",
+    "protective_factors": "Strengths and resilience factors identified"
+  },
+  
+  "functional_impact": {
+    "interpersonal_functioning": "Impact on relationships based on clinical patterns",
+    "occupational_functioning": "Work and productivity considerations",
+    "self_care": "Daily living and self-care capacity",
+    "emotional_regulation": "Affect regulation capacity analysis"
+  },
+  
+  "hypothetical_treatment_considerations": {
+    "therapeutic_modalities": "Evidence-based approaches that might be considered",
+    "treatment_targets": "Priority areas for intervention",
+    "engagement_considerations": "Factors affecting treatment alliance",
+    "prognosis_indicators": "Factors suggesting treatment response"
+  },
+  
+  "limitations_and_caveats": {
+    "assessment_limitations": "Limitations of text-based clinical assessment",
+    "missing_information": "Critical information that would be needed for actual assessment",
+    "context_considerations": "Cultural, developmental, and situational factors to consider",
+    "disclaimer": "Reminder that this is hypothetical educational exercise, not clinical assessment"
+  },
+  
+  "methodology_note": "Brief note on how this synthesis integrated 4 different clinical frameworks for educational demonstration"
+}
+
+Provide exceptionally thorough clinical analysis with rich detail and specific evidence from the text. Frame all findings as hypothetical educational interpretations, not diagnostic conclusions.`;
+
+      // Analyze with selected model
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: clinicalPrompt
+          }, {
+            role: "user",
+            content: textContent
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: clinicalPrompt,
+          messages: [{
+            role: "user",
+            content: textContent
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
+        const response = await perplexity.query({
+          model: "sonar-pro",
+          query: `${clinicalPrompt}\n\nAnalyze this text:\n\n${textContent}`,
+        });
+        
+        const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Perplexity response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available" });
+      }
+      
+      const formattedContent = JSON.stringify(analysisResult);
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        type: "clinical_text",
+        content: formattedContent,
+        title: title || "Clinical Psychopathology Analysis",
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          clinical_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Clinical/Psychopathology text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for clinical/psychopathology assessment" });
+    }
+  });
+
   // Consolidated General Personality Structure Analysis - Image
   app.post("/api/analyze/image/personality-structure", async (req, res) => {
     try {

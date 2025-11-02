@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -1827,6 +1827,54 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               }
             }}
           />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "clinical-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-600/90 hover:to-orange-600/90 border-none"
+          onClick={async () => {
+            setSelectedAnalysisType("clinical-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(10);
+            setMessages([]);
+            
+            try {
+              const data = await analyzeClinicalText(textInput, sessionId, selectedModel);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(data.messages);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Clinical Analysis Complete",
+                  description: "Your text has been analyzed across 4 major clinical frameworks (MMPI, MCMI, DSM-5 SCID, PID-5)",
+                });
+              }
+            } catch (error) {
+              console.error("Clinical text analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: "Failed to analyze text for clinical/psychopathology assessment. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-clinical-text"
+        >
+          🏥 Clinical / Psychopathology (Text)
         </Button>
         
         <Button
