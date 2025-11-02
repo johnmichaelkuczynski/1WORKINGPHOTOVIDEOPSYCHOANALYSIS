@@ -9454,6 +9454,240 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
     }
   });
 
+  // Anxiety / Affective Analysis - Image
+  app.post("/api/analyze/image/anxiety", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Anxiety/Affective image analysis with model: ${selectedModel}`);
+      
+      // Anxiety/Affective image prompt  
+      const anxietyImagePrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+
+You are an expert clinical psychologist conducting COMPREHENSIVE visual affective assessment synthesizing 5 major quantitative scales: Beck Depression Inventory (BDI), Hamilton Depression Rating Scale (HDRS), Beck Anxiety Inventory (BAI), GAD-7, and PHQ-9.
+
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. Catalog EVERY visible micro-feature: specific facial muscle activation (orbicularis oculi, corrugator, zygomatic, frontalis), exact body posture, hand positioning, tension patterns, grooming details, clothing choices, environmental context
+2. For EACH observable feature, provide differential assessment across ALL 5 scales
+3. Include confidence bands for each observation (high/medium/low certainty)
+4. Note contradictory visual cues and explain discrepancies
+5. Provide WALL-TO-WALL depth - minimum 3-4 detailed observations per scale domain
+6. Make BOLD clinical interpretations grounded in specific visual evidence
+
+FORBIDDEN:
+- Generic observations (e.g., "appears sad")
+- Surface-level descriptions without clinical correlation
+- Missing micro-features that are clinically relevant
+- Safe, hedged language avoiding substantive analysis
+
+Provide RICH, EVIDENCE-DENSE visual affective analysis in JSON format:
+
+{
+  "visual_inventory": {
+    "facial_affect": "Detailed catalog of every facial expression pattern - brow position, eye activation, mouth configuration, muscle tension",
+    "body_language_specifics": "Exact posture, shoulder position, hand placement, overall tension or relaxation patterns",
+    "grooming_presentation": "Detailed grooming choices, clothing, personal care indicators relevant to mood/anxiety",
+    "environmental_context": "Setting, lighting, framing choices, background elements that may relate to mood state"
+  },
+  
+  "affective_pattern_analysis": {
+    "bdi_visual_correlates": {
+      "depressed_affect": "Observable sadness, hopelessness in facial expression with specific muscle evidence",
+      "psychomotor_patterns": "Visible agitation or retardation markers - posture, muscle tension, gesture quality",
+      "self_care_indicators": "Grooming and presentation patterns potentially reflecting energy/motivation levels",
+      "anhedonic_markers": "Visual cues suggesting reduced pleasure or emotional flatness"
+    },
+    "hdrs_visual_correlates": {
+      "mood_indicators": "Observable depressive mood markers in facial affect and body language",
+      "anxiety_manifestations": "Visible tension, apprehension, or worry patterns",
+      "somatic_presentations": "Physical manifestations visible in posture, facial tension, overall presentation",
+      "psychomotor_observations": "Retardation or agitation visible in posture and expression"
+    },
+    "bai_visual_correlates": {
+      "somatic_anxiety_markers": "Visible physical anxiety signs - facial tension, body stiffness, tremor if present",
+      "autonomic_indicators": "Observable arousal patterns - facial flushing, tension, perspiration if visible",
+      "fear_apprehension_cues": "Facial expressions suggesting fear, worry, or apprehension",
+      "panic_features": "Acute distress markers if present"
+    },
+    "gad_7_visual_correlates": {
+      "chronic_worry_indicators": "Persistent tension patterns suggesting ongoing worry state",
+      "restlessness_markers": "Visual restlessness or agitation cues in posture and expression",
+      "tension_patterns": "Chronic muscle tension visible in facial and body presentation",
+      "irritability_cues": "Facial or postural indicators of irritation or edginess"
+    },
+    "phq_9_visual_correlates": {
+      "depressive_presentation": "Overall depressive affect visible in facial expression and body language",
+      "energy_level_indicators": "Visual cues about energy, fatigue, or vitality in posture and presentation",
+      "psychomotor_changes": "Observable slowing or agitation patterns",
+      "engagement_markers": "Visual indicators of interest/engagement or withdrawal/disengagement"
+    }
+  },
+  
+  "cross_scale_visual_integration": {
+    "convergent_findings": "Where visual cues consistently suggest similar affective patterns across all 5 scales",
+    "divergent_patterns": "Observations more prominent for some scales than others - explain discrepancies",
+    "depression_vs_anxiety": "Relative prominence of depressive vs anxious visual markers with evidence",
+    "severity_assessment": "Overall severity impression based on visual cues across all scales"
+  },
+  
+  "integrated_affective_impression": "Comprehensive hypothetical affective pattern synthesis based on visual evidence",
+  
+  "limitations": "Extensive limitations of visual-only analysis, missing clinical interview data, lack of history, inability to assess internal experience, cultural considerations, need for professional assessment"
+}
+
+Provide thorough visual affective analysis framed as hypothetical educational interpretation.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: anxietyImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: { url: mediaData }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const mediaType = mediaData.includes('image/png') ? 'image/png' : 
+                         mediaData.includes('image/gif') ? 'image/gif' :
+                         mediaData.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: anxietyImagePrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaType,
+                data: base64Data,
+              }
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
+      let formattedContent = "";
+      
+      if (analysisResult.affective_pattern_analysis) {
+        const apa = analysisResult.affective_pattern_analysis;
+        
+        if (apa.bdi_visual_correlates) {
+          formattedContent += "Beck Depression Inventory (BDI) Visual Correlates:\n";
+          if (apa.bdi_visual_correlates.depressed_affect) formattedContent += `${apa.bdi_visual_correlates.depressed_affect}\n\n`;
+          if (apa.bdi_visual_correlates.psychomotor_patterns) formattedContent += `${apa.bdi_visual_correlates.psychomotor_patterns}\n\n`;
+          if (apa.bdi_visual_correlates.self_care_indicators) formattedContent += `${apa.bdi_visual_correlates.self_care_indicators}\n\n`;
+          if (apa.bdi_visual_correlates.anhedonic_markers) formattedContent += `${apa.bdi_visual_correlates.anhedonic_markers}\n\n`;
+        }
+        
+        if (apa.hdrs_visual_correlates) {
+          formattedContent += "Hamilton Depression Rating Scale (HDRS) Visual Correlates:\n";
+          if (apa.hdrs_visual_correlates.mood_indicators) formattedContent += `${apa.hdrs_visual_correlates.mood_indicators}\n\n`;
+          if (apa.hdrs_visual_correlates.anxiety_manifestations) formattedContent += `${apa.hdrs_visual_correlates.anxiety_manifestations}\n\n`;
+          if (apa.hdrs_visual_correlates.somatic_presentations) formattedContent += `${apa.hdrs_visual_correlates.somatic_presentations}\n\n`;
+          if (apa.hdrs_visual_correlates.psychomotor_observations) formattedContent += `${apa.hdrs_visual_correlates.psychomotor_observations}\n\n`;
+        }
+        
+        if (apa.bai_visual_correlates) {
+          formattedContent += "Beck Anxiety Inventory (BAI) Visual Correlates:\n";
+          if (apa.bai_visual_correlates.somatic_anxiety_markers) formattedContent += `${apa.bai_visual_correlates.somatic_anxiety_markers}\n\n`;
+          if (apa.bai_visual_correlates.autonomic_indicators) formattedContent += `${apa.bai_visual_correlates.autonomic_indicators}\n\n`;
+          if (apa.bai_visual_correlates.fear_apprehension_cues) formattedContent += `${apa.bai_visual_correlates.fear_apprehension_cues}\n\n`;
+          if (apa.bai_visual_correlates.panic_features) formattedContent += `${apa.bai_visual_correlates.panic_features}\n\n`;
+        }
+        
+        if (apa.gad_7_visual_correlates) {
+          formattedContent += "GAD-7 Visual Correlates:\n";
+          if (apa.gad_7_visual_correlates.chronic_worry_indicators) formattedContent += `${apa.gad_7_visual_correlates.chronic_worry_indicators}\n\n`;
+          if (apa.gad_7_visual_correlates.restlessness_markers) formattedContent += `${apa.gad_7_visual_correlates.restlessness_markers}\n\n`;
+          if (apa.gad_7_visual_correlates.tension_patterns) formattedContent += `${apa.gad_7_visual_correlates.tension_patterns}\n\n`;
+          if (apa.gad_7_visual_correlates.irritability_cues) formattedContent += `${apa.gad_7_visual_correlates.irritability_cues}\n\n`;
+        }
+        
+        if (apa.phq_9_visual_correlates) {
+          formattedContent += "PHQ-9 Visual Correlates:\n";
+          if (apa.phq_9_visual_correlates.depressive_presentation) formattedContent += `${apa.phq_9_visual_correlates.depressive_presentation}\n\n`;
+          if (apa.phq_9_visual_correlates.energy_level_indicators) formattedContent += `${apa.phq_9_visual_correlates.energy_level_indicators}\n\n`;
+          if (apa.phq_9_visual_correlates.psychomotor_changes) formattedContent += `${apa.phq_9_visual_correlates.psychomotor_changes}\n\n`;
+          if (apa.phq_9_visual_correlates.engagement_markers) formattedContent += `${apa.phq_9_visual_correlates.engagement_markers}\n\n`;
+        }
+      }
+      
+      if (analysisResult.cross_scale_visual_integration) {
+        formattedContent += `Cross-Scale Integration:\n${JSON.stringify(analysisResult.cross_scale_visual_integration, null, 2)}\n\n`;
+      }
+      
+      if (analysisResult.integrated_affective_impression) {
+        formattedContent += `Integrated Affective Impression:\n${analysisResult.integrated_affective_impression}\n`;
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Anxiety Analysis (Image)",
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, anxiety_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          anxiety_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Anxiety/Affective image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for anxiety/affective assessment" });
+    }
+  });
+
   // Clinical / Psychopathology Analysis - Video
   app.post("/api/analyze/video/clinical", async (req, res) => {
     try {
