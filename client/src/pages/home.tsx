@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -2536,7 +2536,54 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   Analyze Text
                 </Button>
                 <div className="pt-4 mt-4 border-t">
-                  <p className="text-sm font-semibold mb-2">MBTI Analysis (Text)</p>
+                  <p className="text-sm font-semibold mb-2 text-primary">🌟 Consolidated Personality Structure (Text)</p>
+                  <p className="text-xs text-muted-foreground mb-3">Comprehensive synthesis of 8 frameworks: Big Five, HEXACO, 16PF, MBTI, Keirsey, Socionics, Hogan, DISC</p>
+                  <Button 
+                    onClick={async () => {
+                      if (!textInput.trim()) {
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description: "Please enter some text first",
+                        });
+                        return;
+                      }
+                      
+                      setIsAnalyzing(true);
+                      setAnalysisProgress(0);
+                      
+                      try {
+                        const data = await analyzePersonalityStructureText(textInput, sessionId, selectedModel);
+                        
+                        if (data.messages && data.messages.length > 0) {
+                          setMessages(data.messages);
+                          setAnalysisId(data.analysisId);
+                          setAnalysisProgress(100);
+                          toast({
+                            title: "Personality Structure Analysis Complete",
+                            description: "Your text has been analyzed across 8 major personality frameworks",
+                          });
+                        }
+                      } catch (error) {
+                        console.error("Personality Structure text analysis error:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Analysis Failed",
+                          description: "Failed to analyze text for consolidated personality structure. Please try again.",
+                        });
+                      } finally {
+                        setIsAnalyzing(false);
+                      }
+                    }}
+                    variant="default"
+                    className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90" 
+                    disabled={!textInput.trim() || isAnalyzing}
+                    data-testid="button-personality-structure-text"
+                  >
+                    Comprehensive Personality Structure Analysis
+                  </Button>
+                  
+                  <p className="text-sm font-semibold mb-2 mt-6">MBTI Analysis (Text)</p>
                   <Button 
                     onClick={async () => {
                       if (!textInput.trim()) {
