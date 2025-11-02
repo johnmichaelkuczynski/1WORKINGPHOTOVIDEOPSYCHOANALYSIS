@@ -8822,13 +8822,57 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
         return res.status(400).json({ error: "Selected AI model is not available" });
       }
       
-      const formattedContent = JSON.stringify(analysisResult);
+      // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
+      let formattedContent = "";
+      
+      if (analysisResult.framework_synthesis) {
+        const fs = analysisResult.framework_synthesis;
+        
+        if (fs.mmpi_2_mmpi_3) {
+          formattedContent += "MMPI-2/MMPI-3:\n";
+          if (fs.mmpi_2_mmpi_3.clinical_scales) {
+            formattedContent += "Clinical Scales:\n" + JSON.stringify(fs.mmpi_2_mmpi_3.clinical_scales, null, 2) + "\n\n";
+          }
+          if (fs.mmpi_2_mmpi_3.restructured_clinical_scales) {
+            formattedContent += "RC Scales:\n" + JSON.stringify(fs.mmpi_2_mmpi_3.restructured_clinical_scales, null, 2) + "\n\n";
+          }
+          if (fs.mmpi_2_mmpi_3.psy_5_scales) {
+            formattedContent += "PSY-5 Scales:\n" + JSON.stringify(fs.mmpi_2_mmpi_3.psy_5_scales, null, 2) + "\n\n";
+          }
+        }
+        
+        if (fs.mcmi) {
+          formattedContent += "MCMI:\n";
+          if (fs.mcmi.personality_patterns) {
+            formattedContent += "Personality Patterns:\n" + JSON.stringify(fs.mcmi.personality_patterns, null, 2) + "\n\n";
+          }
+          if (fs.mcmi.clinical_syndromes) {
+            formattedContent += "Clinical Syndromes:\n" + JSON.stringify(fs.mcmi.clinical_syndromes, null, 2) + "\n\n";
+          }
+        }
+        
+        if (fs.dsm_5_scid) {
+          formattedContent += "DSM-5 SCID:\n" + JSON.stringify(fs.dsm_5_scid, null, 2) + "\n\n";
+        }
+        
+        if (fs.pid_5) {
+          formattedContent += "PID-5:\n" + JSON.stringify(fs.pid_5, null, 2) + "\n\n";
+        }
+      }
+      
+      if (analysisResult.integrated_clinical_formulation) {
+        formattedContent += `Integrated Clinical Formulation:\n${analysisResult.integrated_clinical_formulation}\n\n`;
+      }
+      
+      if (analysisResult.cross_framework_integration) {
+        formattedContent += `Cross-Framework Integration:\n${analysisResult.cross_framework_integration}\n`;
+      }
       
       const analysis = await storage.createAnalysis({
         sessionId,
         type: "clinical_text",
         content: formattedContent,
-        title: title || "Clinical Psychopathology Analysis",
+        title: title || "Clinical Analysis",
       });
       
       const message = await storage.createMessage({
@@ -8983,13 +9027,51 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
         return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
       }
       
-      const formattedContent = JSON.stringify(analysisResult);
+      // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
+      let formattedContent = "";
+      
+      if (analysisResult.visual_pattern_analysis) {
+        const vpa = analysisResult.visual_pattern_analysis;
+        
+        if (vpa.mmpi_correlates) {
+          formattedContent += "MMPI-2/MMPI-3 Correlates:\n";
+          if (vpa.mmpi_correlates.presentation_style) formattedContent += `${vpa.mmpi_correlates.presentation_style}\n\n`;
+          if (vpa.mmpi_correlates.emotional_expression) formattedContent += `${vpa.mmpi_correlates.emotional_expression}\n\n`;
+          if (vpa.mmpi_correlates.interpersonal_presentation) formattedContent += `${vpa.mmpi_correlates.interpersonal_presentation}\n\n`;
+        }
+        
+        if (vpa.mcmi_correlates) {
+          formattedContent += "MCMI Correlates:\n";
+          if (vpa.mcmi_correlates.personality_style_indicators) formattedContent += `${vpa.mcmi_correlates.personality_style_indicators}\n\n`;
+          if (vpa.mcmi_correlates.clinical_presentation) formattedContent += `${vpa.mcmi_correlates.clinical_presentation}\n\n`;
+        }
+        
+        if (vpa.dsm_patterns) {
+          formattedContent += "DSM-5 Patterns:\n";
+          if (vpa.dsm_patterns.observable_behaviors) formattedContent += `${vpa.dsm_patterns.observable_behaviors}\n\n`;
+          if (vpa.dsm_patterns.presentation_features) formattedContent += `${vpa.dsm_patterns.presentation_features}\n\n`;
+        }
+        
+        if (vpa.pid_5_trait_indicators) {
+          formattedContent += "PID-5 Trait Indicators:\n";
+          const pid = vpa.pid_5_trait_indicators;
+          if (pid.negative_affectivity_cues) formattedContent += `Negative Affectivity: ${pid.negative_affectivity_cues}\n\n`;
+          if (pid.detachment_indicators) formattedContent += `Detachment: ${pid.detachment_indicators}\n\n`;
+          if (pid.antagonism_markers) formattedContent += `Antagonism: ${pid.antagonism_markers}\n\n`;
+          if (pid.disinhibition_signs) formattedContent += `Disinhibition: ${pid.disinhibition_signs}\n\n`;
+          if (pid.psychoticism_indicators) formattedContent += `Psychoticism: ${pid.psychoticism_indicators}\n\n`;
+        }
+      }
+      
+      if (analysisResult.integrated_clinical_impression) {
+        formattedContent += `Integrated Clinical Impression:\n${analysisResult.integrated_clinical_impression}\n`;
+      }
       
       const analysis = await storage.createAnalysis({
         sessionId,
         type: "clinical_image",
         content: formattedContent,
-        title: title || "Clinical Psychopathology Analysis (Image)",
+        title: title || "Clinical Analysis (Image)",
       });
       
       const message = await storage.createMessage({
@@ -9195,13 +9277,56 @@ Provide thorough behavioral analysis across timeline framed as hypothetical educ
         return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
       }
       
-      const formattedContent = JSON.stringify(analysisResult);
+      // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
+      let formattedContent = "";
+      
+      if (analysisResult.temporal_behavioral_analysis) {
+        formattedContent += `Temporal Behavioral Analysis:\n${analysisResult.temporal_behavioral_analysis}\n\n`;
+      }
+      
+      if (analysisResult.behavioral_pattern_analysis) {
+        const bpa = analysisResult.behavioral_pattern_analysis;
+        
+        if (bpa.mmpi_behavioral_correlates) {
+          formattedContent += "MMPI-2/MMPI-3 Behavioral Correlates:\n";
+          if (bpa.mmpi_behavioral_correlates.affect_patterns) formattedContent += `${bpa.mmpi_behavioral_correlates.affect_patterns}\n\n`;
+          if (bpa.mmpi_behavioral_correlates.interpersonal_behavior) formattedContent += `${bpa.mmpi_behavioral_correlates.interpersonal_behavior}\n\n`;
+          if (bpa.mmpi_behavioral_correlates.consistency_patterns) formattedContent += `${bpa.mmpi_behavioral_correlates.consistency_patterns}\n\n`;
+        }
+        
+        if (bpa.mcmi_behavioral_correlates) {
+          formattedContent += "MCMI Behavioral Correlates:\n";
+          if (bpa.mcmi_behavioral_correlates.personality_style_behaviors) formattedContent += `${bpa.mcmi_behavioral_correlates.personality_style_behaviors}\n\n`;
+          if (bpa.mcmi_behavioral_correlates.clinical_presentation_patterns) formattedContent += `${bpa.mcmi_behavioral_correlates.clinical_presentation_patterns}\n\n`;
+        }
+        
+        if (bpa.dsm_behavioral_patterns) {
+          formattedContent += "DSM-5 Behavioral Patterns:\n";
+          if (bpa.dsm_behavioral_patterns.observable_symptoms) formattedContent += `${bpa.dsm_behavioral_patterns.observable_symptoms}\n\n`;
+          if (bpa.dsm_behavioral_patterns.temporal_patterns) formattedContent += `${bpa.dsm_behavioral_patterns.temporal_patterns}\n\n`;
+          if (bpa.dsm_behavioral_patterns.functional_indicators) formattedContent += `${bpa.dsm_behavioral_patterns.functional_indicators}\n\n`;
+        }
+        
+        if (bpa.pid_5_trait_behavioral_indicators) {
+          formattedContent += "PID-5 Trait Behavioral Indicators:\n";
+          const pid = bpa.pid_5_trait_behavioral_indicators;
+          if (pid.negative_affectivity_behaviors) formattedContent += `Negative Affectivity: ${pid.negative_affectivity_behaviors}\n\n`;
+          if (pid.detachment_behaviors) formattedContent += `Detachment: ${pid.detachment_behaviors}\n\n`;
+          if (pid.antagonism_behaviors) formattedContent += `Antagonism: ${pid.antagonism_behaviors}\n\n`;
+          if (pid.disinhibition_behaviors) formattedContent += `Disinhibition: ${pid.disinhibition_behaviors}\n\n`;
+          if (pid.psychoticism_behaviors) formattedContent += `Psychoticism: ${pid.psychoticism_behaviors}\n\n`;
+        }
+      }
+      
+      if (analysisResult.integrated_clinical_impression) {
+        formattedContent += `Integrated Clinical Impression:\n${analysisResult.integrated_clinical_impression}\n`;
+      }
       
       const analysis = await storage.createAnalysis({
         sessionId,
         type: "clinical_video",
         content: formattedContent,
-        title: title || "Clinical Psychopathology Analysis (Video)",
+        title: title || "Clinical Analysis (Video)",
       });
       
       const message = await storage.createMessage({
