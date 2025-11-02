@@ -1187,14 +1187,12 @@ export async function analyzePersonalityStructureText(
 
 // Consolidated General Personality Structure Analysis - Image
 export async function analyzePersonalityStructureImage(
-  file: File,
+  mediaData: string,
   sessionId: string,
   selectedModel: ModelType = "openai",
   title?: string
 ) {
   console.log(`Analyzing image for Consolidated Personality Structure with model: ${selectedModel}, sessionId: ${sessionId}`);
-  
-  const mediaData = await fileToBase64(file);
   
   const res = await apiRequest("POST", "/api/analyze/image/personality-structure", {
     mediaData,

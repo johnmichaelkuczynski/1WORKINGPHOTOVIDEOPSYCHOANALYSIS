@@ -1234,7 +1234,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         setAnalysisProgress(30);
         
         const response = await analyzePersonalityStructureImage(
-          file,
+          mediaData,
           sessionId,
           selectedModel,
           `Personality Structure Image Analysis - ${new Date().toLocaleDateString()}`
@@ -1671,7 +1671,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   return (
     <div className="flex" {...getRootProps()}>
       {/* Left Sidebar - Additional Assessments */}
-      <div className="w-48 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
+      <div className="w-56 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
         <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
         
         {/* Personality Structure */}
