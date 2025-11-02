@@ -1618,6 +1618,53 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
         
         <Button
+          variant={selectedAnalysisType === "personality-structure-text" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-primary to-purple-600 text-white hover:from-primary/90 hover:to-purple-600/90 border-none"
+          onClick={async () => {
+            setSelectedAnalysisType("personality-structure-text");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(0);
+            
+            try {
+              const data = await analyzePersonalityStructureText(textInput, sessionId, selectedModel);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(data.messages);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Personality Structure Analysis Complete",
+                  description: "Your text has been analyzed across 8 major personality frameworks",
+                });
+              }
+            } catch (error) {
+              console.error("Personality Structure text analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: "Failed to analyze text for consolidated personality structure. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-personality-structure-text"
+        >
+          🌟 Personality Structure
+        </Button>
+        
+        <Button
           variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3"
           onClick={() => {
