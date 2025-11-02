@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -123,6 +123,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const stanfordBinetVideoInputRef = useRef<HTMLInputElement>(null);
   const vocationalImageInputRef = useRef<HTMLInputElement>(null);
   const vocationalVideoInputRef = useRef<HTMLInputElement>(null);
+  const personalityStructureImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1212,6 +1213,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Personality Structure image analysis
+  const handlePersonalityStructureImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        setMessages([]);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzePersonalityStructureImage(
+          file,
+          sessionId,
+          selectedModel,
+          `Personality Structure Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(response.messages);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Personality Structure image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for consolidated personality structure. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Personality Structure Analysis Complete",
+        description: "Your image has been analyzed across 8 major personality frameworks.",
+      });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
@@ -1663,6 +1720,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-personality-structure-text"
         >
           🌟 Personality Structure (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "personality-structure-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-primary to-purple-600 text-white hover:from-primary/90 hover:to-purple-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("personality-structure-image");
+            personalityStructureImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-personality-structure-image"
+        >
+          🌟 Personality Structure (Image)
+          <input
+            ref={personalityStructureImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handlePersonalityStructureImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
         
         <Button
