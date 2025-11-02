@@ -1988,7 +1988,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-clinical-text"
         >
-          🏥 Clinical / Psychopathology (Text)
+          🏥 Clinical (Text)
         </Button>
         
         <Button
@@ -2001,7 +2001,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-clinical-image"
         >
-          🏥 Clinical / Psychopathology (Image)
+          🏥 Clinical (Image)
           <input
             ref={clinicalImageInputRef}
             type="file"
@@ -2026,7 +2026,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-clinical-video"
         >
-          🏥 Clinical / Psychopathology (Video)
+          🏥 Clinical (Video)
           <input
             ref={clinicalVideoInputRef}
             type="file"
