@@ -1890,7 +1890,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-personality-structure-text"
         >
-          🌟 Personality Structure (Text)
+          🌟 Personality (Text)
         </Button>
         
         <Button
@@ -1903,7 +1903,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-personality-structure-image"
         >
-          🌟 Personality Structure (Image)
+          🌟 Personality (Image)
           <input
             ref={personalityStructureImageInputRef}
             type="file"
@@ -1928,7 +1928,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           disabled={isAnalyzing}
           data-testid="button-personality-structure-video"
         >
-          🌟 Personality Structure (Video)
+          🌟 Personality (Video)
           <input
             ref={personalityStructureVideoInputRef}
             type="file"

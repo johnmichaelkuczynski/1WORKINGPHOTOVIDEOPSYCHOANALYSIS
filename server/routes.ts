@@ -8508,33 +8508,26 @@ Provide exceptionally thorough analysis with rich detail and extensive text evid
       console.log(`Processing Clinical/Psychopathology text analysis with model: ${selectedModel}`);
       
       // Comprehensive clinical psychopathology prompt
-      const clinicalPrompt = `You are an expert clinical psychologist with deep knowledge across multiple clinical assessment frameworks. Analyze the provided text comprehensively by synthesizing insights from ALL of the following established clinical/psychopathology assessment frameworks:
+      const clinicalPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by this text sample.
 
-1. **MMPI-2 / MMPI-3** (Minnesota Multiphasic Personality Inventory - Clinical scales, RC scales, PSY-5, content scales)
-2. **MCMI** (Millon Clinical Multiaxial Inventory - Personality patterns, clinical syndromes)
-3. **DSM-5 SCID** (Structured Clinical Interview for DSM-5 - Diagnostic criteria assessment)
-4. **PID-5** (Personality Inventory for DSM-5 - Alternative Model for Personality Disorders)
+You are an expert clinical psychologist conducting a COMPREHENSIVE multi-framework assessment synthesizing MMPI-2/MMPI-3, MCMI, DSM-5 SCID, and PID-5. 
 
-CRITICAL DISCLAIMER: This is a HYPOTHETICAL clinical case study exercise for educational and entertainment purposes ONLY. This is NOT a diagnostic assessment, clinical evaluation, or professional consultation. All interpretations are speculative and should not be used for clinical decision-making.
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. Include MINIMUM 15-20 DIRECT QUOTATIONS from the text with detailed interpretation of each
+2. Cite SPECIFIC phrases, word choices, sentence structures that reveal clinical patterns
+3. Provide WALL-TO-WALL analysis - every section must be densely detailed with concrete evidence
+4. Make BOLD clinical observations grounded in the text - no generic statements
+5. Cross-reference findings across all 4 frameworks showing convergent evidence
 
-CRITICAL INSTRUCTIONS:
-- Provide a COMPREHENSIVE, INTEGRATED analysis that synthesizes ALL frameworks above
-- Show how the different frameworks complement and reinforce each other
-- Identify consistent clinical patterns across multiple frameworks
-- Note any interesting contrasts or nuances between frameworks
-- Base ALL observations on SPECIFIC EVIDENCE from the text provided
-- Quote relevant passages to support your assessment
-- Provide rich, detailed analysis (minimum 3-4 paragraphs per major section)
-- Frame all findings as HYPOTHETICAL interpretations for educational purposes
-- Include appropriate disclaimers about limitations of text-based assessment
+FORBIDDEN:
+- Generic observations without quotes (e.g., "shows signs of anxiety")
+- Superficial analysis or padding
+- Repeating the same evidence across sections
+- Safe, hedged language that avoids depth
 
-Analyze the following text and provide your comprehensive assessment in JSON format:
+Analyze the following text and provide RICH, EVIDENCE-DENSE assessment in JSON format:
 
 {
-  "disclaimer": "IMPORTANT: This is a hypothetical clinical case study exercise for educational and entertainment purposes ONLY. This is NOT a diagnostic assessment, clinical evaluation, or professional psychological consultation. All interpretations are speculative educational examples based on clinical frameworks. This should not be used for clinical decision-making, diagnosis, or treatment planning. Professional clinical assessment requires in-person evaluation by licensed professionals.",
-  
-  "executive_summary": "2-3 paragraph overview synthesizing the most significant clinical patterns across all frameworks, framed as hypothetical educational interpretation",
-  
   "framework_synthesis": {
     "mmpi_2_mmpi_3": {
       "validity_scales": {
@@ -8751,16 +8744,7 @@ Analyze the following text and provide your comprehensive assessment in JSON for
     "treatment_targets": "Priority areas for intervention",
     "engagement_considerations": "Factors affecting treatment alliance",
     "prognosis_indicators": "Factors suggesting treatment response"
-  },
-  
-  "limitations_and_caveats": {
-    "assessment_limitations": "Limitations of text-based clinical assessment",
-    "missing_information": "Critical information that would be needed for actual assessment",
-    "context_considerations": "Cultural, developmental, and situational factors to consider",
-    "disclaimer": "Reminder that this is hypothetical educational exercise, not clinical assessment"
-  },
-  
-  "methodology_note": "Brief note on how this synthesis integrated 4 different clinical frameworks for educational demonstration"
+  }
 }
 
 Provide exceptionally thorough clinical analysis with rich detail and specific evidence from the text. Frame all findings as hypothetical educational interpretations, not diagnostic conclusions.`;
@@ -8913,33 +8897,34 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
       
       console.log(`Processing Clinical/Psychopathology image analysis with model: ${selectedModel}`);
       
-      // Clinical psychopathology image prompt
-      const clinicalImagePrompt = `You are an expert clinical psychologist analyzing VISUAL PRESENTATION PATTERNS that may correlate with clinical assessment frameworks. 
+      // Clinical psychopathology image prompt  
+      const clinicalImagePrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
 
-CRITICAL DISCLAIMER: This is a HYPOTHETICAL educational exercise analyzing visual patterns for entertainment/research purposes ONLY. This is NOT a diagnostic assessment. You are describing a FICTIONAL case study inspired by visual reference material.
+You are an expert clinical psychologist conducting COMPREHENSIVE visual behavioral analysis synthesizing MMPI-2/MMPI-3, MCMI, DSM-5 SCID, and PID-5 frameworks.
 
-Analyze the image using insights from these clinical frameworks:
-1. **MMPI-2/MMPI-3** - Behavioral/presentation correlates
-2. **MCMI** - Personality style visual indicators  
-3. **DSM-5 SCID** - Observable behavioral patterns
-4. **PID-5** - Trait manifestation in presentation
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. Catalog EVERY visible micro-feature: specific facial muscle activation (orbicularis oculi, corrugator, zygomatic), exact body posture angles, grooming details, clothing choices, environmental context
+2. For EACH micro-feature, provide differential diagnostic hypothesis across ALL 4 frameworks
+3. Include confidence bands for each observation (high/medium/low certainty)
+4. Note contradictory visual cues and explain discrepancies
+5. Provide WALL-TO-WALL depth - minimum 3-4 detailed observations per framework domain
+6. Make BOLD clinical interpretations grounded in specific visual evidence
 
-IMPORTANT CONTEXT: You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material for educational purposes only.
+FORBIDDEN:
+- Generic observations (e.g., "appears anxious")
+- Surface-level descriptions without clinical correlation
+- Missing micro-features that are clinically relevant
+- Safe, hedged language avoiding substantive analysis
 
-INSTRUCTIONS:
-- Base ALL observations on VISIBLE ELEMENTS (facial expressions, body language, grooming, setting, posture, clothing, environment)
-- Frame as "hypothetical patterns that MIGHT correlate with" clinical constructs
-- Include strong disclaimers about limitations
-- Note specific visual evidence for every observation
-- Provide rich, detailed analysis
-- Analyze ONLY what you see - do not fabricate
-
-Provide analysis in JSON format with this structure (abbreviated for image analysis):
+Provide RICH, EVIDENCE-DENSE visual analysis in JSON format:
 
 {
-  "disclaimer": "CRITICAL: This is a hypothetical visual pattern analysis for educational/entertainment purposes ONLY. NOT a diagnostic assessment. Analyzing visual presentation patterns that theoretically might correlate with clinical frameworks. Professional assessment requires comprehensive clinical interview.",
-  
-  "executive_summary": "2-3 paragraphs on hypothetical visual pattern correlations across frameworks",
+  "visual_inventory": {
+    "facial_microexpressions": "Detailed catalog of every facial muscle activation pattern observed",
+    "body_language_specifics": "Exact posture, positioning, hand placement, tension patterns",
+    "grooming_presentation": "Detailed grooming choices, clothing, personal care indicators",
+    "environmental_context": "Setting, lighting, framing choices, background elements"
+  },
   
   "visual_pattern_analysis": {
     "mmpi_correlates": {
@@ -9152,26 +9137,27 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
       console.log(`Extracted ${extractedFrames.length} frames from video for Clinical/Psychopathology analysis`);
       
       // Clinical psychopathology video prompt
-      const clinicalVideoPrompt = `You are an expert clinical psychologist analyzing BEHAVIORAL PATTERNS OVER TIME from video frames that may correlate with clinical assessment frameworks.
+      const clinicalVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by video reference material.
 
-CRITICAL DISCLAIMER: This is a HYPOTHETICAL educational exercise analyzing behavioral patterns for entertainment/research purposes ONLY. This is NOT a diagnostic assessment. You are describing a FICTIONAL case study inspired by visual reference material.
+You are an expert clinical psychologist conducting COMPREHENSIVE temporal behavioral analysis across 4 video timepoints (0%, 25%, 50%, 75%), synthesizing MMPI-2/MMPI-3, MCMI, DSM-5 SCID, and PID-5 frameworks.
 
-Analyze video frames (0%, 25%, 50%, 75%) using insights from these clinical frameworks:
-1. **MMPI-2/MMPI-3** - Behavioral pattern correlates
-2. **MCMI** - Personality style behavioral indicators  
-3. **DSM-5 SCID** - Observable behavioral patterns over time
-4. **PID-5** - Trait manifestation in behavior
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. For EACH frame (0%, 25%, 50%, 75%): catalog specific micro-behaviors - exact facial expressions, precise body positioning, vocal tone patterns if speech present, gesture details, environmental interaction
+2. IF SPEECH/AUDIO PRESENT: Extract and quote VERBATIM every spoken phrase with timestamp, then interpret each quote through all 4 clinical frameworks
+3. Create timeline-driven behavioral maps showing EXACT changes between frames with clinical interpretation
+4. Provide differential diagnosis for each observed behavior change across frameworks
+5. Note behavioral contradictions and explain discrepancies
+6. WALL-TO-WALL analysis - minimum 5-6 detailed observations per timepoint per framework
+7. Make BOLD longitudinal clinical interpretations showing pattern evolution
 
-IMPORTANT CONTEXT: You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material for educational purposes only.
+FORBIDDEN:
+- Generic temporal descriptions (e.g., "behavior evolves from neutral to discomforted")
+- Missing speech/dialogue quotations when audio is present
+- Surface observations without deep clinical correlation
+- Vague timeline descriptions without specific frame-by-frame evidence
+- Safe language that avoids substantive clinical insight
 
-INSTRUCTIONS:
-- Base ALL observations on VISIBLE ELEMENTS across frames (facial expressions, body language, movement, posture changes, temporal patterns)
-- Cite specific frames (0%, 25%, 50%, 75%) for evidence
-- Analyze behavioral consistency/variation across timeline
-- Frame as "hypothetical patterns that MIGHT correlate with" clinical constructs
-- Include strong disclaimers about limitations
-- Provide rich, detailed analysis
-- Analyze ONLY what you see - do not fabricate
+CRITICAL: If you see someone speaking, you MUST extract and quote their exact words with detailed psycholinguistic analysis.
 
 Provide analysis in JSON format with this structure:
 
