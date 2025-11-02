@@ -8882,6 +8882,325 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
     }
   });
 
+  // Anxiety / Affective Analysis - Text
+  app.post("/api/analyze/text/anxiety", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Anxiety/Affective text analysis with model: ${selectedModel}`);
+      
+      // Comprehensive anxiety and affective assessment prompt
+      const anxietyPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by this text sample.
+
+You are an expert clinical psychologist conducting COMPREHENSIVE affective and anxiety assessment synthesizing 5 major quantitative scales: Beck Depression Inventory (BDI), Hamilton Depression Rating Scale (HDRS), Beck Anxiety Inventory (BAI), GAD-7, and PHQ-9.
+
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. Include MINIMUM 15-20 DIRECT QUOTATIONS from the text with detailed interpretation
+2. For EACH scale item, cite SPECIFIC linguistic evidence (word choices, sentence structure, themes, emotional tone)
+3. Provide WALL-TO-WALL analysis - every scale item must have rich evidence-based scoring rationale
+4. Make BOLD clinical observations about mood, anxiety, and affective patterns grounded in quotes
+5. Cross-reference symptom patterns across all 5 scales showing convergent/divergent evidence
+6. Include severity scoring with detailed justification for each item
+
+FORBIDDEN:
+- Generic observations without quotes (e.g., "text suggests depression")
+- Superficial scoring without detailed evidence
+- Missing quotations when assessing specific symptoms
+- Safe language that avoids substantive clinical insight
+
+Analyze the following text and provide RICH, EVIDENCE-DENSE affective assessment in JSON format:
+
+{
+  "beck_depression_inventory": {
+    "total_score_estimate": "0-63 scale estimate with detailed rationale",
+    "severity_interpretation": "Minimal/Mild/Moderate/Severe with evidence",
+    "item_analysis": {
+      "sadness": {"score": "0-3", "evidence": "Direct quotes showing sadness level"},
+      "pessimism": {"score": "0-3", "evidence": "Quotes revealing pessimistic thinking"},
+      "past_failure": {"score": "0-3", "evidence": "References to failure or past mistakes"},
+      "loss_of_pleasure": {"score": "0-3", "evidence": "Anhedonia indicators from text"},
+      "guilty_feelings": {"score": "0-3", "evidence": "Guilt or self-blame expressions"},
+      "punishment_feelings": {"score": "0-3", "evidence": "Self-punishment themes"},
+      "self_dislike": {"score": "0-3", "evidence": "Self-critical statements"},
+      "self_criticalness": {"score": "0-3", "evidence": "Self-blame patterns"},
+      "suicidal_thoughts": {"score": "0-3", "evidence": "Any ideation references - quote carefully"},
+      "crying": {"score": "0-3", "evidence": "References to crying or tearfulness"},
+      "agitation": {"score": "0-3", "evidence": "Restlessness or agitation markers"},
+      "loss_of_interest": {"score": "0-3", "evidence": "Diminished interest patterns"},
+      "indecisiveness": {"score": "0-3", "evidence": "Decision-making difficulty"},
+      "worthlessness": {"score": "0-3", "evidence": "Worthlessness themes"},
+      "loss_of_energy": {"score": "0-3", "evidence": "Energy or fatigue references"},
+      "sleep_changes": {"score": "0-3", "evidence": "Sleep pattern mentions"},
+      "irritability": {"score": "0-3", "evidence": "Irritation or anger"},
+      "appetite_changes": {"score": "0-3", "evidence": "Eating pattern changes"},
+      "concentration_difficulty": {"score": "0-3", "evidence": "Focus or attention issues"},
+      "tiredness_fatigue": {"score": "0-3", "evidence": "Fatigue expressions"},
+      "loss_of_interest_in_sex": {"score": "0-3", "evidence": "Libido references if present"}
+    },
+    "cognitive_triad_analysis": "Detailed analysis of negative thoughts about self, world, future with quotes",
+    "vegetative_symptoms": "Physical/somatic symptoms of depression with evidence",
+    "affective_symptoms": "Emotional manifestations with specific quotes"
+  },
+  
+  "hamilton_depression_rating_scale": {
+    "total_score_estimate": "0-52+ scale estimate with rationale",
+    "severity_interpretation": "Normal/Mild/Moderate/Severe/Very Severe with evidence",
+    "item_analysis": {
+      "depressed_mood": {"score": "0-4", "evidence": "Sadness, hopelessness quotes"},
+      "guilt": {"score": "0-4", "evidence": "Self-reproach, guilt expressions"},
+      "suicide": {"score": "0-4", "evidence": "Suicidal ideation if any"},
+      "insomnia_early": {"score": "0-2", "evidence": "Sleep onset difficulty"},
+      "insomnia_middle": {"score": "0-2", "evidence": "Nighttime awakening"},
+      "insomnia_late": {"score": "0-2", "evidence": "Early morning awakening"},
+      "work_and_activities": {"score": "0-4", "evidence": "Productivity, engagement level"},
+      "retardation": {"score": "0-4", "evidence": "Psychomotor slowing signs"},
+      "agitation": {"score": "0-4", "evidence": "Restlessness, fidgeting"},
+      "anxiety_psychic": {"score": "0-4", "evidence": "Psychological anxiety symptoms"},
+      "anxiety_somatic": {"score": "0-4", "evidence": "Physical anxiety manifestations"},
+      "somatic_gastrointestinal": {"score": "0-2", "evidence": "GI symptoms if mentioned"},
+      "somatic_general": {"score": "0-2", "evidence": "General somatic complaints"},
+      "genital_symptoms": {"score": "0-2", "evidence": "Sexual function if referenced"},
+      "hypochondriasis": {"score": "0-4", "evidence": "Health preoccupation"},
+      "loss_of_weight": {"score": "0-2", "evidence": "Weight change mentions"},
+      "insight": {"score": "0-2", "evidence": "Awareness of condition"}
+    },
+    "symptom_clusters": "Depression, anxiety, and somatic symptom clustering with evidence"
+  },
+  
+  "beck_anxiety_inventory": {
+    "total_score_estimate": "0-63 scale estimate with rationale",
+    "severity_interpretation": "Minimal/Mild/Moderate/Severe with evidence",
+    "item_analysis": {
+      "numbness_tingling": {"score": "0-3", "evidence": "Paresthesia references"},
+      "feeling_hot": {"score": "0-3", "evidence": "Heat sensations"},
+      "wobbliness_in_legs": {"score": "0-3", "evidence": "Weakness mentions"},
+      "unable_to_relax": {"score": "0-3", "evidence": "Tension, inability to relax"},
+      "fear_of_worst": {"score": "0-3", "evidence": "Catastrophic thinking quotes"},
+      "dizzy_lightheaded": {"score": "0-3", "evidence": "Dizziness references"},
+      "heart_pounding": {"score": "0-3", "evidence": "Cardiac sensations"},
+      "unsteady": {"score": "0-3", "evidence": "Balance or stability issues"},
+      "terrified": {"score": "0-3", "evidence": "Terror or extreme fear"},
+      "nervous": {"score": "0-3", "evidence": "Nervousness expressions"},
+      "feeling_of_choking": {"score": "0-3", "evidence": "Choking sensations"},
+      "hands_trembling": {"score": "0-3", "evidence": "Tremor references"},
+      "shaky": {"score": "0-3", "evidence": "Shakiness mentions"},
+      "fear_of_losing_control": {"score": "0-3", "evidence": "Control loss fears"},
+      "difficulty_breathing": {"score": "0-3", "evidence": "Breathing difficulty"},
+      "fear_of_dying": {"score": "0-3", "evidence": "Death anxiety"},
+      "scared": {"score": "0-3", "evidence": "Scared feelings"},
+      "indigestion": {"score": "0-3", "evidence": "Digestive symptoms"},
+      "faint": {"score": "0-3", "evidence": "Faintness mentions"},
+      "face_flushed": {"score": "0-3", "evidence": "Flushing references"},
+      "sweating": {"score": "0-3", "evidence": "Perspiration mentions"}
+    },
+    "somatic_vs_cognitive": "Balance between physical anxiety symptoms vs cognitive/emotional with quotes",
+    "panic_features": "Panic attack indicators if present with evidence"
+  },
+  
+  "gad_7": {
+    "total_score_estimate": "0-21 scale estimate with rationale",
+    "severity_interpretation": "Minimal/Mild/Moderate/Severe with evidence",
+    "item_analysis": {
+      "feeling_nervous": {"score": "0-3", "evidence": "Nervousness frequency and quotes"},
+      "not_able_to_control_worry": {"score": "0-3", "evidence": "Uncontrollable worry themes"},
+      "worrying_too_much": {"score": "0-3", "evidence": "Excessive worry patterns"},
+      "trouble_relaxing": {"score": "0-3", "evidence": "Relaxation difficulty"},
+      "restlessness": {"score": "0-3", "evidence": "Restless agitation quotes"},
+      "easily_annoyed_irritable": {"score": "0-3", "evidence": "Irritability expressions"},
+      "feeling_afraid": {"score": "0-3", "evidence": "Fear or dread mentions"}
+    },
+    "generalized_anxiety_features": "Chronic, excessive worry patterns with specific evidence",
+    "functional_impairment": "Impact on daily functioning based on text"
+  },
+  
+  "phq_9": {
+    "total_score_estimate": "0-27 scale estimate with rationale",
+    "severity_interpretation": "None/Mild/Moderate/Moderately Severe/Severe with evidence",
+    "item_analysis": {
+      "little_interest_pleasure": {"score": "0-3", "evidence": "Anhedonia indicators"},
+      "feeling_down_depressed": {"score": "0-3", "evidence": "Depressed mood quotes"},
+      "sleep_problems": {"score": "0-3", "evidence": "Sleep disturbance references"},
+      "tired_little_energy": {"score": "0-3", "evidence": "Fatigue expressions"},
+      "poor_appetite_overeating": {"score": "0-3", "evidence": "Appetite changes"},
+      "feeling_bad_about_self": {"score": "0-3", "evidence": "Self-esteem issues"},
+      "trouble_concentrating": {"score": "0-3", "evidence": "Concentration difficulty"},
+      "moving_speaking_slowly": {"score": "0-3", "evidence": "Psychomotor changes"},
+      "thoughts_of_self_harm": {"score": "0-3", "evidence": "Self-harm ideation if any"}
+    },
+    "dsm_5_alignment": "How symptoms align with DSM-5 Major Depressive Disorder criteria",
+    "functional_impairment": "Difficulty with work, relationships, self-care based on text"
+  },
+  
+  "cross_scale_integration": {
+    "convergent_findings": "Where all 5 scales agree on symptom presence - with quotes showing consistency",
+    "divergent_patterns": "Symptoms prominent in some scales but not others - explain discrepancies",
+    "depression_vs_anxiety": "Relative prominence of depressive vs anxious symptoms with evidence",
+    "comorbidity_indicators": "Signs of co-occurring depression and anxiety with quotes",
+    "severity_consensus": "Overall severity level across scales with supporting evidence"
+  },
+  
+  "affective_profile": {
+    "predominant_mood_state": "Primary emotional state with rich textual evidence",
+    "cognitive_patterns": "Thought patterns (rumination, worry, negative cognitions) with quotes",
+    "somatic_manifestations": "Physical symptoms of mood/anxiety with evidence",
+    "functional_impact": "How symptoms affect daily life based on text content",
+    "risk_factors": "Concerning patterns requiring attention with specific quotes",
+    "protective_factors": "Resilience or coping indicators if present"
+  },
+  
+  "clinical_interpretation": {
+    "primary_affective_syndrome": "Most prominent affective condition suggested by scales",
+    "symptom_severity": "Overall severity assessment across all scales",
+    "treatment_implications": "What these patterns might suggest for intervention",
+    "monitoring_priorities": "Key symptoms to track based on analysis"
+  }
+}
+
+Provide exceptionally thorough affective/anxiety analysis with rich detail and minimum 15-20 direct quotations from the text.`;
+
+      // Analyze with selected model
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: anxietyPrompt
+          }, {
+            role: "user",
+            content: textContent
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: anxietyPrompt,
+          messages: [{
+            role: "user",
+            content: textContent
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
+        const response = await perplexity.query({
+          model: "sonar-pro",
+          query: `${anxietyPrompt}\n\nAnalyze this text:\n\n${textContent}`,
+        });
+        
+        const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Perplexity response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available" });
+      }
+      
+      // Format analysis
+      let formattedContent = "";
+      
+      if (analysisResult.beck_depression_inventory) {
+        formattedContent += "Beck Depression Inventory (BDI):\n";
+        formattedContent += `Score: ${analysisResult.beck_depression_inventory.total_score_estimate}\n`;
+        formattedContent += `Severity: ${analysisResult.beck_depression_inventory.severity_interpretation}\n\n`;
+        if (analysisResult.beck_depression_inventory.item_analysis) {
+          formattedContent += JSON.stringify(analysisResult.beck_depression_inventory.item_analysis, null, 2) + "\n\n";
+        }
+      }
+      
+      if (analysisResult.hamilton_depression_rating_scale) {
+        formattedContent += "Hamilton Depression Rating Scale:\n";
+        formattedContent += `Score: ${analysisResult.hamilton_depression_rating_scale.total_score_estimate}\n`;
+        formattedContent += `Severity: ${analysisResult.hamilton_depression_rating_scale.severity_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.beck_anxiety_inventory) {
+        formattedContent += "Beck Anxiety Inventory (BAI):\n";
+        formattedContent += `Score: ${analysisResult.beck_anxiety_inventory.total_score_estimate}\n`;
+        formattedContent += `Severity: ${analysisResult.beck_anxiety_inventory.severity_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.gad_7) {
+        formattedContent += "GAD-7:\n";
+        formattedContent += `Score: ${analysisResult.gad_7.total_score_estimate}\n`;
+        formattedContent += `Severity: ${analysisResult.gad_7.severity_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.phq_9) {
+        formattedContent += "PHQ-9:\n";
+        formattedContent += `Score: ${analysisResult.phq_9.total_score_estimate}\n`;
+        formattedContent += `Severity: ${analysisResult.phq_9.severity_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.cross_scale_integration) {
+        formattedContent += "Cross-Scale Integration:\n" + JSON.stringify(analysisResult.cross_scale_integration, null, 2) + "\n\n";
+      }
+      
+      if (analysisResult.affective_profile) {
+        formattedContent += "Affective Profile:\n" + JSON.stringify(analysisResult.affective_profile, null, 2) + "\n\n";
+      }
+      
+      if (analysisResult.clinical_interpretation) {
+        formattedContent += "Clinical Interpretation:\n" + JSON.stringify(analysisResult.clinical_interpretation, null, 2) + "\n";
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Anxiety Analysis",
+        mediaUrl: `anxiety-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, anxiety_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          anxiety_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Anxiety/Affective text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for anxiety/affective assessment" });
+    }
+  });
+
   // Clinical / Psychopathology Analysis - Image
   app.post("/api/analyze/image/clinical", async (req, res) => {
     try {
