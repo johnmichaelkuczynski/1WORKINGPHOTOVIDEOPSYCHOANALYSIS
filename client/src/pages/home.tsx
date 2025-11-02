@@ -1615,10 +1615,9 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     <div className="flex" {...getRootProps()}>
       {/* Left Sidebar - Additional Assessments */}
       <div className="w-48 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
-        <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Additional Assessments</h3>
-        <p className="text-xs text-muted-foreground mb-3">Smart detection: enter text OR upload media, then click</p>
+        <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
         
-        {/* Personality Structure - Smart Button */}
+        {/* Personality Structure */}
         <Button
           variant={selectedAnalysisType === "personality-structure-text" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-primary to-purple-600 text-white hover:from-primary/90 hover:to-purple-600/90 border-none"
@@ -1667,43 +1666,75 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         </Button>
         
         <Button
-          variant={selectedAnalysisType === "bigfive" ? "default" : "outline"}
+          variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3"
           onClick={() => {
-            setSelectedAnalysisType("bigfive");
+            setSelectedAnalysisType("bigfive-text");
             
-            if (textInput.trim()) {
-              handleBigFiveTextAnalysis.mutate(textInput);
-            } else {
-              bigFiveImageInputRef.current?.click();
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
             }
+            
+            handleBigFiveTextAnalysis.mutate(textInput);
           }}
           disabled={isAnalyzing}
-          data-testid="button-bigfive"
+          data-testid="button-bigfive-text"
         >
-          Big Five
+          Big Five (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "bigfive-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("bigfive-image");
+            bigFiveImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-bigfive-image"
+        >
+          Big Five (Image)
           <input
             ref={bigFiveImageInputRef}
             type="file"
-            accept="image/*,video/*"
+            accept="image/*"
             style={{ display: 'none' }}
             onChange={(e) => {
               const files = e.target.files;
               if (files && files.length > 0) {
-                const file = files[0];
-                if (file.type.startsWith('image/')) {
-                  handleBigFiveImageAnalysis.mutate(file);
-                } else if (file.type.startsWith('video/')) {
-                  handleBigFiveVideoAnalysis.mutate(file);
-                }
+                handleBigFiveImageAnalysis.mutate(files[0]);
               }
             }}
           />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "bigfive-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3"
+          onClick={() => {
+            setSelectedAnalysisType("bigfive-video");
+            bigFiveVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-bigfive-video"
+        >
+          Big Five (Video)
           <input
             ref={bigFiveVideoInputRef}
             type="file"
             accept="video/*"
             style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleBigFiveVideoAnalysis.mutate(files[0]);
+              }
+            }}
           />
         </Button>
         
