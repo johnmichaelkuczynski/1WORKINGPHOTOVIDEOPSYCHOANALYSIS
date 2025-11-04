@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -138,6 +138,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const clinicalVideoInputRef = useRef<HTMLInputElement>(null);
   const anxietyImageInputRef = useRef<HTMLInputElement>(null);
   const anxietyVideoInputRef = useRef<HTMLInputElement>(null);
+  const evoImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1562,6 +1563,61 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // EVO Psych (Evolutionary Psychology) image analysis
+  const handleEvoImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeEvoImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `EVO Psych Image Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(prev => [...prev, ...response.messages]);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('EVO Psych image analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for EVO Psych assessment. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "EVO Psych Analysis Complete",
+        description: "Your image has been analyzed across the 10-pole evolutionary psychology framework.",
+      });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
@@ -2305,6 +2361,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-evo-text"
         >
           🧬 EVO Psych (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "evo-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-600/90 hover:to-emerald-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("evo-image");
+            evoImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-evo-image"
+        >
+          🧬 EVO Psych (Image)
+          <input
+            ref={evoImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleEvoImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
         
         <Button

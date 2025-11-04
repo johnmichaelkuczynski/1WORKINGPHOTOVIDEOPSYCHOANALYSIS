@@ -9551,6 +9551,288 @@ ${textContent}`;
     }
   });
 
+  // EVO Psych (Evolutionary Psychology) Analysis - Image
+  app.post("/api/analyze/image/evo", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing EVO Psych image analysis with model: ${selectedModel}`);
+      
+      // EVO Psych 10-Pole Image Analysis Protocol
+      const evoImagePrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+
+You are an expert evolutionary psychologist applying the 10-Pole Evolutionary Psychology (EVO) Typology to visual imagery. This framework replaces categorical personality types with gravitational poles of attraction based on behavioral niches that evolved across human and pre-human social systems.
+
+CRITICAL INSTRUCTIONS:
+1. Extract ALL visible features: facial expression, posture, body language, color palette, composition, environmental context, symbolic elements
+2. Score ALL 20 VISUAL BENCHMARKS (0.0 to 1.0) based on observable image features
+3. For each pole, compute the mean of its two benchmarks
+4. Provide DETAILED visual evidence for each benchmark score
+5. Show relative gravitational pull across all 10 poles
+6. Generate a rich interpretation of the cognitive/behavioral signature
+
+THE 20 VISUAL BENCHMARKS MAPPED TO 10 POLES:
+
+**POLE 1: ENFORCER**
+- Benchmark 1: Upright, controlled posture; symmetrical composition
+- Benchmark 2: Uniforms, badges, or rule-associated symbols
+
+**POLE 2: EXPLORER / SCOUT**
+- Benchmark 3: Motion blur, unconventional angles, novelty in framing
+- Benchmark 4: Outdoor, frontier, or travel imagery
+
+**POLE 3: HEALER / EMPATH**
+- Benchmark 5: Gentle expression, soft color palette, warmth of gaze
+- Benchmark 6: Group interaction or comforting gestures
+
+**POLE 4: STRATEGIST / SCHEMER**
+- Benchmark 7: Compositional focus, deliberate staging, analytical symmetry
+- Benchmark 8: Tools, plans, or instruments symbolizing design
+
+**POLE 5: SIGNALER / PERFORMER**
+- Benchmark 9: Expressive gesture, dramatic lighting, stylish posing
+- Benchmark 10: High aesthetic self-consciousness, fashion, ornament
+
+**POLE 6: CARETAKER / NURTURER**
+- Benchmark 11: Domestic or familial setting
+- Benchmark 12: Acts of service or caretaking imagery
+
+**POLE 7: AGGRESSOR / PROTECTOR**
+- Benchmark 13: Defensive posture, muscular readiness, forward lean
+- Benchmark 14: Weapons or dominance signaling
+
+**POLE 8: BROKER / DIPLOMAT**
+- Benchmark 15: Handshake, cooperative or mediating positioning
+- Benchmark 16: Balanced multi-person scene with mutual gaze
+
+**POLE 9: SEER / PATTERN-INTERPRETER**
+- Benchmark 17: Abstract symbolism or reflective theme
+- Benchmark 18: Imagery referencing knowledge, time, or cosmic order
+
+**POLE 10: MIMIC / ADAPTOR**
+- Benchmark 19: Conformist clothing or alignment with group norms
+- Benchmark 20: Safe, conventional composition and affect
+
+Analyze the image and provide your assessment in JSON format:
+
+{
+  "image_feature_extraction": {
+    "facial_expression": "Detailed description of facial features, expressions, gaze direction",
+    "posture_body_language": "Exact posture description, body positioning, muscle tension",
+    "color_palette": "Color analysis and emotional/symbolic associations",
+    "composition": "Framing, symmetry, focal points, visual balance",
+    "environment_context": "Setting, background, props, contextual elements",
+    "symbolic_elements": "Any symbolic imagery, metaphors, or conceptual themes"
+  },
+  
+  "visual_benchmark_scores": {
+    "enforcer_1_upright_symmetry": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "enforcer_2_rule_symbols": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "explorer_3_unconventional": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "explorer_4_frontier": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "healer_5_gentle_warmth": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "healer_6_group_comfort": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "strategist_7_deliberate_staging": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "strategist_8_tools_design": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "signaler_9_dramatic_expressive": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "signaler_10_aesthetic_fashion": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "nurturer_11_domestic": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "nurturer_12_caretaking": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "protector_13_defensive_muscular": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "protector_14_weapons_dominance": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "diplomat_15_mediating": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "diplomat_16_balanced_mutual": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "seer_17_abstract_symbolism": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "seer_18_knowledge_cosmic": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "mimic_19_conformist": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"},
+    "mimic_20_conventional_safe": {"score": 0.0-1.0, "visual_evidence": "Specific observable features"}
+  },
+  
+  "pole_aggregations": {
+    "enforcer": {"raw_score": "mean of benchmarks 1-2", "normalized_score": "relative gravitational pull"},
+    "explorer": {"raw_score": "mean of benchmarks 3-4", "normalized_score": "relative gravitational pull"},
+    "healer": {"raw_score": "mean of benchmarks 5-6", "normalized_score": "relative gravitational pull"},
+    "strategist": {"raw_score": "mean of benchmarks 7-8", "normalized_score": "relative gravitational pull"},
+    "signaler": {"raw_score": "mean of benchmarks 9-10", "normalized_score": "relative gravitational pull"},
+    "nurturer": {"raw_score": "mean of benchmarks 11-12", "normalized_score": "relative gravitational pull"},
+    "protector": {"raw_score": "mean of benchmarks 13-14", "normalized_score": "relative gravitational pull"},
+    "diplomat": {"raw_score": "mean of benchmarks 15-16", "normalized_score": "relative gravitational pull"},
+    "seer": {"raw_score": "mean of benchmarks 17-18", "normalized_score": "relative gravitational pull"},
+    "mimic": {"raw_score": "mean of benchmarks 19-20", "normalized_score": "relative gravitational pull"}
+  },
+  
+  "cognitive_signature": "Rich interpretation of which poles dominate based on visual presentation - describe the personality topology shown (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
+  
+  "dominant_triad": "Identify the three strongest poles and explain their visual interaction",
+  
+  "shape_interpretation": "Describe the shape of the radar chart (broad/balanced vs. sharp spikes vs. opposite pole tensions) and what the visual presentation reveals",
+  
+  "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this visual profile most resembles",
+  
+  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this visual pole configuration and how they manifest in presentation style"
+}
+
+Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: evoImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: {
+                url: mediaData
+              }
+            }]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: evoImagePrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaData.startsWith("data:image/png") ? "image/png" : 
+                           mediaData.startsWith("data:image/jpeg") ? "image/jpeg" : "image/webp",
+                data: mediaData.split(',')[1]
+              }
+            }, {
+              type: "text",
+              text: "Analyze this image using the EVO Psych 10-Pole visual framework."
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis for display
+      let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) IMAGE ANALYSIS\n";
+      formattedContent += "=".repeat(60) + "\n\n";
+      
+      if (analysisResult.image_feature_extraction) {
+        const features = analysisResult.image_feature_extraction;
+        formattedContent += "IMAGE FEATURE EXTRACTION:\n\n";
+        if (features.facial_expression) formattedContent += `Facial Expression:\n${features.facial_expression}\n\n`;
+        if (features.posture_body_language) formattedContent += `Posture & Body Language:\n${features.posture_body_language}\n\n`;
+        if (features.color_palette) formattedContent += `Color Palette:\n${features.color_palette}\n\n`;
+        if (features.composition) formattedContent += `Composition:\n${features.composition}\n\n`;
+        if (features.environment_context) formattedContent += `Environment Context:\n${features.environment_context}\n\n`;
+        if (features.symbolic_elements) formattedContent += `Symbolic Elements:\n${features.symbolic_elements}\n\n`;
+      }
+      
+      if (analysisResult.pole_aggregations) {
+        formattedContent += "10-POLE SCORES (Normalized Gravitational Pull):\n\n";
+        const poles = analysisResult.pole_aggregations;
+        
+        Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
+          const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
+          formattedContent += `${displayName}: ${data.normalized_score}\n`;
+          if (data.raw_score) formattedContent += `  Raw Score: ${data.raw_score}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (analysisResult.cognitive_signature) {
+        formattedContent += `COGNITIVE SIGNATURE:\n${analysisResult.cognitive_signature}\n\n`;
+      }
+      
+      if (analysisResult.dominant_triad) {
+        formattedContent += `DOMINANT TRIAD:\n${analysisResult.dominant_triad}\n\n`;
+      }
+      
+      if (analysisResult.evolutionary_archetype) {
+        formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
+      }
+      
+      if (analysisResult.shape_interpretation) {
+        formattedContent += `SHAPE INTERPRETATION:\n${analysisResult.shape_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.adaptive_strategy) {
+        formattedContent += `ADAPTIVE STRATEGY:\n${analysisResult.adaptive_strategy}\n\n`;
+      }
+      
+      if (analysisResult.visual_benchmark_scores) {
+        formattedContent += "DETAILED VISUAL BENCHMARK EVIDENCE:\n\n";
+        Object.entries(analysisResult.visual_benchmark_scores).forEach(([benchmark, data]: [string, any]) => {
+          const displayName = benchmark.replace(/_/g, ' ').toUpperCase();
+          formattedContent += `${displayName}:\n`;
+          formattedContent += `  Score: ${data.score}\n`;
+          formattedContent += `  Visual Evidence: ${data.visual_evidence}\n\n`;
+        });
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "EVO Psych Image Analysis",
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, evo_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          evo_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("EVO Psych image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for EVO Psych assessment" });
+    }
+  });
+
   // Clinical / Psychopathology Analysis - Image
   app.post("/api/analyze/image/clinical", async (req, res) => {
     try {
