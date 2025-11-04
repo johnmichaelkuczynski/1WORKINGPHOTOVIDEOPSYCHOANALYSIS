@@ -9833,6 +9833,311 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
     }
   });
 
+  // EVO Psych (Evolutionary Psychology) Analysis - Video
+  app.post("/api/analyze/video/evo", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing EVO Psych video analysis with model: ${selectedModel}`);
+      
+      // EVO Psych 10-Pole Video Analysis Protocol with Temporal Dynamics
+      const evoVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+
+You are an expert evolutionary psychologist applying the 10-Pole Evolutionary Psychology (EVO) Typology to video content. This framework uses temporal dynamics, behavioral patterns, and audio-linguistic cues to map gravitational attraction across behavioral niches that evolved in human social systems.
+
+CRITICAL INSTRUCTIONS:
+1. Extract temporal features across 5-8 timepoints throughout the video
+2. Analyze frame-level features: posture, gesture, gaze, facial expression, proxemics
+3. Extract audio-linguistic features: speech content, tone, rhythm, affect, pacing
+4. Score ALL 20 DYNAMIC BENCHMARKS (0.0 to 1.0) based on observed behavioral patterns
+5. For each pole, compute the mean of its two benchmarks
+6. Track temporal variation: how pole activation shifts moment-to-moment
+7. Provide DETAILED behavioral evidence for each benchmark score
+
+THE 20 DYNAMIC BENCHMARKS MAPPED TO 10 POLES:
+
+**POLE 1: ENFORCER**
+- Benchmark 1: Steady posture, consistent rule-governed movement
+- Benchmark 2: Verbal precision, corrective tone
+
+**POLE 2: EXPLORER / SCOUT**
+- Benchmark 3: Curious scanning of environment or audience
+- Benchmark 4: Spontaneous topic-shifting or improvisation
+
+**POLE 3: HEALER / EMPATH**
+- Benchmark 5: Warmth in tone and gesture, affiliative body language
+- Benchmark 6: Emotionally congruent facial response to others
+
+**POLE 4: STRATEGIST / SCHEMER**
+- Benchmark 7: Deliberate pacing, planned rhetoric
+- Benchmark 8: Gestural economy—moves only with cognitive purpose
+
+**POLE 5: SIGNALER / PERFORMER**
+- Benchmark 9: Expressive rhythm, humor, or flair
+- Benchmark 10: Heightened self-presentation or camera awareness
+
+**POLE 6: CARETAKER / NURTURER**
+- Benchmark 11: Comforting or supportive tone and posture
+- Benchmark 12: Focus on collective goals or family/group imagery
+
+**POLE 7: AGGRESSOR / PROTECTOR**
+- Benchmark 13: Defensive stance, emphasis on strength or dominance
+- Benchmark 14: Raised voice, energetic assertion
+
+**POLE 8: BROKER / DIPLOMAT**
+- Benchmark 15: Even-tempered mediation of disagreement
+- Benchmark 16: Cooperative alignment of gaze and turn-taking
+
+**POLE 9: SEER / PATTERN-INTERPRETER**
+- Benchmark 17: Long reflective pauses, abstraction in speech
+- Benchmark 18: Metaphoric or philosophical framing of topics
+
+**POLE 10: MIMIC / ADAPTOR**
+- Benchmark 19: Social mimicry, mirroring gestures or tone
+- Benchmark 20: Conformity in language or performance style
+
+Analyze the video and provide your assessment in JSON format:
+
+{
+  "temporal_feature_extraction": {
+    "timepoint_1": {
+      "timestamp": "Time in video (e.g., 0:00-0:30)",
+      "posture": "Description of body positioning and stance",
+      "gesture": "Description of hand movements, gestures",
+      "facial_expression": "Description of facial affect and microexpressions",
+      "tone": "Description of vocal tone and affect",
+      "speech_content": "Summary of what is being discussed",
+      "behavioral_observations": "5-6 specific behavioral markers observed"
+    },
+    "timepoint_2": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
+    "timepoint_3": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
+    "timepoint_4": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
+    "timepoint_5": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."}
+  },
+  
+  "dynamic_benchmark_scores": {
+    "enforcer_1_steady_posture": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns observed across timepoints"},
+    "enforcer_2_verbal_precision": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples from speech"},
+    "explorer_3_curious_scanning": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "explorer_4_spontaneous_shifting": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "healer_5_warmth_affiliation": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "healer_6_emotional_congruence": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "strategist_7_deliberate_pacing": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "strategist_8_gestural_economy": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "signaler_9_expressive_rhythm": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "signaler_10_self_presentation": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "nurturer_11_comforting_tone": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "nurturer_12_collective_focus": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "protector_13_defensive_stance": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "protector_14_energetic_assertion": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "diplomat_15_even_mediation": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "diplomat_16_cooperative_alignment": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "seer_17_reflective_pauses": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "seer_18_metaphoric_framing": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
+    "mimic_19_social_mimicry": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
+    "mimic_20_conformist_style": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"}
+  },
+  
+  "pole_aggregations": {
+    "enforcer": {"raw_score": "mean of benchmarks 1-2", "normalized_score": "relative gravitational pull"},
+    "explorer": {"raw_score": "mean of benchmarks 3-4", "normalized_score": "relative gravitational pull"},
+    "healer": {"raw_score": "mean of benchmarks 5-6", "normalized_score": "relative gravitational pull"},
+    "strategist": {"raw_score": "mean of benchmarks 7-8", "normalized_score": "relative gravitational pull"},
+    "signaler": {"raw_score": "mean of benchmarks 9-10", "normalized_score": "relative gravitational pull"},
+    "nurturer": {"raw_score": "mean of benchmarks 11-12", "normalized_score": "relative gravitational pull"},
+    "protector": {"raw_score": "mean of benchmarks 13-14", "normalized_score": "relative gravitational pull"},
+    "diplomat": {"raw_score": "mean of benchmarks 15-16", "normalized_score": "relative gravitational pull"},
+    "seer": {"raw_score": "mean of benchmarks 17-18", "normalized_score": "relative gravitational pull"},
+    "mimic": {"raw_score": "mean of benchmarks 19-20", "normalized_score": "relative gravitational pull"}
+  },
+  
+  "temporal_dynamics": "Description of how pole activation shifts across timepoints - are there consistent patterns or moment-to-moment fluctuations between certain poles?",
+  
+  "cognitive_signature": "Rich interpretation of which poles dominate in this behavioral performance - describe the personality topology (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
+  
+  "dominant_triad": "Identify the three strongest poles and explain their behavioral interaction across time",
+  
+  "shape_interpretation": "Describe the shape of the radar chart (broad/balanced vs. sharp spikes vs. opposite pole tensions) and what the behavioral performance reveals",
+  
+  "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this temporal profile most resembles",
+  
+  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this behavioral pole configuration and how they manifest in performance style"
+}
+
+Provide thorough EVO Psych video analysis with rich temporal evidence.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: evoVideoPrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this video using the EVO Psych 10-Pole dynamic framework with temporal feature extraction."
+            }, {
+              type: "image_url",
+              image_url: {
+                url: mediaData
+              }
+            }]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: evoVideoPrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this video using the EVO Psych 10-Pole dynamic framework with temporal feature extraction."
+            }, {
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: mediaData.startsWith("data:video/mp4") ? "video/mp4" : 
+                           mediaData.startsWith("data:video/webm") ? "video/webm" : 
+                           mediaData.startsWith("data:video/quicktime") ? "video/quicktime" : "video/mp4",
+                data: mediaData.split(',')[1]
+              }
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis for display
+      let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) VIDEO ANALYSIS\n";
+      formattedContent += "=".repeat(60) + "\n\n";
+      
+      if (analysisResult.temporal_feature_extraction) {
+        formattedContent += "TEMPORAL FEATURE EXTRACTION:\n\n";
+        Object.entries(analysisResult.temporal_feature_extraction).forEach(([timepoint, data]: [string, any]) => {
+          const displayName = timepoint.replace(/_/g, ' ').toUpperCase();
+          formattedContent += `${displayName}:\n`;
+          if (data.timestamp) formattedContent += `  Timestamp: ${data.timestamp}\n`;
+          if (data.posture) formattedContent += `  Posture: ${data.posture}\n`;
+          if (data.gesture) formattedContent += `  Gesture: ${data.gesture}\n`;
+          if (data.facial_expression) formattedContent += `  Facial Expression: ${data.facial_expression}\n`;
+          if (data.tone) formattedContent += `  Tone: ${data.tone}\n`;
+          if (data.speech_content) formattedContent += `  Speech Content: ${data.speech_content}\n`;
+          if (data.behavioral_observations) formattedContent += `  Behavioral Observations: ${data.behavioral_observations}\n`;
+          formattedContent += "\n";
+        });
+      }
+      
+      if (analysisResult.pole_aggregations) {
+        formattedContent += "10-POLE SCORES (Normalized Gravitational Pull):\n\n";
+        const poles = analysisResult.pole_aggregations;
+        
+        Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
+          const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
+          formattedContent += `${displayName}: ${data.normalized_score}\n`;
+          if (data.raw_score) formattedContent += `  Raw Score: ${data.raw_score}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (analysisResult.cognitive_signature) {
+        formattedContent += `COGNITIVE SIGNATURE:\n${analysisResult.cognitive_signature}\n\n`;
+      }
+      
+      if (analysisResult.dominant_triad) {
+        formattedContent += `DOMINANT TRIAD:\n${analysisResult.dominant_triad}\n\n`;
+      }
+      
+      if (analysisResult.evolutionary_archetype) {
+        formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
+      }
+      
+      if (analysisResult.temporal_dynamics) {
+        formattedContent += `TEMPORAL DYNAMICS:\n${analysisResult.temporal_dynamics}\n\n`;
+      }
+      
+      if (analysisResult.shape_interpretation) {
+        formattedContent += `SHAPE INTERPRETATION:\n${analysisResult.shape_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.adaptive_strategy) {
+        formattedContent += `ADAPTIVE STRATEGY:\n${analysisResult.adaptive_strategy}\n\n`;
+      }
+      
+      if (analysisResult.dynamic_benchmark_scores) {
+        formattedContent += "DETAILED DYNAMIC BENCHMARK EVIDENCE:\n\n";
+        Object.entries(analysisResult.dynamic_benchmark_scores).forEach(([benchmark, data]: [string, any]) => {
+          const displayName = benchmark.replace(/_/g, ' ').toUpperCase();
+          formattedContent += `${displayName}:\n`;
+          formattedContent += `  Score: ${data.score}\n`;
+          formattedContent += `  Behavioral Evidence: ${data.behavioral_evidence}\n\n`;
+        });
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "EVO Psych Video Analysis",
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, evo_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          evo_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("EVO Psych video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for EVO Psych assessment" });
+    }
+  });
+
   // Clinical / Psychopathology Analysis - Image
   app.post("/api/analyze/image/clinical", async (req, res) => {
     try {
