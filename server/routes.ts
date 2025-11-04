@@ -9307,6 +9307,250 @@ Provide exceptionally thorough affective/anxiety analysis with rich detail and m
     }
   });
 
+  // EVO Psych (Evolutionary Psychology) Analysis - Text
+  app.post("/api/analyze/text/evo", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing EVO Psych text analysis with model: ${selectedModel}`);
+      
+      // EVO Psych 10-Pole Evolutionary Psychology Typology Analysis Prompt
+      const evoPrompt = `You are an expert evolutionary psychologist applying the 10-Pole Evolutionary Psychology (EVO) Typology to written text. This framework replaces categorical personality types with gravitational poles of attraction based on behavioral niches that evolved across human and pre-human social systems.
+
+CRITICAL INSTRUCTIONS:
+1. Score ALL 20 benchmarks (0.0 to 1.0) based on semantic-sentiment analysis and keyword weighting from the text
+2. Include MINIMUM 10-15 DIRECT QUOTATIONS from the text as evidence for your benchmark scores
+3. For each pole, compute the mean of its two benchmarks
+4. Provide DETAILED evidence-based rationale for each benchmark score
+5. Show relative gravitational pull across all 10 poles
+6. Generate a rich interpretation of the cognitive signature
+
+THE 10 POLES AND 20 BENCHMARK QUESTIONS:
+
+**POLE 1: ENFORCER**
+- Benchmark 1: Displays anger or moral outrage toward norm-violation, corruption, or laziness
+- Benchmark 2: Emphasis on duty, structure, justice, or punishment over empathy
+
+**POLE 2: EXPLORER / SCOUT**
+- Benchmark 3: Seeks novelty, risk, or discovery for its own sake
+- Benchmark 4: Delight in pattern-breaking, experimentation, or travel of mind/body
+
+**POLE 3: HEALER / EMPATH**
+- Benchmark 5: Shows empathic mirroring or concern for healing and reconciliation
+- Benchmark 6: Frames problems in terms of care, pain-reduction, or social repair
+
+**POLE 4: STRATEGIST / SCHEMER**
+- Benchmark 7: Strategic, long-arc, and outcome-oriented tone
+- Benchmark 8: Models complex contingencies or coalition dynamics explicitly
+
+**POLE 5: SIGNALER / PERFORMER**
+- Benchmark 9: Uses rhythm, wit, or self-display to persuade or charm
+- Benchmark 10: Focus on audience reaction, impression, or aesthetics
+
+**POLE 6: CARETAKER / NURTURER**
+- Benchmark 11: References nurturing, provisioning, or protection of dependents
+- Benchmark 12: Finds satisfaction in stability, routine, or maintaining 'home base'
+
+**POLE 7: AGGRESSOR / PROTECTOR**
+- Benchmark 13: Shows defensive or confrontational tone toward threats
+- Benchmark 14: Valorizes strength, hierarchy, or decisive action
+
+**POLE 8: BROKER / DIPLOMAT**
+- Benchmark 15: Brokers peace, builds bridges, or mediates conflicts
+- Benchmark 16: Balances opposing sides or synthesizes contradictions
+
+**POLE 9: SEER / PATTERN-INTERPRETER**
+- Benchmark 17: Searches for hidden order, metaphysics, or meaning
+- Benchmark 18: Tolerates abstraction, paradox, and epistemic friction
+
+**POLE 10: MIMIC / ADAPTOR**
+- Benchmark 19: Emphasizes conformity or comfort with established norms
+- Benchmark 20: Shows anxiety about deviating from authority or majority behavior
+
+Analyze the following text and provide your assessment in JSON format:
+
+{
+  "benchmark_scores": {
+    "enforcer_1_norm_violation": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "enforcer_2_duty_structure": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "explorer_3_novelty_risk": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "explorer_4_pattern_breaking": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "healer_5_empathic_mirroring": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "healer_6_care_repair": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "strategist_7_long_arc": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "strategist_8_contingencies": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "signaler_9_wit_charm": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "signaler_10_audience_focus": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "nurturer_11_provisioning": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "nurturer_12_stability_routine": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "protector_13_confrontational": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "protector_14_strength_hierarchy": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "diplomat_15_mediation": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "diplomat_16_synthesis": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "seer_17_hidden_order": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "seer_18_abstraction_paradox": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "mimic_19_conformity": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"},
+    "mimic_20_authority_anxiety": {"score": 0.0-1.0, "evidence": "Direct quotes and detailed analysis"}
+  },
+  
+  "pole_aggregations": {
+    "enforcer": {"raw_score": "mean of benchmarks 1-2", "normalized_score": "relative gravitational pull"},
+    "explorer": {"raw_score": "mean of benchmarks 3-4", "normalized_score": "relative gravitational pull"},
+    "healer": {"raw_score": "mean of benchmarks 5-6", "normalized_score": "relative gravitational pull"},
+    "strategist": {"raw_score": "mean of benchmarks 7-8", "normalized_score": "relative gravitational pull"},
+    "signaler": {"raw_score": "mean of benchmarks 9-10", "normalized_score": "relative gravitational pull"},
+    "nurturer": {"raw_score": "mean of benchmarks 11-12", "normalized_score": "relative gravitational pull"},
+    "protector": {"raw_score": "mean of benchmarks 13-14", "normalized_score": "relative gravitational pull"},
+    "diplomat": {"raw_score": "mean of benchmarks 15-16", "normalized_score": "relative gravitational pull"},
+    "seer": {"raw_score": "mean of benchmarks 17-18", "normalized_score": "relative gravitational pull"},
+    "mimic": {"raw_score": "mean of benchmarks 19-20", "normalized_score": "relative gravitational pull"}
+  },
+  
+  "cognitive_signature": "Rich interpretation of which poles dominate, conflict, or reinforce each other - describe the personality topology (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
+  
+  "dominant_triad": "Identify the three strongest poles and explain their interaction",
+  
+  "shape_interpretation": "Describe the shape of the radar chart (broad/balanced vs. sharp spikes vs. opposite pole tensions) and what it reveals about cognitive style",
+  
+  "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this profile most resembles",
+  
+  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this pole configuration and how they would manifest in social/intellectual/professional contexts"
+}
+
+Provide thorough EVO Psych analysis with rich evidence from the text.
+
+TEXT TO ANALYZE:
+${textContent}`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: evoPrompt
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: evoPrompt,
+          messages: [{
+            role: "user",
+            content: `Analyze this text using the EVO Psych 10-Pole framework:\n\n${textContent}`
+          }]
+        });
+        
+        const textContent2 = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent2.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis for display
+      let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) ANALYSIS\n";
+      formattedContent += "=".repeat(60) + "\n\n";
+      
+      if (analysisResult.pole_aggregations) {
+        formattedContent += "10-POLE SCORES (Normalized Gravitational Pull):\n\n";
+        const poles = analysisResult.pole_aggregations;
+        
+        Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
+          const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
+          formattedContent += `${displayName}: ${data.normalized_score}\n`;
+          if (data.raw_score) formattedContent += `  Raw Score: ${data.raw_score}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (analysisResult.cognitive_signature) {
+        formattedContent += `COGNITIVE SIGNATURE:\n${analysisResult.cognitive_signature}\n\n`;
+      }
+      
+      if (analysisResult.dominant_triad) {
+        formattedContent += `DOMINANT TRIAD:\n${analysisResult.dominant_triad}\n\n`;
+      }
+      
+      if (analysisResult.evolutionary_archetype) {
+        formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
+      }
+      
+      if (analysisResult.shape_interpretation) {
+        formattedContent += `SHAPE INTERPRETATION:\n${analysisResult.shape_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.adaptive_strategy) {
+        formattedContent += `ADAPTIVE STRATEGY:\n${analysisResult.adaptive_strategy}\n\n`;
+      }
+      
+      if (analysisResult.benchmark_scores) {
+        formattedContent += "DETAILED BENCHMARK EVIDENCE:\n\n";
+        Object.entries(analysisResult.benchmark_scores).forEach(([benchmark, data]: [string, any]) => {
+          const displayName = benchmark.replace(/_/g, ' ').toUpperCase();
+          formattedContent += `${displayName}:\n`;
+          formattedContent += `  Score: ${data.score}\n`;
+          formattedContent += `  Evidence: ${data.evidence}\n\n`;
+        });
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "EVO Psych Analysis",
+        mediaUrl: `evo-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, evo_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          evo_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("EVO Psych text analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for EVO Psych assessment" });
+    }
+  });
+
   // Clinical / Psychopathology Analysis - Image
   app.post("/api/analyze/image/clinical", async (req, res) => {
     try {
