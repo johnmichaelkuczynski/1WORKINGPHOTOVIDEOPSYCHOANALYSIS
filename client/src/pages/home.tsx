@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -137,6 +137,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const clinicalImageInputRef = useRef<HTMLInputElement>(null);
   const clinicalVideoInputRef = useRef<HTMLInputElement>(null);
   const anxietyImageInputRef = useRef<HTMLInputElement>(null);
+  const anxietyVideoInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1505,6 +1506,62 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // Anxiety video analysis
+  const handleAnxietyVideoAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        // Messages now append instead of clear
+        
+        // Read the video file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("video");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeAnxietyVideo(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `Anxiety/Affective Video Analysis - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(prev => [...prev, ...response.messages]);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('Anxiety video analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze video for anxiety/affective assessment. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Anxiety Analysis Complete",
+        description: "Your video has been analyzed across 5 affective/anxiety scales (BDI, HDRS, BAI, GAD-7, PHQ-9).",
+      });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
@@ -2173,6 +2230,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               const files = e.target.files;
               if (files && files.length > 0) {
                 handleAnxietyImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "anxiety-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white hover:from-teal-600/90 hover:to-cyan-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("anxiety-video");
+            anxietyVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-anxiety-video"
+        >
+          💙 Anxiety (Video)
+          <input
+            ref={anxietyVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleAnxietyVideoAnalysis.mutate(files[0]);
               }
             }}
           />

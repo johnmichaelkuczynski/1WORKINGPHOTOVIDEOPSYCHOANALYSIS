@@ -10006,6 +10006,297 @@ Provide thorough behavioral analysis across timeline framed as hypothetical educ
     }
   });
 
+  // Anxiety / Affective Analysis - Video
+  app.post("/api/analyze/video/anxiety", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Anxiety/Affective video analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily and extract frames
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps
+      const framePromises = [0, 25, 50, 75].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for Anxiety/Affective analysis`);
+      
+      // Anxiety/Affective video prompt
+      const anxietyVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by video reference material.
+
+You are an expert clinical psychologist conducting COMPREHENSIVE temporal affective/anxiety assessment across 4 video timepoints (0%, 25%, 50%, 75%), synthesizing 5 major quantitative scales: Beck Depression Inventory (BDI), Hamilton Depression Rating Scale (HDRS), Beck Anxiety Inventory (BAI), GAD-7, and PHQ-9.
+
+MANDATORY EVIDENCE REQUIREMENTS - YOU MUST:
+1. For EACH frame (0%, 25%, 50%, 75%): catalog specific affective micro-behaviors - exact facial muscle activation (orbicularis oculi, corrugator, zygomatic, frontalis), precise body positioning and tension patterns, vocal prosody if speech present, gesture quality and tempo, postural shifts
+2. IF SPEECH/AUDIO PRESENT: Extract and quote VERBATIM every spoken phrase with timestamp, then interpret each quote through all 5 affective/anxiety scales for mood tone, worry content, hopelessness themes
+3. Create timeline-driven affective maps showing EXACT changes between frames with scale-specific interpretation
+4. Provide differential assessment for each observed affective behavior change across all 5 scales
+5. Note contradictory affective signals and explain discrepancies
+6. WALL-TO-WALL analysis - minimum 5-6 detailed observations per timepoint per scale domain
+7. Make BOLD longitudinal affective interpretations showing pattern evolution over time
+
+FORBIDDEN:
+- Generic temporal descriptions (e.g., "mood appears to darken over time")
+- Missing speech/dialogue quotations when audio is present
+- Surface observations without deep scale-specific correlation
+- Vague timeline descriptions without specific frame-by-frame affective evidence
+- Safe language that avoids substantive clinical affective insight
+
+Provide thorough temporal affective/anxiety analysis in JSON format:
+
+{
+  "temporal_affective_analysis": "Rich narrative describing SPECIFIC affective/anxiety pattern changes across 4 timepoints with exact visual evidence from each frame - facial affect evolution, postural tension changes, vocal prosody shifts if present",
+  
+  "affective_pattern_analysis": {
+    "bdi_behavioral_correlates": {
+      "depressed_affect_timeline": "Frame-by-frame catalog of observable sadness, hopelessness in facial expression with specific muscle evidence at each timepoint",
+      "psychomotor_pattern_evolution": "Precise tracking of agitation or retardation markers across frames - posture shifts, muscle tension changes, gesture quality evolution",
+      "self_care_behavioral_indicators": "Grooming and presentation patterns across frames potentially reflecting energy/motivation temporal trends",
+      "anhedonic_behavioral_markers": "Frame-by-frame visual cues suggesting reduced pleasure or emotional flatness evolution"
+    },
+    "hdrs_behavioral_correlates": {
+      "mood_indicator_timeline": "Observable depressive mood marker evolution in facial affect and body language across frames",
+      "anxiety_manifestation_evolution": "Precise tracking of visible tension, apprehension, worry patterns across timepoints",
+      "somatic_presentation_changes": "Physical manifestation evolution visible in posture, facial tension, overall presentation across frames",
+      "psychomotor_observation_timeline": "Detailed retardation or agitation evolution visible in posture and expression across timepoints"
+    },
+    "bai_behavioral_correlates": {
+      "somatic_anxiety_marker_evolution": "Frame-by-frame visible physical anxiety signs - facial tension changes, body stiffness evolution, tremor if present",
+      "autonomic_indicator_timeline": "Observable arousal pattern evolution - facial flushing, tension, perspiration if visible across timepoints",
+      "fear_apprehension_cue_changes": "Facial expression evolution suggesting fear, worry, or apprehension across frames",
+      "panic_feature_timeline": "Acute distress marker evolution if present across timepoints"
+    },
+    "gad_7_behavioral_correlates": {
+      "chronic_worry_indicator_evolution": "Persistent tension pattern evolution suggesting ongoing worry state across frames",
+      "restlessness_marker_timeline": "Visual restlessness or agitation cue evolution in posture and expression across timepoints",
+      "tension_pattern_changes": "Chronic muscle tension evolution visible in facial and body presentation across frames",
+      "irritability_cue_evolution": "Facial or postural indicator evolution of irritation or edginess across timepoints"
+    },
+    "phq_9_behavioral_correlates": {
+      "depressive_presentation_timeline": "Overall depressive affect evolution visible in facial expression and body language across frames",
+      "energy_level_indicator_changes": "Visual cue evolution about energy, fatigue, or vitality in posture and presentation across timepoints",
+      "psychomotor_change_timeline": "Observable slowing or agitation pattern evolution across frames",
+      "engagement_marker_evolution": "Visual indicator evolution of interest/engagement or withdrawal/disengagement across timepoints"
+    }
+  },
+  
+  "cross_scale_temporal_integration": {
+    "convergent_temporal_findings": "Where visual affective cues consistently evolve similarly across all 5 scales with frame-specific evidence",
+    "divergent_temporal_patterns": "Observations more prominent for some scales than others across timepoints - explain temporal discrepancies",
+    "depression_vs_anxiety_evolution": "Relative prominence evolution of depressive vs anxious visual markers across frames with evidence",
+    "severity_trajectory_assessment": "Overall severity impression evolution based on visual cues across all scales and timepoints"
+  },
+  
+  "integrated_temporal_affective_impression": "Comprehensive hypothetical affective pattern synthesis showing temporal evolution based on frame-by-frame visual evidence",
+  
+  "limitations": "Extensive limitations of video-only analysis, missing clinical interview data, lack of history, inability to assess internal experience, cultural considerations, need for professional assessment"
+}
+
+Provide thorough temporal affective/anxiety analysis framed as hypothetical educational interpretation.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: anxietyVideoPrompt
+          }, {
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps) for comprehensive affective/anxiety assessment:` },
+              ...extractedFrames.map(frame => ({
+                type: "image_url" as const,
+                image_url: {
+                  url: frame,
+                  detail: "high" as const,
+                }
+              }))
+            ]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const imageContent = extractedFrames.map((frame) => {
+          const base64Data = frame.split(',')[1];
+          return {
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: "image/jpeg" as const,
+              data: base64Data,
+            }
+          };
+        });
+        
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 16000,
+          temperature: 0.7,
+          system: anxietyVideoPrompt,
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps) for comprehensive affective/anxiety assessment:` },
+              ...imageContent
+            ]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
+      let formattedContent = "";
+      
+      if (analysisResult.temporal_affective_analysis) {
+        formattedContent += `Temporal Affective Analysis:\n${analysisResult.temporal_affective_analysis}\n\n`;
+      }
+      
+      if (analysisResult.affective_pattern_analysis) {
+        const apa = analysisResult.affective_pattern_analysis;
+        
+        if (apa.bdi_behavioral_correlates) {
+          formattedContent += "BDI Behavioral Correlates:\n";
+          if (apa.bdi_behavioral_correlates.depressed_affect_timeline) formattedContent += `${apa.bdi_behavioral_correlates.depressed_affect_timeline}\n\n`;
+          if (apa.bdi_behavioral_correlates.psychomotor_pattern_evolution) formattedContent += `${apa.bdi_behavioral_correlates.psychomotor_pattern_evolution}\n\n`;
+          if (apa.bdi_behavioral_correlates.self_care_behavioral_indicators) formattedContent += `${apa.bdi_behavioral_correlates.self_care_behavioral_indicators}\n\n`;
+          if (apa.bdi_behavioral_correlates.anhedonic_behavioral_markers) formattedContent += `${apa.bdi_behavioral_correlates.anhedonic_behavioral_markers}\n\n`;
+        }
+        
+        if (apa.hdrs_behavioral_correlates) {
+          formattedContent += "HDRS Behavioral Correlates:\n";
+          if (apa.hdrs_behavioral_correlates.mood_indicator_timeline) formattedContent += `${apa.hdrs_behavioral_correlates.mood_indicator_timeline}\n\n`;
+          if (apa.hdrs_behavioral_correlates.anxiety_manifestation_evolution) formattedContent += `${apa.hdrs_behavioral_correlates.anxiety_manifestation_evolution}\n\n`;
+          if (apa.hdrs_behavioral_correlates.somatic_presentation_changes) formattedContent += `${apa.hdrs_behavioral_correlates.somatic_presentation_changes}\n\n`;
+          if (apa.hdrs_behavioral_correlates.psychomotor_observation_timeline) formattedContent += `${apa.hdrs_behavioral_correlates.psychomotor_observation_timeline}\n\n`;
+        }
+        
+        if (apa.bai_behavioral_correlates) {
+          formattedContent += "BAI Behavioral Correlates:\n";
+          if (apa.bai_behavioral_correlates.somatic_anxiety_marker_evolution) formattedContent += `${apa.bai_behavioral_correlates.somatic_anxiety_marker_evolution}\n\n`;
+          if (apa.bai_behavioral_correlates.autonomic_indicator_timeline) formattedContent += `${apa.bai_behavioral_correlates.autonomic_indicator_timeline}\n\n`;
+          if (apa.bai_behavioral_correlates.fear_apprehension_cue_changes) formattedContent += `${apa.bai_behavioral_correlates.fear_apprehension_cue_changes}\n\n`;
+          if (apa.bai_behavioral_correlates.panic_feature_timeline) formattedContent += `${apa.bai_behavioral_correlates.panic_feature_timeline}\n\n`;
+        }
+        
+        if (apa.gad_7_behavioral_correlates) {
+          formattedContent += "GAD-7 Behavioral Correlates:\n";
+          if (apa.gad_7_behavioral_correlates.chronic_worry_indicator_evolution) formattedContent += `${apa.gad_7_behavioral_correlates.chronic_worry_indicator_evolution}\n\n`;
+          if (apa.gad_7_behavioral_correlates.restlessness_marker_timeline) formattedContent += `${apa.gad_7_behavioral_correlates.restlessness_marker_timeline}\n\n`;
+          if (apa.gad_7_behavioral_correlates.tension_pattern_changes) formattedContent += `${apa.gad_7_behavioral_correlates.tension_pattern_changes}\n\n`;
+          if (apa.gad_7_behavioral_correlates.irritability_cue_evolution) formattedContent += `${apa.gad_7_behavioral_correlates.irritability_cue_evolution}\n\n`;
+        }
+        
+        if (apa.phq_9_behavioral_correlates) {
+          formattedContent += "PHQ-9 Behavioral Correlates:\n";
+          if (apa.phq_9_behavioral_correlates.depressive_presentation_timeline) formattedContent += `${apa.phq_9_behavioral_correlates.depressive_presentation_timeline}\n\n`;
+          if (apa.phq_9_behavioral_correlates.energy_level_indicator_changes) formattedContent += `${apa.phq_9_behavioral_correlates.energy_level_indicator_changes}\n\n`;
+          if (apa.phq_9_behavioral_correlates.psychomotor_change_timeline) formattedContent += `${apa.phq_9_behavioral_correlates.psychomotor_change_timeline}\n\n`;
+          if (apa.phq_9_behavioral_correlates.engagement_marker_evolution) formattedContent += `${apa.phq_9_behavioral_correlates.engagement_marker_evolution}\n\n`;
+        }
+      }
+      
+      if (analysisResult.cross_scale_temporal_integration) {
+        formattedContent += "Cross-Scale Temporal Integration:\n";
+        const csti = analysisResult.cross_scale_temporal_integration;
+        if (csti.convergent_temporal_findings) formattedContent += `${csti.convergent_temporal_findings}\n\n`;
+        if (csti.divergent_temporal_patterns) formattedContent += `${csti.divergent_temporal_patterns}\n\n`;
+        if (csti.depression_vs_anxiety_evolution) formattedContent += `${csti.depression_vs_anxiety_evolution}\n\n`;
+        if (csti.severity_trajectory_assessment) formattedContent += `${csti.severity_trajectory_assessment}\n\n`;
+      }
+      
+      if (analysisResult.integrated_temporal_affective_impression) {
+        formattedContent += `Integrated Temporal Affective Impression:\n${analysisResult.integrated_temporal_affective_impression}\n`;
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Anxiety/Affective Analysis (Video)",
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { analysis: formattedContent, affective_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          affective_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Anxiety/Affective video analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for anxiety/affective assessment" });
+    }
+  });
+
   // Consolidated General Personality Structure Analysis - Image
   app.post("/api/analyze/image/personality-structure", async (req, res) => {
     try {
