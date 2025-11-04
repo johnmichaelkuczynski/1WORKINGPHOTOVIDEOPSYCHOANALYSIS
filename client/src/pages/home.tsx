@@ -139,6 +139,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const anxietyImageInputRef = useRef<HTMLInputElement>(null);
   const anxietyVideoInputRef = useRef<HTMLInputElement>(null);
   const evoImageInputRef = useRef<HTMLInputElement>(null);
+  const evoVideoInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -2438,6 +2439,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               const files = e.target.files;
               if (files && files.length > 0) {
                 handleEvoImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "evo-video" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-600/90 hover:to-emerald-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("evo-video");
+            evoVideoInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-evo-video"
+        >
+          🧬 EVO Psych (Video)
+          <input
+            ref={evoVideoInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleEvoVideoAnalysis.mutate(files[0]);
               }
             }}
           />
