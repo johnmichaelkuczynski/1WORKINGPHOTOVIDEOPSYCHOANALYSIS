@@ -9848,6 +9848,43 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
       
       console.log(`Processing EVO Psych video analysis with model: ${selectedModel}`);
       
+      // Save video temporarily and extract frames for OpenAI
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // Extract frames at different timestamps for temporal analysis
+      const framePromises = [0, 20, 40, 60, 80].map(async (percent) => {
+        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              const frameData = fs.readFileSync(outputPath);
+              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+              fs.unlinkSync(outputPath);
+              resolve(base64Frame);
+            })
+            .on('error', (err) => {
+              console.error('Frame extraction error:', err);
+              reject(err);
+            });
+        });
+      });
+      
+      const extractedFrames = await Promise.all(framePromises);
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath);
+      
+      console.log(`Extracted ${extractedFrames.length} frames from video for EVO Psych analysis`);
+      
       // EVO Psych 10-Pole Video Analysis Protocol with Temporal Dynamics
       const evoVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
 
@@ -9977,6 +10014,22 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
       let analysisResult: any;
       
       if (selectedModel === "openai" && openai) {
+        // Build content array with text and all extracted frames
+        const contentArray: any[] = [{
+          type: "text",
+          text: `Analyze these ${extractedFrames.length} frames from a video (at 0%, 20%, 40%, 60%, 80% timestamps) using the EVO Psych 10-Pole dynamic framework with temporal feature extraction. Provide temporal analysis showing how behaviors evolve across these timepoints.`
+        }];
+        
+        // Add all frames as separate images
+        extractedFrames.forEach((frameData, index) => {
+          contentArray.push({
+            type: "image_url",
+            image_url: {
+              url: frameData
+            }
+          });
+        });
+        
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [{
@@ -9984,15 +10037,7 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
             content: evoVideoPrompt
           }, {
             role: "user",
-            content: [{
-              type: "text",
-              text: "Analyze this video using the EVO Psych 10-Pole dynamic framework with temporal feature extraction."
-            }, {
-              type: "image_url",
-              image_url: {
-                url: mediaData
-              }
-            }]
+            content: contentArray
           }],
           max_tokens: 16000,
           temperature: 0.7,
