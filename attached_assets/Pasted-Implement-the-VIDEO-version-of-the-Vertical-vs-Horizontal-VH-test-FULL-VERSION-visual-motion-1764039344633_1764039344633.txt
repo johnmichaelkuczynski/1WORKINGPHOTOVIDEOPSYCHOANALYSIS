@@ -1,0 +1,55 @@
+Implement the VIDEO version of the Vertical vs. Horizontal (VH) test – FULL VERSION (visual + motion + spoken words).
+
+Videos are always <20 seconds, usually talking-head or selfie-style with speech.
+
+CORE SIGNAL SOURCES (all three must be used):
+
+1. Visual + motion cues (same as before)  
+   - Lighting, posture, gaze direction, camera movement, background symbols, etc.
+
+2. Audio prosody (non-verbal voice qualities)  
+   - Deep/slow/resonant → Vertical  
+   - High-pitched, fast, laughing, up-talk, vocal fry, exaggerated warmth → Horizontal
+
+3. Spoken language content (this is mandatory, never ignore)  
+   - Transcribe the audio (use Whisper-tiny or Whisper-base – they are fast and accurate enough for <20s clips)  
+   - Run the exact transcript through the already-existing TEXT Vertical/Horizontal module  
+   - Give the text score heavy weight (50–60 % of final score)
+
+FINAL SCORING FORMULA (hard-code this exact weighted blend):
+vertical_final = 0.30 × visual_score + 0.20 × prosody_score + 0.50 × text_vh_score
+horizontal_final = 1 – vertical_final   (still near-bipolar)
+
+Return the same JSON structure as the other VH modules:
+{
+  "vertical_score": 0.XX,
+  "horizontal_score": 0.XX,
+  "orientation": "...",
+  "dominant_mode": "...",
+  "top_visual_motion_markers_vertical": [...],
+  "top_visual_motion_markers_horizontal": [...],
+  "key_spoken_phrases_vertical": [...],    // max 4 direct quotes that pulled Vertical
+  "key_spoken_phrases_horizontal": [...]   // max 4 direct quotes that pulled Horizontal
+}
+
+CALIBRATION ANCHORS (enforce exactly):
+
+1. 12-second clip: lone man, dramatic lighting, slow deep voice saying “Sacrifice everything lower to what is higher” → 0.97–1.00 Vertical
+2. 15-second TikTok: girl laughing, pastel room, saying “We’re literally a safe space for everyone, no bad vibes only ♡” → ≤0.08 Vertical
+3. 10-second neutral clip: average guy saying “Hey what’s up, just checking in” in normal room → 0.45–0.55 Vertical
+
+Implementation steps (in order):
+
+1. Run Whisper (tiny or base) → get transcript (if no speech, treat text_score = 0.50 neutral)
+2. Feed transcript to the existing TEXT VH module → get text_vh_score
+3. Sample 8–10 keyframes → run through IMAGE VH module → average → visual_score
+4. Quick prosody check (pitch variance, speech rate, laughter detection) → prosody_score
+5. Compute weighted final as above
+6. Pull the 2–4 most extreme spoken phrases responsible for the text score and list them
+
+UI: same bar + one-line summary, now with an extra mini-section:
+Spoken Vertical markers:  “sacrifice… higher…”  “become who you are…”
+Spoken Horizontal markers:  “safe space…”  “no bad vibes only…”
+
+This is the real, production-ready short-video VH test.  
+Implement exactly as specified. Speech is now the dominant signal, exactly as it should be.

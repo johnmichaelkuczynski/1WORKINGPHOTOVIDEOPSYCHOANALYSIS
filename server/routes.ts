@@ -9770,6 +9770,215 @@ ${textContent}`;
     }
   });
 
+  // Vertical vs. Horizontal Orientation Analysis - Image
+  app.post("/api/analyze/image/vertical-horizontal", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing V/H Image orientation analysis with model: ${selectedModel}`);
+      
+      // V/H Image Analysis System Prompt - exact specification
+      const vhImagePrompt = `You are the world's most accurate detector of Vertical vs. Horizontal orientation from images only.
+
+VERTICAL = sacred hierarchy, ascent, severity, solitude, rank, dramatic lighting, vertical lines.
+Visual cues that indicate VERTICAL orientation:
+- High-contrast lighting from above or single dramatic light source (chiaroscuro)
+- Strong vertical lines in frame (columns, thrones, swords upright, mountain backdrops)
+- Subject looking upward or into extreme distance
+- Cold color palette (steel blue, black, white, gold)
+- Symbols of rank or transcendence: crowns, halos, eagles, mountain peaks, weapons held high, solitary elevated position
+- Rigid, symmetrical, statuesque posture
+- Minimal or no background clutter
+- Eyes intense, unblinking, or half-closed in contemplation
+- Dark, severe, or ceremonial clothing
+
+HORIZONTAL = warmth, belonging, softness, domesticity, broad smiles, cozy clutter.
+Visual cues that indicate HORIZONTAL orientation:
+- Soft, even, warm lighting
+- Rounded furniture, cushions, plants, cozy clutter
+- Subject smiling broadly, head tilted, eyes making direct "connect" gaze at camera
+- Domestic setting (bed, couch, kitchen, family photos)
+- Casual, loose, colorful or pastel clothing
+- Presence of pets, children, food, blankets
+- Symmetrical smile + visible teeth
+- Background contains many personal items, posters, knick-knacks
+- Leaning in, open palms, relaxed slouch
+
+CALIBRATION ANCHORS:
+- Solitary severe figures under dramatic light with marble columns = 0.95-1.00 vertical
+- Smiling people in cozy domestic settings with plants, fairy lights, plush items = 0.00-0.15 vertical
+- Casual person smiling in black t-shirt, cozy room with screen + lamp = approximately 0.18-0.24 vertical
+
+SCORING BANDS:
+- Extreme Vertical: vertical_score >= 0.90
+- Strong Vertical: vertical_score >= 0.70 AND < 0.90
+- Moderate Vertical: vertical_score >= 0.55 AND < 0.70
+- Neutral: vertical_score >= 0.45 AND < 0.55
+- Moderate Horizontal: vertical_score >= 0.30 AND < 0.45
+- Strong Horizontal: vertical_score >= 0.10 AND < 0.30
+- Extreme Horizontal: vertical_score < 0.10
+
+Return only JSON with these exact keys:
+{
+  "vertical_score": 0.XX,
+  "horizontal_score": 0.XX,
+  "orientation": "Vertical" | "Horizontal" | "Neutral",
+  "dominant_mode": "Extreme Vertical" | "Strong Vertical" | "Moderate Vertical" | "Neutral" | "Moderate Horizontal" | "Strong Horizontal" | "Extreme Horizontal",
+  "top_visual_markers_vertical": ["marker1", "marker2", ...],
+  "top_visual_markers_horizontal": ["marker1", "marker2", ...],
+  "visual_summary": "2-3 word description of the dominant visual impression"
+}
+
+Never explain. Return only JSON.`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: vhImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this image for Vertical vs. Horizontal visual orientation."
+            }, {
+              type: "image_url",
+              image_url: {
+                url: mediaData
+              }
+            }]
+          }],
+          max_tokens: 2000,
+          temperature: 0.3,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 2000,
+          temperature: 0.3,
+          system: vhImagePrompt,
+          messages: [{
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this image for Vertical vs. Horizontal visual orientation."
+            }, {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaData.startsWith("data:image/png") ? "image/png" : 
+                           mediaData.startsWith("data:image/gif") ? "image/gif" : 
+                           mediaData.startsWith("data:image/webp") ? "image/webp" : "image/jpeg",
+                data: mediaData.split(',')[1]
+              }
+            }]
+          }]
+        });
+        
+        const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis for display
+      let formattedContent = "VERTICAL vs. HORIZONTAL ORIENTATION (IMAGE ANALYSIS)\n";
+      formattedContent += "=".repeat(60) + "\n\n";
+      
+      // Visual orientation bar representation
+      const vertScore = analysisResult.vertical_score || 0;
+      const horzScore = analysisResult.horizontal_score || 0;
+      const orientationEmoji = analysisResult.orientation === "Vertical" ? "⬆️" : 
+                               analysisResult.orientation === "Horizontal" ? "➡️" : "⚖️";
+      
+      formattedContent += `${orientationEmoji} ORIENTATION: ${analysisResult.orientation?.toUpperCase() || "UNKNOWN"}\n`;
+      formattedContent += `📊 MODE: ${analysisResult.dominant_mode || "Unknown"}\n\n`;
+      
+      // One-line summary
+      formattedContent += `✦ Vertical ${vertScore.toFixed(2)} | Horizontal ${horzScore.toFixed(2)} – ${analysisResult.dominant_mode} – ${analysisResult.visual_summary || "Visual analysis"}\n\n`;
+      
+      // Visual bar representation (red = vertical, blue = horizontal)
+      const barLength = 30;
+      const vertBars = Math.round(vertScore * barLength);
+      const horzBars = barLength - vertBars;
+      formattedContent += `VISUAL ORIENTATION BAR:\n`;
+      formattedContent += `  Vertical ${"█".repeat(vertBars)}${"░".repeat(horzBars)} Horizontal\n`;
+      formattedContent += `  (${(vertScore * 100).toFixed(0)}%)${"─".repeat(barLength - 6)}(${(horzScore * 100).toFixed(0)}%)\n\n`;
+      
+      // Vertical visual markers
+      if (analysisResult.top_visual_markers_vertical && analysisResult.top_visual_markers_vertical.length > 0) {
+        formattedContent += "VERTICAL VISUAL MARKERS:\n";
+        analysisResult.top_visual_markers_vertical.forEach((marker: string) => {
+          formattedContent += `  ⬆ ${marker}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      // Horizontal visual markers
+      if (analysisResult.top_visual_markers_horizontal && analysisResult.top_visual_markers_horizontal.length > 0) {
+        formattedContent += "HORIZONTAL VISUAL MARKERS:\n";
+        analysisResult.top_visual_markers_horizontal.forEach((marker: string) => {
+          formattedContent += `  ➡ ${marker}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "V/H Image Orientation",
+        mediaUrl: mediaData,
+        mediaType: "image",
+        personalityInsights: { analysis: formattedContent, vh_image_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          vh_image_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("V/H Image orientation analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image for V/H orientation" });
+    }
+  });
+
   // EVO Psych (Evolutionary Psychology) Analysis - Image
   app.post("/api/analyze/image/evo", async (req, res) => {
     try {

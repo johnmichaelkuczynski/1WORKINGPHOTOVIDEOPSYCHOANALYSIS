@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -140,6 +140,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const anxietyVideoInputRef = useRef<HTMLInputElement>(null);
   const evoImageInputRef = useRef<HTMLInputElement>(null);
   const evoVideoInputRef = useRef<HTMLInputElement>(null);
+  const vhImageInputRef = useRef<HTMLInputElement>(null);
 
   // Check API status on component mount
   useEffect(() => {
@@ -1674,6 +1675,61 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
     }
   });
 
+  // V/H (Vertical/Horizontal) Orientation image analysis
+  const handleVHImageAnalysis = useMutation({
+    mutationFn: async (file: File) => {
+      try {
+        setIsAnalyzing(true);
+        setAnalysisProgress(10);
+        
+        // Read the image file
+        const reader = new FileReader();
+        const mediaData = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        setUploadedMedia(mediaData);
+        setMediaData(mediaData);
+        setMediaType("image");
+        setAnalysisProgress(30);
+        
+        const response = await analyzeVerticalHorizontalImage(
+          mediaData,
+          sessionId,
+          selectedModel,
+          `V/H Image Orientation - ${new Date().toLocaleDateString()}`
+        );
+        
+        setAnalysisId(response.analysisId);
+        
+        if (response.messages && response.messages.length > 0) {
+          setMessages(prev => [...prev, ...response.messages]);
+        }
+        
+        setAnalysisProgress(100);
+        return response;
+      } catch (error: any) {
+        console.error('V/H Image orientation analysis error:', error);
+        toast({
+          title: "Analysis Failed",
+          description: error.message || "Failed to analyze image for V/H orientation. Please try again.",
+          variant: "destructive",
+        });
+        setAnalysisProgress(0);
+        throw error;
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "V/H Orientation Complete",
+        description: "Your image has been analyzed for Vertical vs. Horizontal visual orientation.",
+      });
+    }
+  });
+
   // Stanford-Binet Intelligence Scale image analysis
   const handleStanfordBinetImageAnalysis = useMutation({
     mutationFn: async (file: File) => {
@@ -2514,6 +2570,31 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           data-testid="button-vh-text"
         >
           ⬆️ V/H Orientation (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "vh-image" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-600/90 hover:to-violet-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("vh-image");
+            vhImageInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-vh-image"
+        >
+          ⬆️ V/H Orientation (Image)
+          <input
+            ref={vhImageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleVHImageAnalysis.mutate(files[0]);
+              }
+            }}
+          />
         </Button>
         
         <Button

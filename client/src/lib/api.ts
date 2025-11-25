@@ -1711,6 +1711,54 @@ export async function analyzeEvoVideo(
   return data;
 }
 
+// Vertical vs. Horizontal Orientation Analysis - Image
+export async function analyzeVerticalHorizontalImage(
+  mediaData: string,
+  sessionId: string,
+  selectedModel: ModelType = "openai",
+  title?: string
+) {
+  console.log(`Analyzing image for V/H Orientation with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/image/vertical-horizontal", {
+    mediaData,
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("V/H Orientation image analysis response:", data);
+  
+  // Extract the analysis text into a proper message format if missing
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from V/H Orientation image analysis insights");
+      let analysisContent = '';
+      
+      // Try to extract analysis text from different possible formats
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
 // Vertical vs. Horizontal Orientation Analysis - Text
 export async function analyzeVerticalHorizontalText(
   content: string,
