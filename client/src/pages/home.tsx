@@ -110,7 +110,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const [copied, setCopied] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelType>("openai");
+  const [selectedModel, setSelectedModel] = useState<ModelType>("grok");
   const [documentName, setDocumentName] = useState<string>("");
   const [selectedAnalysisType, setSelectedAnalysisType] = useState<string | null>(null);
   
@@ -3075,6 +3075,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 <SelectValue placeholder="Select AI Model" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="grok">知 5</SelectItem>
                 <SelectItem value="anthropic">知 1</SelectItem>
                 <SelectItem value="openai">知 2</SelectItem>
                 <SelectItem value="deepseek">知 3</SelectItem>
@@ -3380,7 +3381,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       toast({
                         title: "Analysis Complete",
                         description: "Your image has been analyzed with " + 
-                          (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
+                          (selectedModel === "grok" ? "知 5" : selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                       });
                     } catch (error) {
                       console.error("Image analysis error:", error);
@@ -3396,7 +3397,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
+                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "grok" ? "知 5" : selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
                 <div className="pt-4 mt-4 border-t">
                   <p className="text-sm font-semibold mb-2">MBTI Analysis (Image)</p>
@@ -3497,7 +3498,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                       toast({
                         title: "Analysis Complete",
                         description: "Your video has been analyzed with " + 
-                          (selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
+                          (selectedModel === "grok" ? "知 5" : selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"),
                       });
                     } catch (error) {
                       console.error("Video analysis error:", error);
@@ -3513,7 +3514,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing || !mediaData}
                 >
-                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
+                  {messages.length > 0 ? "Re-Analyze" : "Analyze"} with {selectedModel === "grok" ? "知 5" : selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
                 <div className="pt-4 mt-4 border-t">
                   <p className="text-sm font-semibold mb-2">MBTI Analysis (Video)</p>
@@ -3595,7 +3596,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="w-full"
                   disabled={isAnalyzing}
                 >
-                  Re-Analyze with {selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
+                  Re-Analyze with {selectedModel === "grok" ? "知 5" : selectedModel === "openai" ? "知 2" : selectedModel === "anthropic" ? "知 1" : selectedModel === "deepseek" ? "知 3" : "知 4"}
                 </Button>
               </div>
             )}

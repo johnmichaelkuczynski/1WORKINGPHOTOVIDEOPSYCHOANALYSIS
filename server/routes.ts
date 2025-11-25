@@ -24,6 +24,7 @@ import * as mammoth from 'mammoth';
 // Initialize API clients with proper error handling for missing keys
 let openai: OpenAI | null = null;
 let anthropic: Anthropic | null = null;
+let grokClient: OpenAI | null = null;
 
 // Check if OpenAI API key is available
 if (process.env.OPENAI_API_KEY) {
@@ -47,6 +48,21 @@ if (process.env.ANTHROPIC_API_KEY) {
   }
 } else {
   console.warn("ANTHROPIC_API_KEY environment variable is not set. Anthropic API functionality will be limited.");
+}
+
+// Check if xAI/Grok API key is available (uses OpenAI SDK with different base URL)
+if (process.env.XAI_API_KEY) {
+  try {
+    grokClient = new OpenAI({ 
+      apiKey: process.env.XAI_API_KEY,
+      baseURL: "https://api.x.ai/v1"
+    });
+    console.log("Grok/xAI client initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize Grok/xAI client:", error);
+  }
+} else {
+  console.warn("XAI_API_KEY environment variable is not set. Grok/xAI API functionality will be limited.");
 }
 
 // Perplexity AI client
@@ -443,6 +459,19 @@ Return JSON:
           };
         }
       }
+      else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok/xAI for text analysis');
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an expert literary psychologist and personality analyst." },
+            { role: "user", content: textAnalysisPrompt }
+          ],
+          response_format: { type: "json_object" }
+        });
+        
+        analysisResult = JSON.parse(completion.choices[0].message.content || "{}");
+      }
       else {
         return res.status(503).json({ 
           error: "Selected AI model is not available. Please try again with a different model." 
@@ -622,6 +651,18 @@ Provide a comprehensive analysis of this document, including:
         });
         
         analysisText = response.text;
+      }
+      else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok/xAI for document analysis');
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an expert in document analysis and personality assessment." },
+            { role: "user", content: documentAnalysisPrompt }
+          ]
+        });
+        
+        analysisText = completion.choices[0].message.content || "";
       }
       else {
         return res.status(503).json({ 
@@ -841,6 +882,28 @@ Provide a comprehensive analysis of this document, including:
         });
         
         aiResponseText = response.text;
+      }
+      else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok/xAI for chat');
+        const systemPrompt = analysisContext ? 
+          `You are an AI assistant specialized in personality analysis. ${analysisContext}` :
+          "You are an AI assistant specialized in personality analysis. Be helpful, informative, and engaging.";
+        
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { 
+              role: "system", 
+              content: systemPrompt
+            },
+            ...conversationHistory.map(msg => ({
+              role: msg.role as any,
+              content: msg.content
+            }))
+          ]
+        });
+        
+        aiResponseText = completion.choices[0].message.content || "";
       }
       else {
         return res.status(503).json({ 
@@ -1528,6 +1591,31 @@ Provide your analysis in JSON format:
             confidence: "Low - parsing error"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{ role: "user", content: mbtiTextPrompt }],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: "Analysis completed but formatting error occurred.",
+            detailed_analysis: {
+              introversion_extraversion: rawResponse.substring(0, 500),
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              deeper_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
       } else {
         return res.status(400).json({ 
           error: "Selected AI model is not available. Please try again with a different model." 
@@ -1789,6 +1877,34 @@ Provide your analysis in JSON format:
           analysisResult = JSON.parse(jsonText);
         } catch (parseError) {
           console.error("Failed to parse Perplexity response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000),
+            detailed_analysis: {
+              introversion_extraversion: "See summary for details",
+              sensing_intuition: "See summary for details",
+              thinking_feeling: "See summary for details",
+              judging_perceiving: "See summary for details",
+              deeper_signals: "See summary for details"
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low - parsing error"
+          };
+        }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an expert MBTI analyst specializing in analyzing written documents for personality indicators." },
+            { role: "user", content: mbtiDocumentPrompt }
+          ],
+          response_format: { type: "json_object" },
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
           analysisResult = {
             summary: rawResponse.substring(0, 1000),
             detailed_analysis: {
@@ -8057,6 +8173,7 @@ Provide your analysis in JSON format:
         openai: !!openai,
         anthropic: !!anthropic,
         perplexity: !!process.env.PERPLEXITY_API_KEY,
+        grok: !!grokClient,
         aws: !!process.env.AWS_ACCESS_KEY_ID && !!process.env.AWS_SECRET_ACCESS_KEY,
         facepp: !!process.env.FACEPP_API_KEY && !!process.env.FACEPP_API_SECRET,
         sendgrid: !!process.env.SENDGRID_API_KEY && !!process.env.SENDGRID_VERIFIED_SENDER,
@@ -8509,6 +8626,23 @@ Provide exceptionally thorough analysis with rich detail and extensive text evid
           throw new Error("Could not extract JSON from Perplexity response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: personalityStructurePrompt
+          }, {
+            role: "user",
+            content: `Analyze this text comprehensively:\n\n${textContent}`
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available" });
       }
@@ -8853,6 +8987,23 @@ Provide exceptionally thorough clinical analysis with rich detail and specific e
           throw new Error("Could not extract JSON from Perplexity response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: clinicalPrompt
+          }, {
+            role: "user",
+            content: textContent
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available" });
       }
@@ -9169,6 +9320,23 @@ Provide exceptionally thorough affective/anxiety analysis with rich detail and m
         } else {
           throw new Error("Could not extract JSON from Perplexity response");
         }
+        
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: anxietyPrompt
+          }, {
+            role: "user",
+            content: textContent
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
         
       } else {
         return res.status(400).json({ error: "Selected AI model is not available" });
@@ -9496,6 +9664,23 @@ ${textContent}`;
           throw new Error("Could not extract JSON from Anthropic response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: evoPrompt
+          }, {
+            role: "user",
+            content: `Analyze this text using the EVO Psych 10-Pole framework:\n\n${textContent}`
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
       }
@@ -9693,6 +9878,23 @@ ${textContent}`;
         } else {
           throw new Error("Could not extract JSON from Anthropic response");
         }
+        
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: vhPrompt
+          }, {
+            role: "user",
+            content: `Analyze this text for Vertical vs. Horizontal orientation:\n\n${textContent}`
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.5,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
         
       } else {
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
@@ -9902,6 +10104,32 @@ Never explain. Return only JSON.`;
         } else {
           throw new Error("Could not extract JSON from Anthropic response");
         }
+        
+      } else if (selectedModel === "grok" && grokClient) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: vhImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this image for Vertical vs. Horizontal visual orientation."
+            }, {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Data}`
+              }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
         
       } else {
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
@@ -10591,6 +10819,37 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
           throw new Error("Could not extract JSON from Anthropic response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: evoImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "text",
+              text: "Analyze this image using the EVO Psych 10-Pole visual framework."
+            }, {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Data}`
+              }
+            }]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Grok response");
+        }
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
       }
@@ -10930,6 +11189,41 @@ Return ONLY valid JSON:
           throw new Error("Could not extract JSON from Anthropic response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const grokContentArray: any[] = [{
+          type: "text",
+          text: `CRITICAL: The FULL TRANSCRIPT is in the system prompt. You MUST quote directly from it for EVERY benchmark score. These are ${extractedFrames.length} video frames at 0%, 25%, 50%, 75%, 100% for visual evidence.`
+        }];
+        
+        extractedFrames.forEach((frameData) => {
+          const base64Data = frameData.split(',')[1] || frameData;
+          grokContentArray.push({
+            type: "image_url",
+            image_url: { url: `data:image/jpeg;base64,${base64Data}` }
+          });
+        });
+        
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: evoVideoPrompt
+          }, {
+            role: "user",
+            content: grokContentArray
+          }],
+          max_tokens: 16000,
+          temperature: 0.5,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Grok response");
+        }
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
       }
@@ -11205,6 +11499,27 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
           throw new Error("Could not extract JSON from Anthropic response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: clinicalImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${base64Data}` }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
       }
@@ -11423,6 +11738,27 @@ Provide thorough visual affective analysis framed as hypothetical educational in
         } else {
           throw new Error("Could not extract JSON from Anthropic response");
         }
+        
+      } else if (selectedModel === "grok" && grokClient) {
+        const base64Data = mediaData.split(',')[1] || mediaData;
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: anxietyImagePrompt
+          }, {
+            role: "user",
+            content: [{
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${base64Data}` }
+            }]
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        analysisResult = JSON.parse(rawResponse);
         
       } else {
         return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
@@ -11697,6 +12033,39 @@ Provide thorough behavioral analysis across timeline framed as hypothetical educ
           throw new Error("Could not extract JSON from Anthropic response");
         }
         
+      } else if (selectedModel === "grok" && grokClient) {
+        const grokImageContent = extractedFrames.map((frame) => {
+          const base64Data = frame.split(',')[1] || frame;
+          return {
+            type: "image_url" as const,
+            image_url: { url: `data:image/jpeg;base64,${base64Data}` }
+          };
+        });
+        
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: clinicalVideoPrompt
+          }, {
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps):` },
+              ...grokImageContent
+            ]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Grok response");
+        }
+        
       } else {
         return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
       }
@@ -11967,6 +12336,39 @@ Provide thorough temporal affective/anxiety analysis framed as hypothetical educ
           analysisResult = JSON.parse(jsonMatch[0]);
         } else {
           throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else if (selectedModel === "grok" && grokClient) {
+        const grokImageContent = extractedFrames.map((frame) => {
+          const base64Data = frame.split(',')[1] || frame;
+          return {
+            type: "image_url" as const,
+            image_url: { url: `data:image/jpeg;base64,${base64Data}` }
+          };
+        });
+        
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "system",
+            content: anxietyVideoPrompt
+          }, {
+            role: "user",
+            content: [
+              { type: "text", text: `Analyze these 4 frames from the video (at 0%, 25%, 50%, and 75% timestamps) for comprehensive affective/anxiety assessment:` },
+              ...grokImageContent
+            ]
+          }],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Grok response");
         }
         
       } else {

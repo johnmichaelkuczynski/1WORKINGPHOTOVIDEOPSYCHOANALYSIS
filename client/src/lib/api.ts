@@ -1,7 +1,7 @@
 import { apiRequest } from "./queryClient";
 
 // Type definitions for enhanced API functionality
-export type ModelType = "openai" | "anthropic" | "perplexity";
+export type ModelType = "openai" | "anthropic" | "perplexity" | "grok";
 export type MediaType = "image" | "video" | "document" | "text";
 
 export async function uploadMedia(

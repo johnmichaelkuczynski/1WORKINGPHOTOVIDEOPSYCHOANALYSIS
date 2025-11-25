@@ -27,11 +27,11 @@ The platform is built with a React.js frontend (TypeScript, Tailwind CSS, shadcn
 - **UI/UX:** Features a clean interface with capabilities for re-analysis and email sharing. Sidebar width optimized to 14rem (56) for full button text visibility. Color-coded analysis buttons (purple for Personality, red-orange for Clinical, teal-cyan for Anxiety, green-emerald for EVO Psych).
 - **Comprehensive Analysis Frameworks:** Implements detailed 50-question frameworks for image, video, and text analysis, and a 100-question framework for comprehensive text analysis, ensuring evidence-based results with specific references.
 - **Robust Error Handling:** Consistent JSON.stringify usage for result formatting.
-- **AI Model Naming:** Displays AI models elegantly as 知 1-4 using the Chinese character for "knowledge" for enhanced user experience.
+- **AI Model Naming:** Displays AI models elegantly as 知 1-5 using the Chinese character for "knowledge" for enhanced user experience. 知 5 (Grok/xAI) is the default model.
 - **Grounded Analysis:** AI prompts are designed to receive structured visual data and scene context, preventing fabrication and ensuring analysis is based on actual visual evidence.
 
 ## External Dependencies
-- **AI Services**: OpenAI (GPT-4o, Whisper), Anthropic (Claude), Perplexity
+- **AI Services**: OpenAI (GPT-4o, Whisper), Anthropic (Claude), Perplexity, Grok/xAI (grok-2-1212, grok-2-vision-1212)
 - **Facial Analysis**: AWS Rekognition, Face++
 - **Email Service**: SendGrid
 - **Storage**: In-memory session management
