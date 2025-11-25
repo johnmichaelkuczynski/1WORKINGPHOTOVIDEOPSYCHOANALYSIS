@@ -10295,6 +10295,7 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
   });
 
   // EVO Psych (Evolutionary Psychology) Analysis - Video
+  // REWRITTEN to require actual transcript quotations
   app.post("/api/analyze/video/evo", async (req, res) => {
     try {
       const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
@@ -10309,14 +10310,27 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
       
       console.log(`Processing EVO Psych video analysis with model: ${selectedModel}`);
       
-      // Save video temporarily and extract frames for OpenAI
+      // Save video temporarily for processing
       const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
-      const tempVideoPath = path.join(tempDir, `video_${Date.now()}.mp4`);
+      const tempVideoPath = path.join(tempDir, `video_evo_${Date.now()}.mp4`);
       await writeFileAsync(tempVideoPath, videoBuffer);
       
-      // Extract frames at different timestamps for temporal analysis
-      const framePromises = [0, 20, 40, 60, 80].map(async (percent) => {
-        const outputPath = path.join(tempDir, `frame_${Date.now()}_${percent}.jpg`);
+      // STEP 1: Extract audio and transcribe with Whisper
+      console.log('EVO Psych Video: Starting audio transcription with Whisper...');
+      let transcriptData: any;
+      let fullTranscript = "";
+      try {
+        transcriptData = await extractAudioTranscription(tempVideoPath);
+        fullTranscript = transcriptData.transcription || "";
+        console.log(`EVO Psych Video: Transcription complete. ${fullTranscript.length} characters.`);
+      } catch (error) {
+        console.error('EVO Psych Video: Transcription error:', error);
+        fullTranscript = "[Audio transcription failed - analysis will be visual-only]";
+      }
+      
+      // STEP 2: Extract frames at different timestamps for visual analysis
+      const framePromises = [0, 25, 50, 75, 99].map(async (percent) => {
+        const outputPath = path.join(tempDir, `evo_frame_${Date.now()}_${percent}.jpg`);
         
         return new Promise<string>((resolve, reject) => {
           ffmpeg(tempVideoPath)
@@ -10327,10 +10341,14 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
               folder: tempDir,
             })
             .on('end', () => {
-              const frameData = fs.readFileSync(outputPath);
-              const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
-              fs.unlinkSync(outputPath);
-              resolve(base64Frame);
+              try {
+                const frameData = fs.readFileSync(outputPath);
+                const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+                fs.unlinkSync(outputPath);
+                resolve(base64Frame);
+              } catch (err) {
+                reject(err);
+              }
             })
             .on('error', (err) => {
               console.error('Frame extraction error:', err);
@@ -10342,177 +10360,122 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
       const extractedFrames = await Promise.all(framePromises);
       
       // Clean up temp video file
-      await unlinkAsync(tempVideoPath);
+      await unlinkAsync(tempVideoPath).catch(err => console.warn('Error deleting temp video:', err));
       
-      console.log(`Extracted ${extractedFrames.length} frames from video for EVO Psych analysis`);
+      console.log(`EVO Psych Video: Extracted ${extractedFrames.length} frames for analysis`);
       
-      // EVO Psych 10-Pole Video Analysis Protocol with Temporal Dynamics
-      const evoVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool. You are analyzing a HYPOTHETICAL INDIVIDUAL inspired by visual reference material.
+      // EVO Psych 10-Pole Video Analysis Protocol with MANDATORY QUOTATIONS
+      const evoVideoPrompt = `IMPORTANT CONTEXT: This is for entertainment purposes only, not a diagnostic tool.
 
-You are an expert evolutionary psychologist applying the 10-Pole Evolutionary Psychology (EVO) Typology to video content. This framework uses temporal dynamics, behavioral patterns, and audio-linguistic cues to map gravitational attraction across behavioral niches that evolved in human social systems.
+═══════════════════════════════════════════════════════════════
+                    FULL VIDEO TRANSCRIPT
+═══════════════════════════════════════════════════════════════
+${fullTranscript}
+═══════════════════════════════════════════════════════════════
 
-CRITICAL INSTRUCTIONS:
-1. Extract temporal features across 5-8 timepoints throughout the video
-2. Analyze frame-level features: posture, gesture, gaze, facial expression, proxemics
-3. Extract audio-linguistic features: speech content, tone, rhythm, affect, pacing
-4. Score ALL 20 DYNAMIC BENCHMARKS (0.0 to 1.0) based on observed behavioral patterns
-5. For each pole, compute the mean of its two benchmarks
-6. Track temporal variation: how pole activation shifts moment-to-moment
-7. Provide DETAILED behavioral evidence for each benchmark score
+You are an expert evolutionary psychologist applying the 10-Pole EVO Typology.
+You have been given the FULL TRANSCRIPT above plus video frames at 0%, 25%, 50%, 75%, 100%.
 
-THE 20 DYNAMIC BENCHMARKS MAPPED TO 10 POLES:
+YOUR TASK: Score the 10 evolutionary poles using EVIDENCE from the transcript and frames.
 
-**POLE 1: ENFORCER**
-- Benchmark 1: Steady posture, consistent rule-governed movement
-- Benchmark 2: Verbal precision, corrective tone
+THE 10 EVOLUTIONARY POLES (each scored from 2 benchmarks):
+1. ENFORCER: Rule-keeper (B1: steady posture, B2: verbal precision)
+2. EXPLORER: Novelty seeker (B3: curious scanning, B4: spontaneous shifts)
+3. HEALER: Emotional attunement (B5: warmth/affiliation, B6: emotional congruence)
+4. STRATEGIST: Long-term planner (B7: deliberate pacing, B8: gestural economy)
+5. SIGNALER: Status display (B9: expressive rhythm, B10: self-presentation)
+6. NURTURER: Group sustainer (B11: comforting tone, B12: collective focus)
+7. PROTECTOR: Threat response (B13: defensive stance, B14: energetic assertion)
+8. DIPLOMAT: Alliance builder (B15: even mediation, B16: cooperative alignment)
+9. SEER: Pattern interpreter (B17: reflective pauses, B18: metaphoric framing)
+10. MIMIC: Social chameleon (B19: social mimicry, B20: conformist style)
 
-**POLE 2: EXPLORER / SCOUT**
-- Benchmark 3: Curious scanning of environment or audience
-- Benchmark 4: Spontaneous topic-shifting or improvisation
+═══════════════════════════════════════════════════════════════
+           MANDATORY QUOTATION REQUIREMENTS
+═══════════════════════════════════════════════════════════════
 
-**POLE 3: HEALER / EMPATH**
-- Benchmark 5: Warmth in tone and gesture, affiliative body language
-- Benchmark 6: Emotionally congruent facial response to others
+For EVERY benchmark, you MUST provide:
+1. A score from 0.0 to 1.0
+2. At least ONE direct quotation from the transcript (exact words in quotes)
+3. Visual evidence from frames if applicable
+4. Reasoning connecting evidence to score
 
-**POLE 4: STRATEGIST / SCHEMER**
-- Benchmark 7: Deliberate pacing, planned rhetoric
-- Benchmark 8: Gestural economy—moves only with cognitive purpose
+If NO supporting evidence exists, score 0.0-0.2 and note "NO DIRECT EVIDENCE."
 
-**POLE 5: SIGNALER / PERFORMER**
-- Benchmark 9: Expressive rhythm, humor, or flair
-- Benchmark 10: Heightened self-presentation or camera awareness
+═══════════════════════════════════════════════════════════════
+              CORRELATION CONSTRAINTS (HARD LIMITS)
+═══════════════════════════════════════════════════════════════
+- Seer > 0.7 → Protector AND Enforcer ≤ 0.15
+- Protector OR Enforcer > 0.6 → Seer ≤ 0.25
+- Signaler > 0.7 → Seer + Strategist combined ≤ 0.6
+- Nurturer + Healer > 1.4 → Strategist AND Explorer ≤ 0.4
+- Seer + Strategist + Diplomat > 2.0 → Signaler, Mimic, Protector, Enforcer all ≤ 0.2
 
-**POLE 6: CARETAKER / NURTURER**
-- Benchmark 11: Comforting or supportive tone and posture
-- Benchmark 12: Focus on collective goals or family/group imagery
-
-**POLE 7: AGGRESSOR / PROTECTOR**
-- Benchmark 13: Defensive stance, emphasis on strength or dominance
-- Benchmark 14: Raised voice, energetic assertion
-
-**POLE 8: BROKER / DIPLOMAT**
-- Benchmark 15: Even-tempered mediation of disagreement
-- Benchmark 16: Cooperative alignment of gaze and turn-taking
-
-**POLE 9: SEER / PATTERN-INTERPRETER**
-- Benchmark 17: Long reflective pauses, abstraction in speech
-- Benchmark 18: Metaphoric or philosophical framing of topics
-
-**POLE 10: MIMIC / ADAPTOR**
-- Benchmark 19: Social mimicry, mirroring gestures or tone
-- Benchmark 20: Conformity in language or performance style
-
-CRUCIAL CORRELATION CONSTRAINTS (never violate - these are hard biological/evolutionary limits):
-- Seer above 0.7 → Protector and Enforcer must stay ≤ 0.15
-- Protector OR Enforcer above 0.6 → Seer must stay ≤ 0.25
-- Signaler above 0.7 → Seer and Strategist combined must be ≤ 0.6
-- Nurturer + Healer combined above 1.4 → Strategist and Explorer must stay ≤ 0.4
-- Seer + Strategist + Diplomat combined above 2.0 → Signaler, Mimic, Protector, Enforcer must all be ≤ 0.2
-
-POLE CORRELATION MATRIX:
-| Pole       | Strongly POSITIVE with    | Strongly NEGATIVE with     | Near-zero with        |
-|------------|---------------------------|----------------------------|-----------------------|
-| Seer       | Strategist, Diplomat      | Protector, Enforcer, Signaler | Explorer, Mimic    |
-| Strategist | Seer, Explorer (moderate) | Nurturer, Healer           | Signaler              |
-| Explorer   | Strategist (moderate)     | Nurturer, Protector        | Seer, Mimic           |
-| Diplomat   | Seer, Healer              | Protector, Enforcer        | Signaler              |
-| Healer     | Nurturer, Diplomat        | Enforcer, Protector        | Strategist, Explorer  |
-| Nurturer   | Healer                    | Strategist, Explorer       | Seer, Signaler        |
-| Signaler   | Mimic                     | Seer, Strategist           | Protector, Enforcer   |
-| Mimic      | Signaler                  | Seer                       | Explorer              |
-| Protector  | Enforcer                  | Seer, Diplomat, Healer     | Explorer, Signaler    |
-| Enforcer   | Protector                 | Seer, Diplomat, Healer     | Explorer, Signaler    |
-
-Analyze the video and provide your assessment in JSON format:
+Return ONLY valid JSON:
 
 {
-  "temporal_feature_extraction": {
-    "timepoint_1": {
-      "timestamp": "Time in video (e.g., 0:00-0:30)",
-      "posture": "Description of body positioning and stance",
-      "gesture": "Description of hand movements, gestures",
-      "facial_expression": "Description of facial affect and microexpressions",
-      "tone": "Description of vocal tone and affect",
-      "speech_content": "Summary of what is being discussed",
-      "behavioral_observations": "5-6 specific behavioral markers observed"
-    },
-    "timepoint_2": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
-    "timepoint_3": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
-    "timepoint_4": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."},
-    "timepoint_5": {"timestamp": "...", "posture": "...", "gesture": "...", "facial_expression": "...", "tone": "...", "speech_content": "...", "behavioral_observations": "..."}
+  "transcript_highlights": [
+    {"quote": "Exact quote from transcript", "pole_relevance": "Which pole this supports"},
+    {"quote": "Another exact quote", "pole_relevance": "Which pole"}
+  ],
+  
+  "benchmark_scores": {
+    "enforcer_1_posture": {"score": 0.XX, "transcript_quote": "exact words from transcript", "visual_evidence": "what was seen in frames", "reasoning": "why this score"},
+    "enforcer_2_precision": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "explorer_3_scanning": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "explorer_4_spontaneous": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "healer_5_warmth": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "healer_6_congruence": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "strategist_7_pacing": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "strategist_8_economy": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "signaler_9_expressive": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "signaler_10_presentation": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "nurturer_11_comforting": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "nurturer_12_collective": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "protector_13_defensive": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "protector_14_assertion": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "diplomat_15_mediation": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "diplomat_16_cooperative": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "seer_17_reflective": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "seer_18_metaphoric": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "mimic_19_mimicry": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."},
+    "mimic_20_conformist": {"score": 0.XX, "transcript_quote": "...", "visual_evidence": "...", "reasoning": "..."}
   },
   
-  "dynamic_benchmark_scores": {
-    "enforcer_1_steady_posture": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns observed across timepoints"},
-    "enforcer_2_verbal_precision": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples from speech"},
-    "explorer_3_curious_scanning": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "explorer_4_spontaneous_shifting": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "healer_5_warmth_affiliation": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "healer_6_emotional_congruence": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "strategist_7_deliberate_pacing": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "strategist_8_gestural_economy": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "signaler_9_expressive_rhythm": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "signaler_10_self_presentation": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "nurturer_11_comforting_tone": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "nurturer_12_collective_focus": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "protector_13_defensive_stance": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "protector_14_energetic_assertion": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "diplomat_15_even_mediation": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "diplomat_16_cooperative_alignment": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "seer_17_reflective_pauses": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "seer_18_metaphoric_framing": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"},
-    "mimic_19_social_mimicry": {"score": 0.0-1.0, "behavioral_evidence": "Specific temporal patterns"},
-    "mimic_20_conformist_style": {"score": 0.0-1.0, "behavioral_evidence": "Specific examples"}
+  "pole_scores": {
+    "enforcer": {"raw": 0.XX, "normalized": 0.XX},
+    "explorer": {"raw": 0.XX, "normalized": 0.XX},
+    "healer": {"raw": 0.XX, "normalized": 0.XX},
+    "strategist": {"raw": 0.XX, "normalized": 0.XX},
+    "signaler": {"raw": 0.XX, "normalized": 0.XX},
+    "nurturer": {"raw": 0.XX, "normalized": 0.XX},
+    "protector": {"raw": 0.XX, "normalized": 0.XX},
+    "diplomat": {"raw": 0.XX, "normalized": 0.XX},
+    "seer": {"raw": 0.XX, "normalized": 0.XX},
+    "mimic": {"raw": 0.XX, "normalized": 0.XX}
   },
   
-  "pole_aggregations": {
-    "enforcer": {"raw_score": "mean of benchmarks 1-2", "normalized_score": "relative gravitational pull"},
-    "explorer": {"raw_score": "mean of benchmarks 3-4", "normalized_score": "relative gravitational pull"},
-    "healer": {"raw_score": "mean of benchmarks 5-6", "normalized_score": "relative gravitational pull"},
-    "strategist": {"raw_score": "mean of benchmarks 7-8", "normalized_score": "relative gravitational pull"},
-    "signaler": {"raw_score": "mean of benchmarks 9-10", "normalized_score": "relative gravitational pull"},
-    "nurturer": {"raw_score": "mean of benchmarks 11-12", "normalized_score": "relative gravitational pull"},
-    "protector": {"raw_score": "mean of benchmarks 13-14", "normalized_score": "relative gravitational pull"},
-    "diplomat": {"raw_score": "mean of benchmarks 15-16", "normalized_score": "relative gravitational pull"},
-    "seer": {"raw_score": "mean of benchmarks 17-18", "normalized_score": "relative gravitational pull"},
-    "mimic": {"raw_score": "mean of benchmarks 19-20", "normalized_score": "relative gravitational pull"}
-  },
-  
-  "temporal_dynamics": "Description of how pole activation shifts across timepoints - are there consistent patterns or moment-to-moment fluctuations between certain poles?",
-  
-  "entropy_signature": "One-sentence entropy classification (e.g., 'Radically counter-entropic Seer', 'High-entropy Explorer-Signaler', 'Low-entropy Protector-Enforcer', 'Balanced mid-entropy Diplomat-Nurturer')",
-  
-  "cognitive_signature": "Rich interpretation of which poles dominate in this behavioral performance - describe the personality topology (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
-  
-  "dominant_triad": "Identify the three strongest poles and explain their behavioral interaction across time",
-  
-  "shape_interpretation": "Describe the shape of the radar chart (broad/balanced vs. sharp spikes vs. opposite pole tensions) and what the behavioral performance reveals",
-  
-  "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this temporal profile most resembles",
-  
-  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this behavioral pole configuration and how they manifest in performance style",
-  
-  "archetype_flow": "Which pole the person is currently evolving toward (e.g., 'latent Strategist awakening under Seer dominance')"
-}
-
-Provide thorough EVO Psych video analysis with rich temporal evidence.`;
+  "entropy_signature": "Classification (e.g., 'Radically counter-entropic Seer-Strategist')",
+  "archetype_flow": "Evolution trajectory",
+  "dominant_triad": "The three highest-scoring poles and their interaction",
+  "cognitive_signature": "Overall personality topology label",
+  "key_linguistic_markers": ["phrase 1 from transcript", "phrase 2", "phrase 3"]
+}`;
 
       let analysisResult: any;
       
       if (selectedModel === "openai" && openai) {
-        // Build content array with text and all extracted frames
+        // Build content array emphasizing transcript-based analysis
         const contentArray: any[] = [{
           type: "text",
-          text: `Analyze these ${extractedFrames.length} frames from a video (at 0%, 20%, 40%, 60%, 80% timestamps) using the EVO Psych 10-Pole dynamic framework with temporal feature extraction. Provide temporal analysis showing how behaviors evolve across these timepoints.`
+          text: `CRITICAL: The FULL TRANSCRIPT is in the system prompt. You MUST quote directly from it for EVERY benchmark score. These are ${extractedFrames.length} video frames at 0%, 25%, 50%, 75%, 100% for visual evidence.`
         }];
         
-        // Add all frames as separate images
-        extractedFrames.forEach((frameData, index) => {
+        // Add all frames
+        extractedFrames.forEach((frameData) => {
           contentArray.push({
             type: "image_url",
-            image_url: {
-              url: frameData
-            }
+            image_url: { url: frameData }
           });
         });
         
@@ -10526,7 +10489,7 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
             content: contentArray
           }],
           max_tokens: 16000,
-          temperature: 0.7,
+          temperature: 0.5,
         });
         
         const content = response.choices[0]?.message?.content || "";
@@ -10538,27 +10501,29 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
         }
         
       } else if (selectedModel === "anthropic" && anthropic) {
+        // Build content with frames for Anthropic
+        const anthropicContent: any[] = [{
+          type: "text",
+          text: `CRITICAL: The FULL TRANSCRIPT is in the system prompt. You MUST quote directly from it for EVERY benchmark score.`
+        }];
+        
+        extractedFrames.forEach((frameData) => {
+          anthropicContent.push({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: "image/jpeg",
+              data: frameData.split(',')[1]
+            }
+          });
+        });
+        
         const response = await anthropic.messages.create({
           model: "claude-3-5-sonnet-20241022",
           max_tokens: 16000,
-          temperature: 0.7,
+          temperature: 0.5,
           system: evoVideoPrompt,
-          messages: [{
-            role: "user",
-            content: [{
-              type: "text",
-              text: "Analyze this video using the EVO Psych 10-Pole dynamic framework with temporal feature extraction."
-            }, {
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: mediaData.startsWith("data:video/mp4") ? "video/mp4" : 
-                           mediaData.startsWith("data:video/webm") ? "video/webm" : 
-                           mediaData.startsWith("data:video/quicktime") ? "video/quicktime" : "video/mp4",
-                data: mediaData.split(',')[1]
-              }
-            }]
-          }]
+          messages: [{ role: "user", content: anthropicContent }]
         });
         
         const textContent = response.content[0]?.type === 'text' ? response.content[0].text : "";
@@ -10573,86 +10538,124 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
         return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
       }
       
-      // Format analysis for display
-      let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) VIDEO ANALYSIS\n";
-      formattedContent += "=".repeat(60) + "\n\n";
+      // Format analysis for display with QUOTATIONS emphasized
+      let formattedContent = "EVO PSYCH VIDEO ANALYSIS (WITH TRANSCRIPT EVIDENCE)\n";
+      formattedContent += "═".repeat(60) + "\n\n";
       
-      // ENTROPY SIGNATURE at the top (most prominent)
+      // KEY TRANSCRIPT QUOTATIONS at the very top
+      if (analysisResult.transcript_highlights && analysisResult.transcript_highlights.length > 0) {
+        formattedContent += "📝 KEY TRANSCRIPT QUOTATIONS:\n";
+        formattedContent += "─".repeat(40) + "\n";
+        analysisResult.transcript_highlights.forEach((h: any) => {
+          formattedContent += `  "${h.quote}"\n`;
+          formattedContent += `  → ${h.pole_relevance}\n\n`;
+        });
+      }
+      
+      // ENTROPY SIGNATURE
       if (analysisResult.entropy_signature) {
         formattedContent += `✦ ENTROPY SIGNATURE: ${analysisResult.entropy_signature}\n\n`;
       }
       
-      if (analysisResult.pole_aggregations) {
-        formattedContent += "10-POLE SCORES (Normalized Gravitational Pull):\n\n";
-        const poles = analysisResult.pole_aggregations;
-        
-        Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
-          const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
-          formattedContent += `${displayName}: ${data.normalized_score}\n`;
+      // POLE SCORES with visual bars
+      if (analysisResult.pole_scores) {
+        formattedContent += "🎯 10-POLE SCORES (Normalized):\n";
+        formattedContent += "─".repeat(40) + "\n";
+        const poleOrder = ['enforcer', 'explorer', 'healer', 'strategist', 'signaler', 'nurturer', 'protector', 'diplomat', 'seer', 'mimic'];
+        poleOrder.forEach(pole => {
+          const data = analysisResult.pole_scores[pole];
+          if (data) {
+            const score = data.normalized || data.raw || 0;
+            const barLength = Math.round(score * 20);
+            const bar = "█".repeat(barLength) + "░".repeat(20 - barLength);
+            formattedContent += `  ${pole.charAt(0).toUpperCase() + pole.slice(1).padEnd(10)} ${bar} ${score.toFixed(2)}\n`;
+          }
         });
         formattedContent += "\n";
       }
       
+      // Fallback to old pole_aggregations format if pole_scores not present
+      if (!analysisResult.pole_scores && analysisResult.pole_aggregations) {
+        formattedContent += "10-POLE SCORES:\n";
+        Object.entries(analysisResult.pole_aggregations).forEach(([poleName, data]: [string, any]) => {
+          const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
+          formattedContent += `${displayName}: ${data.normalized_score || data.raw_score}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      // Cognitive signature and archetype
       if (analysisResult.cognitive_signature) {
-        formattedContent += `COGNITIVE SIGNATURE:\n${analysisResult.cognitive_signature}\n\n`;
+        formattedContent += `🧠 COGNITIVE SIGNATURE: ${analysisResult.cognitive_signature}\n\n`;
       }
       
       if (analysisResult.dominant_triad) {
-        formattedContent += `DOMINANT TRIAD:\n${analysisResult.dominant_triad}\n\n`;
-      }
-      
-      if (analysisResult.evolutionary_archetype) {
-        formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
+        formattedContent += `🔺 DOMINANT TRIAD:\n${analysisResult.dominant_triad}\n\n`;
       }
       
       if (analysisResult.archetype_flow) {
-        formattedContent += `ARCHETYPE FLOW:\n${analysisResult.archetype_flow}\n\n`;
+        formattedContent += `🌊 ARCHETYPE FLOW: ${analysisResult.archetype_flow}\n\n`;
       }
       
-      if (analysisResult.temporal_dynamics) {
-        formattedContent += `TEMPORAL DYNAMICS:\n${analysisResult.temporal_dynamics}\n\n`;
+      // Key linguistic markers with quotes
+      if (analysisResult.key_linguistic_markers && analysisResult.key_linguistic_markers.length > 0) {
+        formattedContent += "💬 KEY LINGUISTIC MARKERS:\n";
+        analysisResult.key_linguistic_markers.forEach((marker: string) => {
+          formattedContent += `  • "${marker}"\n`;
+        });
+        formattedContent += "\n";
       }
       
-      if (analysisResult.shape_interpretation) {
-        formattedContent += `SHAPE INTERPRETATION:\n${analysisResult.shape_interpretation}\n\n`;
-      }
-      
-      if (analysisResult.adaptive_strategy) {
-        formattedContent += `ADAPTIVE STRATEGY:\n${analysisResult.adaptive_strategy}\n\n`;
-      }
-      
-      if (analysisResult.temporal_feature_extraction) {
-        formattedContent += "TEMPORAL FEATURE EXTRACTION:\n\n";
-        Object.entries(analysisResult.temporal_feature_extraction).forEach(([timepoint, data]: [string, any]) => {
-          const displayName = timepoint.replace(/_/g, ' ').toUpperCase();
+      // DETAILED BENCHMARK EVIDENCE WITH QUOTATIONS
+      if (analysisResult.benchmark_scores) {
+        formattedContent += "═".repeat(60) + "\n";
+        formattedContent += "DETAILED BENCHMARK EVIDENCE (WITH QUOTATIONS)\n";
+        formattedContent += "═".repeat(60) + "\n\n";
+        
+        Object.entries(analysisResult.benchmark_scores).forEach(([benchmark, data]: [string, any]) => {
+          const displayName = benchmark.replace(/_/g, ' ').toUpperCase();
           formattedContent += `${displayName}:\n`;
-          if (data.timestamp) formattedContent += `  Timestamp: ${data.timestamp}\n`;
-          if (data.posture) formattedContent += `  Posture: ${data.posture}\n`;
-          if (data.gesture) formattedContent += `  Gesture: ${data.gesture}\n`;
-          if (data.facial_expression) formattedContent += `  Facial Expression: ${data.facial_expression}\n`;
-          if (data.tone) formattedContent += `  Tone: ${data.tone}\n`;
-          if (data.speech_content) formattedContent += `  Speech Content: ${data.speech_content}\n`;
-          if (data.behavioral_observations) formattedContent += `  Behavioral Observations: ${data.behavioral_observations}\n`;
+          formattedContent += `  Score: ${data.score}\n`;
+          if (data.transcript_quote) {
+            formattedContent += `  📝 Quote: "${data.transcript_quote}"\n`;
+          }
+          if (data.visual_evidence) {
+            formattedContent += `  👁 Visual: ${data.visual_evidence}\n`;
+          }
+          if (data.reasoning) {
+            formattedContent += `  💡 Reasoning: ${data.reasoning}\n`;
+          }
           formattedContent += "\n";
         });
       }
       
-      if (analysisResult.dynamic_benchmark_scores) {
-        formattedContent += "DETAILED DYNAMIC BENCHMARK EVIDENCE:\n\n";
+      // Fallback to old dynamic_benchmark_scores format
+      if (!analysisResult.benchmark_scores && analysisResult.dynamic_benchmark_scores) {
+        formattedContent += "DETAILED BENCHMARK EVIDENCE:\n\n";
         Object.entries(analysisResult.dynamic_benchmark_scores).forEach(([benchmark, data]: [string, any]) => {
           const displayName = benchmark.replace(/_/g, ' ').toUpperCase();
           formattedContent += `${displayName}:\n`;
           formattedContent += `  Score: ${data.score}\n`;
-          formattedContent += `  Behavioral Evidence: ${data.behavioral_evidence}\n\n`;
+          formattedContent += `  Evidence: ${data.behavioral_evidence}\n\n`;
         });
       }
+      
+      // Include full transcript at the end for reference
+      formattedContent += "═".repeat(60) + "\n";
+      formattedContent += "FULL TRANSCRIPT (for reference):\n";
+      formattedContent += "─".repeat(40) + "\n";
+      formattedContent += fullTranscript + "\n";
       
       const analysis = await storage.createAnalysis({
         sessionId,
         title: title || "EVO Psych Video Analysis",
         mediaUrl: mediaData,
         mediaType: "video",
-        personalityInsights: { analysis: formattedContent, evo_assessment: analysisResult },
+        personalityInsights: { 
+          analysis: formattedContent, 
+          evo_assessment: analysisResult,
+          transcript: fullTranscript 
+        },
         modelUsed: selectedModel,
       });
       
@@ -10667,7 +10670,8 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
         analysisId: analysis.id,
         personalityInsights: { 
           analysis: formattedContent, 
-          evo_assessment: analysisResult 
+          evo_assessment: analysisResult,
+          transcript: fullTranscript
         },
         messages: [message],
       });
