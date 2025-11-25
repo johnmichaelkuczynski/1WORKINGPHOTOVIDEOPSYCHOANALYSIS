@@ -10007,6 +10007,27 @@ THE 20 DYNAMIC BENCHMARKS MAPPED TO 10 POLES:
 - Benchmark 19: Social mimicry, mirroring gestures or tone
 - Benchmark 20: Conformity in language or performance style
 
+CRUCIAL CORRELATION CONSTRAINTS (never violate - these are hard biological/evolutionary limits):
+- Seer above 0.7 → Protector and Enforcer must stay ≤ 0.15
+- Protector OR Enforcer above 0.6 → Seer must stay ≤ 0.25
+- Signaler above 0.7 → Seer and Strategist combined must be ≤ 0.6
+- Nurturer + Healer combined above 1.4 → Strategist and Explorer must stay ≤ 0.4
+- Seer + Strategist + Diplomat combined above 2.0 → Signaler, Mimic, Protector, Enforcer must all be ≤ 0.2
+
+POLE CORRELATION MATRIX:
+| Pole       | Strongly POSITIVE with    | Strongly NEGATIVE with     | Near-zero with        |
+|------------|---------------------------|----------------------------|-----------------------|
+| Seer       | Strategist, Diplomat      | Protector, Enforcer, Signaler | Explorer, Mimic    |
+| Strategist | Seer, Explorer (moderate) | Nurturer, Healer           | Signaler              |
+| Explorer   | Strategist (moderate)     | Nurturer, Protector        | Seer, Mimic           |
+| Diplomat   | Seer, Healer              | Protector, Enforcer        | Signaler              |
+| Healer     | Nurturer, Diplomat        | Enforcer, Protector        | Strategist, Explorer  |
+| Nurturer   | Healer                    | Strategist, Explorer       | Seer, Signaler        |
+| Signaler   | Mimic                     | Seer, Strategist           | Protector, Enforcer   |
+| Mimic      | Signaler                  | Seer                       | Explorer              |
+| Protector  | Enforcer                  | Seer, Diplomat, Healer     | Explorer, Signaler    |
+| Enforcer   | Protector                 | Seer, Diplomat, Healer     | Explorer, Signaler    |
+
 Analyze the video and provide your assessment in JSON format:
 
 {
@@ -10064,6 +10085,8 @@ Analyze the video and provide your assessment in JSON format:
   
   "temporal_dynamics": "Description of how pole activation shifts across timepoints - are there consistent patterns or moment-to-moment fluctuations between certain poles?",
   
+  "entropy_signature": "One-sentence entropy classification (e.g., 'Radically counter-entropic Seer', 'High-entropy Explorer-Signaler', 'Low-entropy Protector-Enforcer', 'Balanced mid-entropy Diplomat-Nurturer')",
+  
   "cognitive_signature": "Rich interpretation of which poles dominate in this behavioral performance - describe the personality topology (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
   
   "dominant_triad": "Identify the three strongest poles and explain their behavioral interaction across time",
@@ -10072,7 +10095,9 @@ Analyze the video and provide your assessment in JSON format:
   
   "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this temporal profile most resembles",
   
-  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this behavioral pole configuration and how they manifest in performance style"
+  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this behavioral pole configuration and how they manifest in performance style",
+  
+  "archetype_flow": "Which pole the person is currently evolving toward (e.g., 'latent Strategist awakening under Seer dominance')"
 }
 
 Provide thorough EVO Psych video analysis with rich temporal evidence.`;
@@ -10157,20 +10182,9 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
       let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) VIDEO ANALYSIS\n";
       formattedContent += "=".repeat(60) + "\n\n";
       
-      if (analysisResult.temporal_feature_extraction) {
-        formattedContent += "TEMPORAL FEATURE EXTRACTION:\n\n";
-        Object.entries(analysisResult.temporal_feature_extraction).forEach(([timepoint, data]: [string, any]) => {
-          const displayName = timepoint.replace(/_/g, ' ').toUpperCase();
-          formattedContent += `${displayName}:\n`;
-          if (data.timestamp) formattedContent += `  Timestamp: ${data.timestamp}\n`;
-          if (data.posture) formattedContent += `  Posture: ${data.posture}\n`;
-          if (data.gesture) formattedContent += `  Gesture: ${data.gesture}\n`;
-          if (data.facial_expression) formattedContent += `  Facial Expression: ${data.facial_expression}\n`;
-          if (data.tone) formattedContent += `  Tone: ${data.tone}\n`;
-          if (data.speech_content) formattedContent += `  Speech Content: ${data.speech_content}\n`;
-          if (data.behavioral_observations) formattedContent += `  Behavioral Observations: ${data.behavioral_observations}\n`;
-          formattedContent += "\n";
-        });
+      // ENTROPY SIGNATURE at the top (most prominent)
+      if (analysisResult.entropy_signature) {
+        formattedContent += `✦ ENTROPY SIGNATURE: ${analysisResult.entropy_signature}\n\n`;
       }
       
       if (analysisResult.pole_aggregations) {
@@ -10180,7 +10194,6 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
         Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
           const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
           formattedContent += `${displayName}: ${data.normalized_score}\n`;
-          if (data.raw_score) formattedContent += `  Raw Score: ${data.raw_score}\n`;
         });
         formattedContent += "\n";
       }
@@ -10197,6 +10210,10 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
         formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
       }
       
+      if (analysisResult.archetype_flow) {
+        formattedContent += `ARCHETYPE FLOW:\n${analysisResult.archetype_flow}\n\n`;
+      }
+      
       if (analysisResult.temporal_dynamics) {
         formattedContent += `TEMPORAL DYNAMICS:\n${analysisResult.temporal_dynamics}\n\n`;
       }
@@ -10207,6 +10224,22 @@ Provide thorough EVO Psych video analysis with rich temporal evidence.`;
       
       if (analysisResult.adaptive_strategy) {
         formattedContent += `ADAPTIVE STRATEGY:\n${analysisResult.adaptive_strategy}\n\n`;
+      }
+      
+      if (analysisResult.temporal_feature_extraction) {
+        formattedContent += "TEMPORAL FEATURE EXTRACTION:\n\n";
+        Object.entries(analysisResult.temporal_feature_extraction).forEach(([timepoint, data]: [string, any]) => {
+          const displayName = timepoint.replace(/_/g, ' ').toUpperCase();
+          formattedContent += `${displayName}:\n`;
+          if (data.timestamp) formattedContent += `  Timestamp: ${data.timestamp}\n`;
+          if (data.posture) formattedContent += `  Posture: ${data.posture}\n`;
+          if (data.gesture) formattedContent += `  Gesture: ${data.gesture}\n`;
+          if (data.facial_expression) formattedContent += `  Facial Expression: ${data.facial_expression}\n`;
+          if (data.tone) formattedContent += `  Tone: ${data.tone}\n`;
+          if (data.speech_content) formattedContent += `  Speech Content: ${data.speech_content}\n`;
+          if (data.behavioral_observations) formattedContent += `  Behavioral Observations: ${data.behavioral_observations}\n`;
+          formattedContent += "\n";
+        });
       }
       
       if (analysisResult.dynamic_benchmark_scores) {
