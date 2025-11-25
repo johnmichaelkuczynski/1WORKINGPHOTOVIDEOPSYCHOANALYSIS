@@ -3089,7 +3089,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             <div className="grid grid-cols-3 gap-3">
               <Button 
                 variant={selectedAnalysisType === "image" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-500/90 hover:to-cyan-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("image");
                   handleImageVideoClick();
@@ -3110,7 +3110,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               
               <Button 
                 variant={selectedAnalysisType === "document" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-500/90 hover:to-orange-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("document");
                   handleDocumentClick();
@@ -3131,7 +3131,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               
               <Button 
                 variant={selectedAnalysisType === "video" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-500/90 hover:to-pink-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("video");
                   handleImageVideoClick();
@@ -3145,7 +3145,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
                 onClick={async () => {
                   setSelectedAnalysisType("text-mbti");
                   
@@ -3195,7 +3195,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "image-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("image-mbti");
                   imageMBTIInputRef.current?.click();
@@ -3221,7 +3221,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "video-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("video-mbti");
                   videoMBTIInputRef.current?.click();
@@ -3247,7 +3247,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "image-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("image-deepdive");
                   toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." });
@@ -3261,7 +3261,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "text-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("text-deepdive");
                   toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." });
@@ -3275,7 +3275,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
 
               <Button 
                 variant={selectedAnalysisType === "video-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs" 
+                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
                 onClick={() => {
                   setSelectedAnalysisType("video-deepdive");
                   toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." });
