@@ -9584,6 +9584,192 @@ ${textContent}`;
     }
   });
 
+  // Vertical vs. Horizontal Orientation Analysis - Text
+  app.post("/api/analyze/text/vertical-horizontal", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Vertical/Horizontal orientation analysis with model: ${selectedModel}`);
+      
+      // Vertical vs. Horizontal Orientation Analysis Prompt
+      const vhPrompt = `You are an expert at analyzing text for meta-dimensional orientation along the VERTICAL vs. HORIZONTAL axis. This is a single bipolar dimension that captures fundamental worldview orientation.
+
+CORE DEFINITIONS (apply rigorously):
+
+VERTICAL ORIENTATION (transcendence, sacred, hierarchy-of-being, ascent):
+- Language of higher/lower, ascent/descent, purity, rank, sacrifice of lower for higher
+- Eternal vs. temporal, reality vs. appearance, being vs. becoming
+- Nobility, greatness, overcoming, discipline, solitude, contempt for the common
+- Sacred hierarchy, spiritual striving, self-transcendence
+- Typical markers: "higher truth", "eternal", "noble", "ascend", "overcome", "discipline", "sacrifice", "purity", "hierarchy of value", "transcend", "sacred", "greatness", "contempt for mediocrity"
+- Typical authors/voices: Nietzsche (late), Evola, certain mystics, Stoic emperors, Eliade on the sacred, Jordan Peterson in "climb the hierarchy of competence" mode, texts about "the only morality is ascent"
+
+HORIZONTAL ORIENTATION (immanence, coalition, profane, status-within-plane, reciprocity):
+- Language of belonging/exclusion, fairness, solidarity, lived experience
+- Collective trauma, harm, safety, allyship, reputation, shame/honor
+- Empathy-as-glue, "centering voices", demands for accountability, in-group signaling
+- Community bonds, mutual support, social justice, inclusion
+- Typical markers: "community", "solidarity", "lived experience", "centering", "harm", "safety", "belonging", "inclusion", "accountability", "ally", "voices", "trauma", "collective", "justice", "fairness"
+- Typical authors/voices: modern DEI statements, social-justice manifestos, therapy-speak, politician speeches about unity/justice, corporate HR memos about inclusion
+
+SCORING RULES:
+1. Scan for VERTICAL markers: hierarchy language, transcendence themes, sacred/profane distinction, ascent metaphors, discipline/sacrifice, contempt for the common
+2. Scan for HORIZONTAL markers: belonging language, fairness themes, solidarity, lived experience, harm/safety, in-group signaling
+3. Score vertical_score from 0.00 to 1.00 based on density and intensity of vertical markers
+4. Score horizontal_score from 0.00 to 1.00 based on density and intensity of horizontal markers
+5. The two scores are INDEPENDENT (not forced to sum to 1.0) - text can be high on both, low on both, or polarized
+6. Extract up to 8 key phrases that exemplify each orientation
+
+DOMINANT MODE CLASSIFICATION:
+- Extreme Vertical: vertical_score >= 0.85 AND horizontal_score <= 0.20
+- Strong Vertical: vertical_score >= 0.65 AND vertical_score > horizontal_score + 0.25
+- Moderate Vertical: vertical_score > horizontal_score + 0.10
+- Neutral: |vertical_score - horizontal_score| <= 0.10
+- Moderate Horizontal: horizontal_score > vertical_score + 0.10
+- Strong Horizontal: horizontal_score >= 0.65 AND horizontal_score > vertical_score + 0.25
+- Extreme Horizontal: horizontal_score >= 0.85 AND vertical_score <= 0.20
+
+Analyze the following text and provide your assessment in JSON format:
+
+{
+  "vertical_score": 0.XX,
+  "horizontal_score": 0.XX,
+  "orientation": "Vertical" | "Horizontal" | "Neutral",
+  "dominant_mode": "Extreme Vertical" | "Strong Vertical" | "Moderate Vertical" | "Neutral" | "Moderate Horizontal" | "Strong Horizontal" | "Extreme Horizontal",
+  "key_phrases_vertical": ["phrase1", "phrase2", ...],
+  "key_phrases_horizontal": ["phrase1", "phrase2", ...],
+  "analysis_summary": "2-3 sentence explanation of why this text exhibits this orientation pattern",
+  "worldview_signature": "One-sentence characterization of the author's fundamental orientation (e.g., 'Nietzschean ascetic striving toward the Overman', 'Coalition-builder seeking inclusive solidarity', 'Mixed sacred-profane voice')"
+}
+
+TEXT TO ANALYZE:
+${textContent}`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: vhPrompt
+          }],
+          max_tokens: 4000,
+          temperature: 0.5,
+        });
+        
+        const content = response.choices[0]?.message?.content || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from OpenAI response");
+        }
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 4000,
+          temperature: 0.5,
+          system: vhPrompt,
+          messages: [{
+            role: "user",
+            content: `Analyze this text for Vertical vs. Horizontal orientation:\n\n${textContent}`
+          }]
+        });
+        
+        const textContent2 = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent2.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+      }
+      
+      // Format analysis for display
+      let formattedContent = "VERTICAL vs. HORIZONTAL ORIENTATION ANALYSIS\n";
+      formattedContent += "=".repeat(60) + "\n\n";
+      
+      // Orientation badge at top
+      const orientationEmoji = analysisResult.orientation === "Vertical" ? "⬆️" : 
+                               analysisResult.orientation === "Horizontal" ? "➡️" : "⚖️";
+      formattedContent += `${orientationEmoji} ORIENTATION: ${analysisResult.orientation?.toUpperCase() || "UNKNOWN"}\n`;
+      formattedContent += `📊 MODE: ${analysisResult.dominant_mode || "Unknown"}\n\n`;
+      
+      // Scores
+      formattedContent += "DIMENSION SCORES:\n";
+      formattedContent += `  Vertical (Transcendence): ${analysisResult.vertical_score?.toFixed(2) || "N/A"}\n`;
+      formattedContent += `  Horizontal (Immanence): ${analysisResult.horizontal_score?.toFixed(2) || "N/A"}\n\n`;
+      
+      // Worldview signature
+      if (analysisResult.worldview_signature) {
+        formattedContent += `✦ WORLDVIEW SIGNATURE:\n${analysisResult.worldview_signature}\n\n`;
+      }
+      
+      // Analysis summary
+      if (analysisResult.analysis_summary) {
+        formattedContent += `ANALYSIS SUMMARY:\n${analysisResult.analysis_summary}\n\n`;
+      }
+      
+      // Key phrases
+      if (analysisResult.key_phrases_vertical && analysisResult.key_phrases_vertical.length > 0) {
+        formattedContent += "KEY VERTICAL PHRASES:\n";
+        analysisResult.key_phrases_vertical.forEach((phrase: string) => {
+          formattedContent += `  • "${phrase}"\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (analysisResult.key_phrases_horizontal && analysisResult.key_phrases_horizontal.length > 0) {
+        formattedContent += "KEY HORIZONTAL PHRASES:\n";
+        analysisResult.key_phrases_horizontal.forEach((phrase: string) => {
+          formattedContent += `  • "${phrase}"\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "V/H Orientation Analysis",
+        mediaUrl: `vh-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, vh_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          vh_assessment: analysisResult 
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Vertical/Horizontal orientation analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Vertical/Horizontal orientation" });
+    }
+  });
+
   // EVO Psych (Evolutionary Psychology) Analysis - Image
   app.post("/api/analyze/image/evo", async (req, res) => {
     try {
