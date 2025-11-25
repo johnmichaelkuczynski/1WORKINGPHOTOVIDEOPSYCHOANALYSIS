@@ -2681,7 +2681,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-blue-600 to-sky-600 text-white hover:from-blue-600/90 hover:to-sky-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("bigfive-text");
             
@@ -2704,7 +2704,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "bigfive-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-blue-600 to-sky-600 text-white hover:from-blue-600/90 hover:to-sky-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("bigfive-image");
             bigFiveImageInputRef.current?.click();
@@ -2729,7 +2729,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "bigfive-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-blue-600 to-sky-600 text-white hover:from-blue-600/90 hover:to-sky-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("bigfive-video");
             bigFiveVideoInputRef.current?.click();
@@ -2754,7 +2754,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "enneagram-text" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-amber-600 to-yellow-500 text-white hover:from-amber-600/90 hover:to-yellow-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("enneagram-text");
             
@@ -2777,7 +2777,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "enneagram-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-amber-600 to-yellow-500 text-white hover:from-amber-600/90 hover:to-yellow-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("enneagram-image");
             enneagramImageInputRef.current?.click();
@@ -2802,7 +2802,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "enneagram-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-amber-600 to-yellow-500 text-white hover:from-amber-600/90 hover:to-yellow-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("enneagram-video");
             enneagramVideoInputRef.current?.click();
@@ -2827,7 +2827,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "darktraits-text" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-slate-700 to-gray-600 text-white hover:from-slate-700/90 hover:to-gray-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("darktraits-text");
             
@@ -2850,7 +2850,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "darktraits-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-slate-700 to-gray-600 text-white hover:from-slate-700/90 hover:to-gray-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("darktraits-image");
             darkTraitsImageInputRef.current?.click();
@@ -2875,7 +2875,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "darktraits-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-slate-700 to-gray-600 text-white hover:from-slate-700/90 hover:to-gray-600/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("darktraits-video");
             darkTraitsVideoInputRef.current?.click();
@@ -2900,7 +2900,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "stanford-binet-text" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-600 to-pink-500 text-white hover:from-rose-600/90 hover:to-pink-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("stanford-binet-text");
             
@@ -2923,7 +2923,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "stanford-binet-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-600 to-pink-500 text-white hover:from-rose-600/90 hover:to-pink-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("stanford-binet-image");
             stanfordBinetImageInputRef.current?.click();
@@ -2948,7 +2948,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "stanford-binet-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-600 to-pink-500 text-white hover:from-rose-600/90 hover:to-pink-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("stanford-binet-video");
             stanfordBinetVideoInputRef.current?.click();
@@ -2973,7 +2973,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "vocational-text" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-lime-600 to-green-500 text-white hover:from-lime-600/90 hover:to-green-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("vocational-text");
             
@@ -2996,7 +2996,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "vocational-image" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-lime-600 to-green-500 text-white hover:from-lime-600/90 hover:to-green-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("vocational-image");
             vocationalImageInputRef.current?.click();
@@ -3021,7 +3021,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         
         <Button
           variant={selectedAnalysisType === "vocational-video" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3"
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-lime-600 to-green-500 text-white hover:from-lime-600/90 hover:to-green-500/90 border-none"
           onClick={() => {
             setSelectedAnalysisType("vocational-video");
             vocationalVideoInputRef.current?.click();
@@ -3277,6 +3277,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                 <span>Video Deep Dive</span>
               </Button>
             </div>
+            
+            <p className="text-xs text-amber-600 mt-2">For best results, videos should be under 15 seconds.</p>
             
             {isAnalyzing && (
               <div className="mt-4 space-y-2">
@@ -3676,6 +3678,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   className="min-h-[250px] resize-y"
                   disabled={isAnalyzing}
                 />
+                <p className="text-xs text-amber-600 mt-1">For best results, texts should be under 2,000 words.</p>
                 <Button 
                   type="submit" 
                   className="w-full" 
