@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, analyzeVerticalHorizontalVideo, ModelType, MediaType } from "@/lib/api";
-import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download } from "lucide-react";
+import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download, Copy, Check } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -107,6 +107,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const [analysisId, setAnalysisId] = useState<number | null>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [emailServiceAvailable, setEmailServiceAvailable] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelType>("openai");
@@ -4019,11 +4020,29 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   </div>
                 </div>
               ) : (
-                <ScrollArea className="flex-1 pr-4 mb-4">
-                  <div className="space-y-4">
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Debug: Found {messages.length} messages, {messages.filter(m => m.role === "assistant").length} are from assistant
-                    </div>
+                <>
+                  <div className="flex justify-end mb-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const analysisText = messages
+                          .filter(m => m.role === "assistant")
+                          .map(m => m.content)
+                          .join("\n\n---\n\n");
+                        navigator.clipboard.writeText(analysisText);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="gap-2"
+                      data-testid="button-copy-analysis"
+                    >
+                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
+                  <ScrollArea className="flex-1 pr-4 mb-4">
+                    <div className="space-y-4">
                     {messages.filter(message => message.role === "assistant").map((message, index) => (
                       <div
                         key={index}
@@ -4045,6 +4064,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                     <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
+                </>
               )}
             </div>
           </Card>
