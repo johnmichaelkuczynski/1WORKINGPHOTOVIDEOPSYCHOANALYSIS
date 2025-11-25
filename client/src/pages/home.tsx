@@ -3048,6 +3048,16 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       {/* Main Content Area */}
       <div className="flex-1">
         <div className="container mx-auto p-4 max-w-6xl">
+          <div className="flex justify-between items-center mb-4">
+            <a 
+              href="mailto:contact@zhisystems.ai" 
+              className="text-sm text-primary hover:underline flex items-center gap-1"
+              data-testid="link-contact-us"
+            >
+              Contact Us
+            </a>
+            <div></div>
+          </div>
           <h1 className="text-4xl font-bold text-center mb-8">AI Personality Analysis</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
