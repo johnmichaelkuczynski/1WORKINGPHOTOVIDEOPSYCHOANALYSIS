@@ -9654,6 +9654,27 @@ THE 20 VISUAL BENCHMARKS MAPPED TO 10 POLES:
 - Benchmark 19: Conformist clothing or alignment with group norms
 - Benchmark 20: Safe, conventional composition and affect
 
+CRUCIAL CORRELATION CONSTRAINTS (never violate - these are hard biological/evolutionary limits):
+- Seer above 0.7 → Protector and Enforcer must stay ≤ 0.15
+- Protector OR Enforcer above 0.6 → Seer must stay ≤ 0.25
+- Signaler above 0.7 → Seer and Strategist combined must be ≤ 0.6
+- Nurturer + Healer combined above 1.4 → Strategist and Explorer must stay ≤ 0.4
+- Seer + Strategist + Diplomat combined above 2.0 → Signaler, Mimic, Protector, Enforcer must all be ≤ 0.2
+
+POLE CORRELATION MATRIX:
+| Pole       | Strongly POSITIVE with    | Strongly NEGATIVE with     | Near-zero with        |
+|------------|---------------------------|----------------------------|-----------------------|
+| Seer       | Strategist, Diplomat      | Protector, Enforcer, Signaler | Explorer, Mimic    |
+| Strategist | Seer, Explorer (moderate) | Nurturer, Healer           | Signaler              |
+| Explorer   | Strategist (moderate)     | Nurturer, Protector        | Seer, Mimic           |
+| Diplomat   | Seer, Healer              | Protector, Enforcer        | Signaler              |
+| Healer     | Nurturer, Diplomat        | Enforcer, Protector        | Strategist, Explorer  |
+| Nurturer   | Healer                    | Strategist, Explorer       | Seer, Signaler        |
+| Signaler   | Mimic                     | Seer, Strategist           | Protector, Enforcer   |
+| Mimic      | Signaler                  | Seer                       | Explorer              |
+| Protector  | Enforcer                  | Seer, Diplomat, Healer     | Explorer, Signaler    |
+| Enforcer   | Protector                 | Seer, Diplomat, Healer     | Explorer, Signaler    |
+
 Analyze the image and provide your assessment in JSON format:
 
 {
@@ -9702,6 +9723,8 @@ Analyze the image and provide your assessment in JSON format:
     "mimic": {"raw_score": "mean of benchmarks 19-20", "normalized_score": "relative gravitational pull"}
   },
   
+  "entropy_signature": "One-sentence entropy classification (e.g., 'Radically counter-entropic Seer', 'High-entropy Explorer-Signaler', 'Low-entropy Protector-Enforcer', 'Balanced mid-entropy Diplomat-Nurturer')",
+  
   "cognitive_signature": "Rich interpretation of which poles dominate based on visual presentation - describe the personality topology shown (e.g., 'Cognitive Sentinel', 'Empathic Strategist', etc.)",
   
   "dominant_triad": "Identify the three strongest poles and explain their visual interaction",
@@ -9710,7 +9733,9 @@ Analyze the image and provide your assessment in JSON format:
   
   "evolutionary_archetype": "Name and describe the evolutionary behavioral archetype this visual profile most resembles",
   
-  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this visual pole configuration and how they manifest in presentation style"
+  "adaptive_strategy": "Explain the primary adaptive strategies revealed by this visual pole configuration and how they manifest in presentation style",
+  
+  "archetype_flow": "Which pole the person is currently evolving toward (e.g., 'latent Strategist awakening under Seer dominance')"
 }
 
 Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
@@ -9783,15 +9808,9 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
       let formattedContent = "EVO PSYCH (EVOLUTIONARY PSYCHOLOGY) IMAGE ANALYSIS\n";
       formattedContent += "=".repeat(60) + "\n\n";
       
-      if (analysisResult.image_feature_extraction) {
-        const features = analysisResult.image_feature_extraction;
-        formattedContent += "IMAGE FEATURE EXTRACTION:\n\n";
-        if (features.facial_expression) formattedContent += `Facial Expression:\n${features.facial_expression}\n\n`;
-        if (features.posture_body_language) formattedContent += `Posture & Body Language:\n${features.posture_body_language}\n\n`;
-        if (features.color_palette) formattedContent += `Color Palette:\n${features.color_palette}\n\n`;
-        if (features.composition) formattedContent += `Composition:\n${features.composition}\n\n`;
-        if (features.environment_context) formattedContent += `Environment Context:\n${features.environment_context}\n\n`;
-        if (features.symbolic_elements) formattedContent += `Symbolic Elements:\n${features.symbolic_elements}\n\n`;
+      // ENTROPY SIGNATURE at the top (most prominent)
+      if (analysisResult.entropy_signature) {
+        formattedContent += `✦ ENTROPY SIGNATURE: ${analysisResult.entropy_signature}\n\n`;
       }
       
       if (analysisResult.pole_aggregations) {
@@ -9801,7 +9820,6 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
         Object.entries(poles).forEach(([poleName, data]: [string, any]) => {
           const displayName = poleName.charAt(0).toUpperCase() + poleName.slice(1);
           formattedContent += `${displayName}: ${data.normalized_score}\n`;
-          if (data.raw_score) formattedContent += `  Raw Score: ${data.raw_score}\n`;
         });
         formattedContent += "\n";
       }
@@ -9818,8 +9836,23 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
         formattedContent += `EVOLUTIONARY ARCHETYPE:\n${analysisResult.evolutionary_archetype}\n\n`;
       }
       
+      if (analysisResult.archetype_flow) {
+        formattedContent += `ARCHETYPE FLOW:\n${analysisResult.archetype_flow}\n\n`;
+      }
+      
       if (analysisResult.shape_interpretation) {
         formattedContent += `SHAPE INTERPRETATION:\n${analysisResult.shape_interpretation}\n\n`;
+      }
+      
+      if (analysisResult.image_feature_extraction) {
+        const features = analysisResult.image_feature_extraction;
+        formattedContent += "IMAGE FEATURE EXTRACTION:\n\n";
+        if (features.facial_expression) formattedContent += `Facial Expression:\n${features.facial_expression}\n\n`;
+        if (features.posture_body_language) formattedContent += `Posture & Body Language:\n${features.posture_body_language}\n\n`;
+        if (features.color_palette) formattedContent += `Color Palette:\n${features.color_palette}\n\n`;
+        if (features.composition) formattedContent += `Composition:\n${features.composition}\n\n`;
+        if (features.environment_context) formattedContent += `Environment Context:\n${features.environment_context}\n\n`;
+        if (features.symbolic_elements) formattedContent += `Symbolic Elements:\n${features.symbolic_elements}\n\n`;
       }
       
       if (analysisResult.adaptive_strategy) {
