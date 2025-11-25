@@ -9979,6 +9979,402 @@ Never explain. Return only JSON.`;
     }
   });
 
+  // Vertical vs. Horizontal Orientation Analysis - VIDEO (Full Version)
+  // Speech is DOMINANT signal (50%), Visual (30%), Prosody (20%)
+  app.post("/api/analyze/video/vertical-horizontal", async (req, res) => {
+    try {
+      const { mediaData, sessionId, selectedModel = "openai", title } = req.body;
+      
+      if (!mediaData || typeof mediaData !== 'string') {
+        return res.status(400).json({ error: "Video data is required" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing V/H Video orientation analysis with model: ${selectedModel}`);
+      
+      // Save video temporarily
+      const videoBuffer = Buffer.from(mediaData.split(',')[1], 'base64');
+      const tempVideoPath = path.join(tempDir, `vh_video_${Date.now()}.mp4`);
+      await writeFileAsync(tempVideoPath, videoBuffer);
+      
+      // ═══════════════════════════════════════════════════════════════
+      // STEP 1: TRANSCRIBE AUDIO WITH WHISPER (for text_vh_score - 50% weight)
+      // ═══════════════════════════════════════════════════════════════
+      console.log('V/H Video: Starting audio transcription with Whisper...');
+      let transcriptData: any;
+      let fullTranscript = "";
+      let textVhScore = 0.50; // Neutral default if no speech
+      let textVhResult: any = null;
+      let spokenPhrasesVertical: string[] = [];
+      let spokenPhrasesHorizontal: string[] = [];
+      
+      try {
+        transcriptData = await extractAudioTranscription(tempVideoPath);
+        fullTranscript = transcriptData.transcription || "";
+        console.log(`V/H Video: Transcription complete. ${fullTranscript.length} characters.`);
+        
+        // If we have actual speech, analyze it with the TEXT V/H prompt
+        if (fullTranscript.length > 20 && !fullTranscript.includes("Failed to transcribe")) {
+          const vhTextPrompt = `You are an expert at analyzing text for meta-dimensional orientation along the VERTICAL vs. HORIZONTAL axis.
+
+VERTICAL ORIENTATION (transcendence, sacred hierarchy, ascent):
+- Language of higher/lower, ascent/descent, purity, rank, sacrifice
+- Eternal vs. temporal, reality vs. appearance, nobility, greatness
+- Markers: "higher truth", "eternal", "noble", "ascend", "overcome", "discipline", "sacrifice", "hierarchy", "transcend", "sacred", "greatness", "contempt for mediocrity"
+
+HORIZONTAL ORIENTATION (immanence, coalition, belonging):
+- Language of belonging, fairness, solidarity, lived experience
+- Community, trauma, harm, safety, allyship, inclusion
+- Markers: "community", "solidarity", "lived experience", "centering", "harm", "safety", "belonging", "inclusion", "accountability", "ally", "voices", "trauma", "collective", "justice"
+
+Analyze this transcript and return ONLY JSON:
+{
+  "vertical_score": 0.XX,
+  "horizontal_score": 0.XX,
+  "key_phrases_vertical": ["max 4 exact quotes that pulled Vertical"],
+  "key_phrases_horizontal": ["max 4 exact quotes that pulled Horizontal"],
+  "text_analysis_summary": "1-2 sentence summary"
+}
+
+TRANSCRIPT:
+${fullTranscript}`;
+
+          if (selectedModel === "openai" && openai) {
+            const textResponse = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [{ role: "system", content: vhTextPrompt }],
+              max_tokens: 2000,
+              temperature: 0.3,
+            });
+            const textContent = textResponse.choices[0]?.message?.content || "";
+            const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              textVhResult = JSON.parse(jsonMatch[0]);
+              textVhScore = textVhResult.vertical_score || 0.50;
+              spokenPhrasesVertical = textVhResult.key_phrases_vertical || [];
+              spokenPhrasesHorizontal = textVhResult.key_phrases_horizontal || [];
+            }
+          } else if (selectedModel === "anthropic" && anthropic) {
+            const textResponse = await anthropic.messages.create({
+              model: "claude-3-5-sonnet-20241022",
+              max_tokens: 2000,
+              temperature: 0.3,
+              system: vhTextPrompt,
+              messages: [{ role: "user", content: "Analyze this transcript for V/H orientation." }]
+            });
+            const textContent = textResponse.content[0]?.type === 'text' ? textResponse.content[0].text : "";
+            const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              textVhResult = JSON.parse(jsonMatch[0]);
+              textVhScore = textVhResult.vertical_score || 0.50;
+              spokenPhrasesVertical = textVhResult.key_phrases_vertical || [];
+              spokenPhrasesHorizontal = textVhResult.key_phrases_horizontal || [];
+            }
+          }
+        }
+      } catch (error) {
+        console.error('V/H Video: Transcription error:', error);
+        fullTranscript = "[No audible speech detected]";
+      }
+      
+      // ═══════════════════════════════════════════════════════════════
+      // STEP 2: EXTRACT KEYFRAMES FOR VISUAL ANALYSIS (30% weight)
+      // ═══════════════════════════════════════════════════════════════
+      console.log('V/H Video: Extracting keyframes for visual analysis...');
+      const framePercentages = [0, 12, 25, 37, 50, 62, 75, 87, 99];
+      const framePromises = framePercentages.map(async (percent) => {
+        const outputPath = path.join(tempDir, `vh_frame_${Date.now()}_${percent}.jpg`);
+        
+        return new Promise<string>((resolve, reject) => {
+          ffmpeg(tempVideoPath)
+            .screenshots({
+              count: 1,
+              timemarks: [`${percent}%`],
+              filename: path.basename(outputPath),
+              folder: tempDir,
+            })
+            .on('end', () => {
+              try {
+                const frameData = fs.readFileSync(outputPath);
+                const base64Frame = `data:image/jpeg;base64,${frameData.toString('base64')}`;
+                fs.unlinkSync(outputPath);
+                resolve(base64Frame);
+              } catch (err) {
+                reject(err);
+              }
+            })
+            .on('error', (err) => reject(err));
+        });
+      });
+      
+      let extractedFrames: string[] = [];
+      try {
+        extractedFrames = await Promise.all(framePromises);
+        console.log(`V/H Video: Extracted ${extractedFrames.length} keyframes`);
+      } catch (frameError) {
+        console.error('V/H Video: Frame extraction error:', frameError);
+      }
+      
+      // Analyze frames for visual V/H score
+      let visualVhScore = 0.50;
+      let visualMarkersVertical: string[] = [];
+      let visualMarkersHorizontal: string[] = [];
+      
+      if (extractedFrames.length > 0 && openai) {
+        const vhVisualPrompt = `Analyze these ${extractedFrames.length} video frames for VERTICAL vs. HORIZONTAL visual orientation.
+
+VERTICAL cues: dramatic lighting, vertical lines, upward gaze, cold colors (steel blue, black, gold), symbols of rank/transcendence, rigid posture, severe/ceremonial clothing, solitary elevated position
+HORIZONTAL cues: soft warm lighting, rounded furniture, broad smiles, domestic settings, casual colorful clothing, pets/children/food, cozy clutter, open relaxed posture
+
+Return ONLY JSON:
+{
+  "visual_vertical_score": 0.XX,
+  "visual_horizontal_score": 0.XX,
+  "top_visual_markers_vertical": ["marker1", "marker2", "marker3"],
+  "top_visual_markers_horizontal": ["marker1", "marker2", "marker3"]
+}`;
+
+        try {
+          const contentArray: any[] = [{ type: "text", text: vhVisualPrompt }];
+          extractedFrames.forEach(frame => {
+            contentArray.push({ type: "image_url", image_url: { url: frame } });
+          });
+          
+          const visualResponse = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{ role: "user", content: contentArray }],
+            max_tokens: 1500,
+            temperature: 0.3,
+          });
+          
+          const visualContent = visualResponse.choices[0]?.message?.content || "";
+          const jsonMatch = visualContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const visualResult = JSON.parse(jsonMatch[0]);
+            visualVhScore = visualResult.visual_vertical_score || 0.50;
+            visualMarkersVertical = visualResult.top_visual_markers_vertical || [];
+            visualMarkersHorizontal = visualResult.top_visual_markers_horizontal || [];
+          }
+        } catch (visualError) {
+          console.error('V/H Video: Visual analysis error:', visualError);
+        }
+      }
+      
+      // ═══════════════════════════════════════════════════════════════
+      // STEP 3: PROSODY ANALYSIS (20% weight)
+      // ═══════════════════════════════════════════════════════════════
+      let prosodyVhScore = 0.50;
+      let prosodyMarkers: string[] = [];
+      
+      // Analyze prosody from speech data if available
+      if (transcriptData && transcriptData.speechAnalysis) {
+        const speechRate = transcriptData.speechAnalysis.speakingRate || 0;
+        
+        // Prosody heuristics:
+        // Deep/slow/resonant → Vertical (speakingRate < 2.5 words/sec)
+        // Fast/high-pitched/up-talk → Horizontal (speakingRate > 3.5 words/sec)
+        
+        if (speechRate > 0) {
+          if (speechRate < 2.0) {
+            prosodyVhScore = 0.75; // Slow, deliberate = Vertical
+            prosodyMarkers.push("slow deliberate speech");
+          } else if (speechRate < 2.5) {
+            prosodyVhScore = 0.60;
+            prosodyMarkers.push("measured pacing");
+          } else if (speechRate > 4.0) {
+            prosodyVhScore = 0.20; // Very fast = Horizontal
+            prosodyMarkers.push("rapid excited speech");
+          } else if (speechRate > 3.5) {
+            prosodyVhScore = 0.30;
+            prosodyMarkers.push("fast animated delivery");
+          } else {
+            prosodyVhScore = 0.50;
+            prosodyMarkers.push("moderate speech rate");
+          }
+        }
+        
+        // Check for laughter indicators in transcript
+        const lowerTranscript = fullTranscript.toLowerCase();
+        if (lowerTranscript.includes("haha") || lowerTranscript.includes("lol") || 
+            lowerTranscript.includes("[laughter]") || lowerTranscript.includes("literally")) {
+          prosodyVhScore = Math.max(0.15, prosodyVhScore - 0.25);
+          prosodyMarkers.push("laughter/informal markers detected");
+        }
+        
+        // Check for emphatic/formal speech patterns
+        if (lowerTranscript.includes("must") || lowerTranscript.includes("shall") || 
+            lowerTranscript.includes("duty") || lowerTranscript.includes("therefore")) {
+          prosodyVhScore = Math.min(0.85, prosodyVhScore + 0.15);
+          prosodyMarkers.push("formal/emphatic markers detected");
+        }
+      }
+      
+      // Clean up temp video file
+      await unlinkAsync(tempVideoPath).catch(err => console.warn('Error deleting temp video:', err));
+      
+      // ═══════════════════════════════════════════════════════════════
+      // STEP 4: COMPUTE WEIGHTED FINAL SCORE
+      // vertical_final = 0.30 × visual + 0.20 × prosody + 0.50 × text
+      // ═══════════════════════════════════════════════════════════════
+      const finalVerticalScore = (0.30 * visualVhScore) + (0.20 * prosodyVhScore) + (0.50 * textVhScore);
+      const finalHorizontalScore = 1.0 - finalVerticalScore;
+      
+      // Determine orientation and dominant mode
+      let orientation: string;
+      let dominantMode: string;
+      
+      if (finalVerticalScore >= 0.90) {
+        orientation = "Vertical";
+        dominantMode = "Extreme Vertical";
+      } else if (finalVerticalScore >= 0.70) {
+        orientation = "Vertical";
+        dominantMode = "Strong Vertical";
+      } else if (finalVerticalScore >= 0.55) {
+        orientation = "Vertical";
+        dominantMode = "Moderate Vertical";
+      } else if (finalVerticalScore >= 0.45) {
+        orientation = "Neutral";
+        dominantMode = "Neutral";
+      } else if (finalVerticalScore >= 0.30) {
+        orientation = "Horizontal";
+        dominantMode = "Moderate Horizontal";
+      } else if (finalVerticalScore >= 0.10) {
+        orientation = "Horizontal";
+        dominantMode = "Strong Horizontal";
+      } else {
+        orientation = "Horizontal";
+        dominantMode = "Extreme Horizontal";
+      }
+      
+      // Build result object matching specification
+      const analysisResult = {
+        vertical_score: parseFloat(finalVerticalScore.toFixed(2)),
+        horizontal_score: parseFloat(finalHorizontalScore.toFixed(2)),
+        orientation,
+        dominant_mode: dominantMode,
+        component_scores: {
+          text_score: parseFloat(textVhScore.toFixed(2)),
+          visual_score: parseFloat(visualVhScore.toFixed(2)),
+          prosody_score: parseFloat(prosodyVhScore.toFixed(2)),
+          weights: { text: 0.50, visual: 0.30, prosody: 0.20 }
+        },
+        top_visual_motion_markers_vertical: visualMarkersVertical.slice(0, 4),
+        top_visual_motion_markers_horizontal: visualMarkersHorizontal.slice(0, 4),
+        key_spoken_phrases_vertical: spokenPhrasesVertical.slice(0, 4),
+        key_spoken_phrases_horizontal: spokenPhrasesHorizontal.slice(0, 4),
+        prosody_markers: prosodyMarkers,
+        transcript: fullTranscript
+      };
+      
+      // ═══════════════════════════════════════════════════════════════
+      // STEP 5: FORMAT OUTPUT
+      // ═══════════════════════════════════════════════════════════════
+      let formattedContent = "VERTICAL vs. HORIZONTAL ORIENTATION (VIDEO ANALYSIS)\n";
+      formattedContent += "═".repeat(60) + "\n\n";
+      
+      // Main orientation badge
+      const orientationEmoji = orientation === "Vertical" ? "⬆️" : orientation === "Horizontal" ? "➡️" : "⚖️";
+      formattedContent += `${orientationEmoji} ORIENTATION: ${orientation.toUpperCase()}\n`;
+      formattedContent += `📊 MODE: ${dominantMode}\n\n`;
+      
+      // One-line summary with bar
+      const barLength = 30;
+      const vertBars = Math.round(finalVerticalScore * barLength);
+      formattedContent += `✦ Vertical ${finalVerticalScore.toFixed(2)} | Horizontal ${finalHorizontalScore.toFixed(2)}\n`;
+      formattedContent += `  ${"█".repeat(vertBars)}${"░".repeat(barLength - vertBars)}\n\n`;
+      
+      // Component score breakdown
+      formattedContent += "COMPONENT SCORES (weighted blend):\n";
+      formattedContent += `  📝 Speech/Text (50%): ${textVhScore.toFixed(2)}\n`;
+      formattedContent += `  👁 Visual/Motion (30%): ${visualVhScore.toFixed(2)}\n`;
+      formattedContent += `  🎙 Prosody (20%): ${prosodyVhScore.toFixed(2)}\n\n`;
+      
+      // Spoken phrases (the key differentiator for video)
+      if (spokenPhrasesVertical.length > 0) {
+        formattedContent += "💬 SPOKEN VERTICAL MARKERS:\n";
+        spokenPhrasesVertical.slice(0, 4).forEach(phrase => {
+          formattedContent += `  ⬆ "${phrase}"\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (spokenPhrasesHorizontal.length > 0) {
+        formattedContent += "💬 SPOKEN HORIZONTAL MARKERS:\n";
+        spokenPhrasesHorizontal.slice(0, 4).forEach(phrase => {
+          formattedContent += `  ➡ "${phrase}"\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      // Visual markers
+      if (visualMarkersVertical.length > 0) {
+        formattedContent += "👁 VISUAL VERTICAL MARKERS:\n";
+        visualMarkersVertical.slice(0, 4).forEach(marker => {
+          formattedContent += `  ⬆ ${marker}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      if (visualMarkersHorizontal.length > 0) {
+        formattedContent += "👁 VISUAL HORIZONTAL MARKERS:\n";
+        visualMarkersHorizontal.slice(0, 4).forEach(marker => {
+          formattedContent += `  ➡ ${marker}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      // Prosody markers
+      if (prosodyMarkers.length > 0) {
+        formattedContent += "🎙 PROSODY MARKERS:\n";
+        prosodyMarkers.forEach(marker => {
+          formattedContent += `  • ${marker}\n`;
+        });
+        formattedContent += "\n";
+      }
+      
+      // Full transcript for reference
+      formattedContent += "─".repeat(40) + "\n";
+      formattedContent += "TRANSCRIPT:\n";
+      formattedContent += fullTranscript + "\n";
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "V/H Video Orientation",
+        mediaUrl: mediaData,
+        mediaType: "video",
+        personalityInsights: { 
+          analysis: formattedContent, 
+          vh_video_assessment: analysisResult,
+          transcript: fullTranscript 
+        },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { 
+          analysis: formattedContent, 
+          vh_video_assessment: analysisResult,
+          transcript: fullTranscript
+        },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("V/H Video orientation analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze video for V/H orientation" });
+    }
+  });
+
   // EVO Psych (Evolutionary Psychology) Analysis - Image
   app.post("/api/analyze/image/evo", async (req, res) => {
     try {
