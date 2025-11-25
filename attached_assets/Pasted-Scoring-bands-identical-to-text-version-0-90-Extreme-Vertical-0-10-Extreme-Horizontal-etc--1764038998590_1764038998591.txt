@@ -1,0 +1,25 @@
+Scoring bands identical to text version (0.90+ = Extreme Vertical, ≤0.10 = Extreme Horizontal, etc.).
+HARD CALIBRATION ANCHORS (store these three images in the code and enforce exact scores):
+
+MAX VERTICAL REFERENCE → photo of a man in black suit, severe expression, standing alone under dramatic top-lighting in front of a marble column → must return 0.97–1.00 Vertical
+MAX HORIZONTAL REFERENCE → photo of a smiling woman surrounded by plants, fairy lights, plush toys, pastel sweater → must return ≤0.08 Vertical
+The photo the user just uploaded (casual guy smiling in black t-shirt, cozy room with screen + lamp) → must return approximately 0.18–0.24 Vertical / 0.76–0.82 Horizontal
+
+UI display (add to image results page):
+
+Same red←●→blue bar as text version
+One-line summary: "Vertical X.XX | Horizontal X.XX – [dominant_mode] – [2–3 word visual description]"
+Two columns underneath: "Vertical visual markers" / "Horizontal visual markers"
+
+Implementation route (choose one, both work):
+Option A (fastest): multimodal LLM (GPT-4o, Claude-3-Opus, etc.) with the exact system prompt below.
+Option B (cheaper long-term): CLIP + small fine-tuned classifier on ~3k labeled Vertical/Horizontal photos.
+If using multimodal LLM, use this exact system prompt (append nothing else):
+"You are the world's most accurate detector of Vertical vs. Horizontal orientation from images only.
+Vertical = sacred hierarchy, ascent, severity, solitude, rank, dramatic lighting, vertical lines.
+Horizontal = warmth, belonging, softness, domesticity, broad smiles, cozy clutter.
+Return only JSON with keys: vertical_score, horizontal_score, top_visual_markers_vertical (array), top_visual_markers_horizontal (array).
+Calibrate so that solitary severe figures under dramatic light = 0.95–1.00 vertical and smiling people in cozy domestic settings = 0.00–0.15 vertical.
+Never explain."
+Run this module in parallel with the existing Evo-Psych image test. Add toggle: "Show Vertical/Horizontal (Visual)"
+That is all. Implement exactly as specified.
