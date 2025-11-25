@@ -1,0 +1,43 @@
+Implement the IMAGE-ONLY version of the Vertical vs. Horizontal (VH) test.
+
+This is a completely separate module from the text VH test. It receives ONLY an image (photo of a person or their environment) and returns a Vertical/Horizontal score based on visual cues alone – no OCR, no captions, no text overlay.
+
+CORE VISUAL DIAGNOSTICS (hard-coded, never change):
+
+VERTICAL cues (higher score when present and dominant):
+- High-contrast lighting from above or single dramatic light source (chiaroscuro)
+- Strong vertical lines in frame (columns, thrones, swords upright, mountain backdrops)
+- Subject looking upward or into extreme distance
+- Cold color palette (steel blue, black, white, gold)
+- Symbols of rank or transcendence: crowns, halos, eagles, mountain peaks, weapons held high, solitary elevated position
+- Rigid, symmetrical, statuesque posture
+- Minimal or no background clutter
+- Eyes intense, unblinking, or half-closed in contemplation
+- Dark, severe, or ceremonial clothing
+
+HORIZONTAL cues (higher score when present and dominant):
+- Soft, even, warm lighting
+- Rounded furniture, cushions, plants, cozy clutter
+- Subject smiling broadly, head tilted, eyes making direct “connect” gaze at camera
+- Domestic setting (bed, couch, kitchen, family photos)
+- Casual, loose, colorful or pastel clothing
+- Presence of pets, children, food, blankets
+- Symmetrical smile + visible teeth
+- Background contains many personal items, posters, knick-knacks
+- Leaning in, open palms, relaxed slouch
+
+TECHNICAL IMPLEMENTATION:
+
+Create a new function  
+`analyze_vertical_horizontal_image(image_bytes) -> dict`
+
+Return exactly this JSON:
+```json
+{
+  "vertical_score": 0.XX,
+  "horizontal_score": 0.XX,
+  "orientation": "Vertical" | "Horizontal" | "Neutral",
+  "dominant_mode": "Extreme Vertical" | "Strong Vertical" | "Moderate Vertical" | "Neutral" | "Moderate Horizontal" | "Strong Horizontal" | "Extreme Horizontal",
+  "top_visual_markers_vertical": [...],   // max 6 strings
+  "top_visual_markers_horizontal": [...]  // max 6 strings
+}
