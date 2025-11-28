@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, analyzeVerticalHorizontalVideo, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, analyzeVerticalHorizontalVideo, analyzeVerticalityRadar, analyzeVerticalityRadarComparison, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download, Copy, Check } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -98,6 +98,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [textInput, setTextInput] = useState("");
+  const [comparisonTextInput, setComparisonTextInput] = useState("");
+  const [isComparisonDialogOpen, setIsComparisonDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   
   // Media states
@@ -2680,6 +2682,75 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
         </Button>
         
         <Button
+          variant={selectedAnalysisType === "verticality-radar" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white hover:from-fuchsia-600/90 hover:to-pink-600/90 border-none"
+          onClick={async () => {
+            setSelectedAnalysisType("verticality-radar");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text (min 100 words) in the Input Preview section below",
+              });
+              return;
+            }
+            
+            if (textInput.split(/\s+/).length < 100) {
+              toast({
+                variant: "destructive",
+                title: "Text Too Short",
+                description: "Verticality Radar requires at least 100 words for accurate stylometric analysis",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(10);
+            
+            try {
+              const data = await analyzeVerticalityRadar(textInput, sessionId, selectedModel, `Verticality Radar - ${new Date().toLocaleDateString()}`);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(prev => [...prev, ...data.messages]);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Verticality Radar Complete",
+                  description: "Your text has been analyzed for stylometric verticality",
+                });
+              }
+            } catch (error: any) {
+              console.error("Verticality Radar analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: error.message || "Failed to analyze text. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-verticality-radar"
+        >
+          📊 Verticality Radar (Text)
+        </Button>
+        
+        <Button
+          variant={selectedAnalysisType === "verticality-compare" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white hover:from-fuchsia-600/90 hover:to-pink-600/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("verticality-compare");
+            setIsComparisonDialogOpen(true);
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-verticality-compare"
+        >
+          📊 Verticality Radar (Compare 2)
+        </Button>
+        
+        <Button
           variant={selectedAnalysisType === "bigfive-text" ? "default" : "outline"}
           className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-blue-600 to-sky-600 text-white hover:from-blue-600/90 hover:to-sky-600/90 border-none"
           onClick={() => {
@@ -4147,6 +4218,107 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       </div>
         </div>
       </div>
+      
+      {/* Verticality Radar Comparison Dialog */}
+      <Dialog open={isComparisonDialogOpen} onOpenChange={setIsComparisonDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Verticality Radar - Compare Two Texts</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Text A (min 100 words)</label>
+              <Textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Paste your first text sample here... (e.g., an academic paper, philosophical essay)"
+                className="min-h-[150px]"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Word count: {textInput.split(/\s+/).filter(w => w).length}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Text B (min 100 words)</label>
+              <Textarea
+                value={comparisonTextInput}
+                onChange={(e) => setComparisonTextInput(e.target.value)}
+                placeholder="Paste your second text sample here... (e.g., a narrative essay, personal writing)"
+                className="min-h-[150px]"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Word count: {comparisonTextInput.split(/\s+/).filter(w => w).length}
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsComparisonDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!textInput.trim() || !comparisonTextInput.trim()) {
+                    toast({
+                      variant: "destructive",
+                      title: "Both Texts Required",
+                      description: "Please enter text in both fields",
+                    });
+                    return;
+                  }
+                  
+                  if (textInput.split(/\s+/).length < 100 || comparisonTextInput.split(/\s+/).length < 100) {
+                    toast({
+                      variant: "destructive",
+                      title: "Texts Too Short",
+                      description: "Each text must be at least 100 words for accurate analysis",
+                    });
+                    return;
+                  }
+                  
+                  setIsComparisonDialogOpen(false);
+                  setIsAnalyzing(true);
+                  setAnalysisProgress(10);
+                  
+                  try {
+                    const data = await analyzeVerticalityRadarComparison(
+                      textInput,
+                      comparisonTextInput,
+                      sessionId,
+                      selectedModel,
+                      `Verticality Radar Comparison - ${new Date().toLocaleDateString()}`
+                    );
+                    
+                    if (data.messages && data.messages.length > 0) {
+                      setMessages(prev => [...prev, ...data.messages]);
+                      setAnalysisId(data.analysisId);
+                      setAnalysisProgress(100);
+                      toast({
+                        title: "Comparison Complete",
+                        description: "Both texts have been compared for stylometric verticality",
+                      });
+                    }
+                  } catch (error: any) {
+                    console.error("Verticality comparison error:", error);
+                    toast({
+                      variant: "destructive",
+                      title: "Comparison Failed",
+                      description: error.message || "Failed to compare texts. Please try again.",
+                    });
+                  } finally {
+                    setIsAnalyzing(false);
+                    setComparisonTextInput("");
+                  }
+                }}
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing ? "Analyzing..." : "Compare Texts"}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

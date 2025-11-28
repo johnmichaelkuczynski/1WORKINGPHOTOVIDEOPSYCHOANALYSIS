@@ -10603,6 +10603,539 @@ Return ONLY JSON:
     }
   });
 
+  // Verticality Radar - Single Text Stylometry Analysis
+  app.post("/api/analyze/text/verticality-radar", async (req, res) => {
+    try {
+      const { textContent, sessionId, selectedModel = "grok", title } = req.body;
+      
+      if (!textContent || typeof textContent !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (textContent.split(/\s+/).length < 100) {
+        return res.status(400).json({ error: "Text must be at least 100 words for accurate stylometric analysis" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Verticality Radar analysis with model: ${selectedModel}`);
+      
+      const verticalityRadarPrompt = `You are an expert stylometrician and literary psychologist. You analyze writing style to determine where text falls on the VERTICAL-HORIZONTAL spectrum - a stylistic dimension capturing prose personality.
+
+CORE DEFINITIONS:
+
+VERTICAL (0.80-1.00): Ego-absent, impersonal, logical, ghost-like prose
+- Near-zero first-person pronouns (I, me, my, we, us, our)
+- Heavy hypotaxis (nested subordinate clauses)
+- No anecdotes, narratives, or concrete examples
+- Pure logical architecture with colons, semicolons
+- Impersonal constructions ("It has been noted that...", "One may observe...")
+- Abstract vocabulary, formal register
+- Exemplar authors: Frege, Schopenhauer, Nagel, Hempel, Kuczynski
+
+MODERATE-VERTICAL (0.55-0.79): Academic, analytical, but with some authorial presence
+- Low but non-zero first-person pronouns
+- Mostly formal but occasional warmth
+- Arguments structured logically with some illustration
+- Exemplar authors: Bertrand Russell, early Wittgenstein, academic philosophy
+
+NEUTRAL (0.45-0.54): Balanced mix of impersonal and personal elements
+- Moderate first-person usage
+- Mix of abstract argument and concrete example
+- Neither purely logical nor purely narrative
+- Exemplar authors: Isaiah Berlin, popular science writers
+
+MODERATE-HORIZONTAL (0.25-0.44): Warm, essayistic, conversational
+- Frequent first-person and second-person pronouns
+- Anecdotes and illustrations common
+- Metaphors and imagery woven throughout
+- Sentence variety (short punchy + long flowing)
+- Exemplar authors: Adam Smith, Hume, Montaigne, good journalism
+
+HORIZONTAL (0.00-0.24): Ego-present, narrative, metaphorical, carnival-like
+- Heavy first-person saturation
+- Stream of consciousness or highly narrative
+- Rich metaphor, sensory detail, emotional language
+- Stories, scenes, direct address to reader
+- Exemplar authors: William James, Kerouac, Joyce, Hunter Thompson
+
+STYLOMETRIC FEATURES TO ANALYZE:
+1. Ego-pronoun rate: Count I/me/my/we/us/our per 1000 words (high = horizontal)
+2. Impersonal constructions: "It is," "One may," "There exists" (high = vertical)
+3. Sentence length variation: Uniform = vertical; High variance = horizontal
+4. Subordination depth: Deeply nested clauses = vertical
+5. Metaphor/imagery density: High = horizontal
+6. Anecdote/narrative presence: Stories = horizontal; Pure argument = vertical
+7. Punctuation patterns: Semicolons/colons = vertical; Dashes/exclamations = horizontal
+8. Abstract vs. concrete vocabulary: Abstract = vertical; Sensory = horizontal
+9. Reader address: "you", rhetorical questions = horizontal
+10. Emotional language: Affect words, evaluative adjectives = horizontal
+
+AUTHOR MATCHING:
+Compare the text's stylometric profile to these reference authors:
+- Extreme Vertical (0.90+): Gottlob Frege, Ernest Nagel, Carl Hempel, Kuczynski
+- High Vertical (0.75-0.89): Schopenhauer, late Wittgenstein, Quine
+- Moderate Vertical (0.60-0.74): Bertrand Russell, Thomas Kuhn, analytic philosophers
+- Neutral (0.45-0.59): Isaiah Berlin, Malcolm Gladwell, popular academics
+- Moderate Horizontal (0.30-0.44): David Hume, Adam Smith, essayists
+- High Horizontal (0.15-0.29): William James, Montaigne, literary journalists
+- Extreme Horizontal (0.00-0.14): Kerouac, Joyce, Hunter Thompson
+
+CHARACTER INFERENCE RULES:
+- Verticality 0.80+: High cognitive empathy, low affective empathy, need for closure, schizoid/schizotypal features, contempt for consensus
+- Verticality 0.60-0.79: Analytical mind, values precision, can be warm but defaults to logic
+- Verticality 0.40-0.59: Balanced empathy types, adaptable communicator
+- Verticality 0.20-0.39: High affective empathy, social warmth, tolerates ambiguity, performative
+- Verticality 0.00-0.19: Extremely body-centered, sensory, chaotic, intense affective experience
+
+Analyze the following text and provide your assessment:
+
+TEXT TO ANALYZE:
+${textContent}
+
+Return your analysis in this JSON format:
+{
+  "verticality_quotient": 0.XX,
+  "classification": "Extreme Vertical" | "High Vertical" | "Moderate Vertical" | "Neutral" | "Moderate Horizontal" | "High Horizontal" | "Extreme Horizontal",
+  "stylometric_evidence": {
+    "ego_pronoun_rate": "X per 1000 words - [interpretation]",
+    "impersonal_constructions": "[count and examples]",
+    "sentence_structure": "[analysis of length, variation, subordination]",
+    "metaphor_density": "[low/moderate/high with examples]",
+    "narrative_elements": "[present/absent, examples if present]",
+    "punctuation_patterns": "[analysis]",
+    "vocabulary_register": "[abstract/concrete/mixed]",
+    "reader_address": "[present/absent]",
+    "emotional_language": "[analysis]"
+  },
+  "representative_quotes": ["quote1 - why it exemplifies the score", "quote2 - explanation", "quote3 - explanation"],
+  "closest_author_match": "Author Name",
+  "author_match_explanation": "Why this author is the closest stylometric match",
+  "character_profile": {
+    "cognitive_empathy": "extremely high/high/moderate/low/extremely low",
+    "affective_empathy": "extremely high/high/moderate/low/extremely low", 
+    "ambiguity_tolerance": "high/moderate/low",
+    "social_orientation": "[description]",
+    "likely_traits": ["trait1", "trait2", "trait3", "trait4", "trait5"],
+    "psychological_summary": "2-3 sentence portrait of the author's likely personality"
+  }
+}`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: "You are an expert stylometrician and literary psychologist. Analyze writing style with precision and provide detailed evidence for all claims."
+          }, {
+            role: "user",
+            content: verticalityRadarPrompt
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        
+        analysisResult = JSON.parse(response.choices[0]?.message.content || "{}");
+        
+      } else if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: "You are an expert stylometrician and literary psychologist. Analyze writing style with precision and provide detailed evidence for all claims."
+          }, {
+            role: "user",
+            content: verticalityRadarPrompt
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        
+        analysisResult = JSON.parse(response.choices[0]?.message.content || "{}");
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 6000,
+          temperature: 0.3,
+          system: "You are an expert stylometrician and literary psychologist. Analyze writing style with precision and provide detailed evidence for all claims. Always return valid JSON.",
+          messages: [{
+            role: "user",
+            content: verticalityRadarPrompt
+          }]
+        });
+        
+        const textContent2 = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent2.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available" });
+      }
+      
+      // Format the analysis as readable prose
+      let formattedContent = "╔══════════════════════════════════════════════════════════════╗\n";
+      formattedContent += "║           VERTICALITY RADAR - STYLOMETRIC ANALYSIS           ║\n";
+      formattedContent += "╚══════════════════════════════════════════════════════════════╝\n\n";
+      
+      // Verticality quotient with visual bar
+      const quotient = analysisResult.verticality_quotient || 0.5;
+      const barLength = 40;
+      const filledLength = Math.round(quotient * barLength);
+      const verticalityBar = "█".repeat(filledLength) + "░".repeat(barLength - filledLength);
+      
+      formattedContent += `VERTICALITY QUOTIENT: ${quotient.toFixed(2)}\n`;
+      formattedContent += `[${verticalityBar}]\n`;
+      formattedContent += `Horizontal ◄────────────────────────────────► Vertical\n\n`;
+      
+      formattedContent += `CLASSIFICATION: ${analysisResult.classification || "Unknown"}\n\n`;
+      
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "STYLOMETRIC EVIDENCE\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.stylometric_evidence) {
+        const evidence = analysisResult.stylometric_evidence;
+        formattedContent += `• Ego-Pronoun Rate: ${evidence.ego_pronoun_rate || "N/A"}\n\n`;
+        formattedContent += `• Impersonal Constructions: ${evidence.impersonal_constructions || "N/A"}\n\n`;
+        formattedContent += `• Sentence Structure: ${evidence.sentence_structure || "N/A"}\n\n`;
+        formattedContent += `• Metaphor Density: ${evidence.metaphor_density || "N/A"}\n\n`;
+        formattedContent += `• Narrative Elements: ${evidence.narrative_elements || "N/A"}\n\n`;
+        formattedContent += `• Punctuation Patterns: ${evidence.punctuation_patterns || "N/A"}\n\n`;
+        formattedContent += `• Vocabulary Register: ${evidence.vocabulary_register || "N/A"}\n\n`;
+        formattedContent += `• Reader Address: ${evidence.reader_address || "N/A"}\n\n`;
+        formattedContent += `• Emotional Language: ${evidence.emotional_language || "N/A"}\n\n`;
+      }
+      
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "REPRESENTATIVE QUOTES\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.representative_quotes && Array.isArray(analysisResult.representative_quotes)) {
+        analysisResult.representative_quotes.forEach((quote: string, i: number) => {
+          formattedContent += `${i + 1}. "${quote}"\n\n`;
+        });
+      }
+      
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "CLOSEST AUTHOR MATCH\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      formattedContent += `Author: ${analysisResult.closest_author_match || "Unknown"}\n\n`;
+      formattedContent += `Why: ${analysisResult.author_match_explanation || "N/A"}\n\n`;
+      
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "CHARACTER PROFILE\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.character_profile) {
+        const profile = analysisResult.character_profile;
+        formattedContent += `• Cognitive Empathy: ${profile.cognitive_empathy || "N/A"}\n`;
+        formattedContent += `• Affective Empathy: ${profile.affective_empathy || "N/A"}\n`;
+        formattedContent += `• Ambiguity Tolerance: ${profile.ambiguity_tolerance || "N/A"}\n`;
+        formattedContent += `• Social Orientation: ${profile.social_orientation || "N/A"}\n\n`;
+        
+        if (profile.likely_traits && Array.isArray(profile.likely_traits)) {
+          formattedContent += "Likely Traits:\n";
+          profile.likely_traits.forEach((trait: string) => {
+            formattedContent += `  • ${trait}\n`;
+          });
+          formattedContent += "\n";
+        }
+        
+        formattedContent += `PSYCHOLOGICAL SUMMARY:\n${profile.psychological_summary || "N/A"}\n`;
+      }
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Verticality Radar Analysis",
+        mediaUrl: `verticality-radar:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, verticality_assessment: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, verticality_assessment: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Verticality Radar analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze text for Verticality Radar" });
+    }
+  });
+
+  // Verticality Radar - Two Text Comparison
+  app.post("/api/analyze/text/verticality-radar-comparison", async (req, res) => {
+    try {
+      const { textA, textB, sessionId, selectedModel = "grok", title } = req.body;
+      
+      if (!textA || typeof textA !== 'string' || !textB || typeof textB !== 'string') {
+        return res.status(400).json({ error: "Two text samples are required" });
+      }
+      
+      if (textA.split(/\s+/).length < 100 || textB.split(/\s+/).length < 100) {
+        return res.status(400).json({ error: "Each text must be at least 100 words for accurate stylometric analysis" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Verticality Radar comparison with model: ${selectedModel}`);
+      
+      const comparisonPrompt = `You are an expert stylometrician and literary psychologist. You will analyze TWO texts and compare their positions on the VERTICAL-HORIZONTAL spectrum.
+
+VERTICAL (0.80-1.00): Ego-absent, impersonal, logical, ghost-like prose (Frege, Nagel, Kuczynski)
+HORIZONTAL (0.00-0.24): Ego-present, narrative, metaphorical, carnival-like prose (William James, Kerouac, Joyce)
+
+Analyze both texts for:
+1. Ego-pronoun rate (I/me/my/we/us/our per 1000 words)
+2. Impersonal constructions
+3. Sentence structure and subordination depth
+4. Metaphor and imagery density
+5. Narrative elements
+6. Punctuation patterns
+7. Vocabulary register (abstract vs concrete)
+8. Reader address
+9. Emotional language
+
+TEXT A:
+${textA}
+
+TEXT B:
+${textB}
+
+Return your comparative analysis in this JSON format:
+{
+  "text_a": {
+    "verticality_quotient": 0.XX,
+    "classification": "classification",
+    "closest_author_match": "Author Name",
+    "key_evidence": ["evidence1", "evidence2", "evidence3"],
+    "representative_quote": "quote from text A that exemplifies its style",
+    "character_traits": ["trait1", "trait2", "trait3"]
+  },
+  "text_b": {
+    "verticality_quotient": 0.XX,
+    "classification": "classification", 
+    "closest_author_match": "Author Name",
+    "key_evidence": ["evidence1", "evidence2", "evidence3"],
+    "representative_quote": "quote from text B that exemplifies its style",
+    "character_traits": ["trait1", "trait2", "trait3"]
+  },
+  "comparison": {
+    "verdict": "Text A is [more/less/equally] vertical than Text B",
+    "quotient_difference": 0.XX,
+    "key_stylistic_differences": ["difference1", "difference2", "difference3"],
+    "if_in_same_room": "Description of how these two authors would interact if they were in the same room together",
+    "collaborative_potential": "What would happen if they worked on a project together"
+  }
+}`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "system",
+            content: "You are an expert stylometrician comparing two texts. Be precise and provide detailed evidence."
+          }, {
+            role: "user",
+            content: comparisonPrompt
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        
+        analysisResult = JSON.parse(response.choices[0]?.message.content || "{}");
+        
+      } else if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{
+            role: "system",
+            content: "You are an expert stylometrician comparing two texts. Be precise and provide detailed evidence."
+          }, {
+            role: "user",
+            content: comparisonPrompt
+          }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        
+        analysisResult = JSON.parse(response.choices[0]?.message.content || "{}");
+        
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 6000,
+          temperature: 0.3,
+          system: "You are an expert stylometrician comparing two texts. Be precise and provide detailed evidence. Always return valid JSON.",
+          messages: [{
+            role: "user",
+            content: comparisonPrompt
+          }]
+        });
+        
+        const textContent2 = response.content[0]?.type === 'text' ? response.content[0].text : "";
+        const jsonMatch = textContent2.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          analysisResult = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not extract JSON from Anthropic response");
+        }
+        
+      } else {
+        return res.status(400).json({ error: "Selected AI model is not available" });
+      }
+      
+      // Format comparison results
+      let formattedContent = "╔══════════════════════════════════════════════════════════════╗\n";
+      formattedContent += "║      VERTICALITY RADAR - TWO-TEXT COMPARISON ANALYSIS        ║\n";
+      formattedContent += "╚══════════════════════════════════════════════════════════════╝\n\n";
+      
+      // Side by side comparison header
+      const qA = analysisResult.text_a?.verticality_quotient || 0.5;
+      const qB = analysisResult.text_b?.verticality_quotient || 0.5;
+      
+      formattedContent += "┌─────────────────────────────┬─────────────────────────────┐\n";
+      formattedContent += "│          TEXT A             │          TEXT B             │\n";
+      formattedContent += "├─────────────────────────────┼─────────────────────────────┤\n";
+      formattedContent += `│ Quotient: ${qA.toFixed(2).padEnd(18)}│ Quotient: ${qB.toFixed(2).padEnd(18)}│\n`;
+      formattedContent += `│ ${(analysisResult.text_a?.classification || "Unknown").padEnd(27)}│ ${(analysisResult.text_b?.classification || "Unknown").padEnd(27)}│\n`;
+      formattedContent += `│ ≈ ${(analysisResult.text_a?.closest_author_match || "Unknown").substring(0, 24).padEnd(25)}│ ≈ ${(analysisResult.text_b?.closest_author_match || "Unknown").substring(0, 24).padEnd(25)}│\n`;
+      formattedContent += "└─────────────────────────────┴─────────────────────────────┘\n\n";
+      
+      // Verdict
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "VERDICT\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      formattedContent += `${analysisResult.comparison?.verdict || "Comparison unavailable"}\n\n`;
+      formattedContent += `Quotient Difference: ${Math.abs(qA - qB).toFixed(2)}\n\n`;
+      
+      // Visual comparison bar
+      const barLength = 50;
+      const posA = Math.round(qA * barLength);
+      const posB = Math.round(qB * barLength);
+      let comparisonBar = "";
+      for (let i = 0; i <= barLength; i++) {
+        if (i === posA && i === posB) comparisonBar += "◆";
+        else if (i === posA) comparisonBar += "A";
+        else if (i === posB) comparisonBar += "B";
+        else comparisonBar += "─";
+      }
+      formattedContent += `Horizontal [${comparisonBar}] Vertical\n\n`;
+      
+      // Text A details
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "TEXT A ANALYSIS\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.text_a) {
+        formattedContent += `Representative Quote: "${analysisResult.text_a.representative_quote || "N/A"}"\n\n`;
+        
+        if (analysisResult.text_a.key_evidence && Array.isArray(analysisResult.text_a.key_evidence)) {
+          formattedContent += "Key Evidence:\n";
+          analysisResult.text_a.key_evidence.forEach((ev: string) => {
+            formattedContent += `  • ${ev}\n`;
+          });
+          formattedContent += "\n";
+        }
+        
+        if (analysisResult.text_a.character_traits && Array.isArray(analysisResult.text_a.character_traits)) {
+          formattedContent += "Character Traits: " + analysisResult.text_a.character_traits.join(", ") + "\n\n";
+        }
+      }
+      
+      // Text B details
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "TEXT B ANALYSIS\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.text_b) {
+        formattedContent += `Representative Quote: "${analysisResult.text_b.representative_quote || "N/A"}"\n\n`;
+        
+        if (analysisResult.text_b.key_evidence && Array.isArray(analysisResult.text_b.key_evidence)) {
+          formattedContent += "Key Evidence:\n";
+          analysisResult.text_b.key_evidence.forEach((ev: string) => {
+            formattedContent += `  • ${ev}\n`;
+          });
+          formattedContent += "\n";
+        }
+        
+        if (analysisResult.text_b.character_traits && Array.isArray(analysisResult.text_b.character_traits)) {
+          formattedContent += "Character Traits: " + analysisResult.text_b.character_traits.join(", ") + "\n\n";
+        }
+      }
+      
+      // Key stylistic differences
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "KEY STYLISTIC DIFFERENCES\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      
+      if (analysisResult.comparison?.key_stylistic_differences && Array.isArray(analysisResult.comparison.key_stylistic_differences)) {
+        analysisResult.comparison.key_stylistic_differences.forEach((diff: string, i: number) => {
+          formattedContent += `${i + 1}. ${diff}\n\n`;
+        });
+      }
+      
+      // If in same room
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "IF THESE AUTHORS WERE IN THE SAME ROOM\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      formattedContent += `${analysisResult.comparison?.if_in_same_room || "N/A"}\n\n`;
+      
+      // Collaborative potential
+      formattedContent += "─".repeat(65) + "\n";
+      formattedContent += "COLLABORATIVE POTENTIAL\n";
+      formattedContent += "─".repeat(65) + "\n\n";
+      formattedContent += `${analysisResult.comparison?.collaborative_potential || "N/A"}\n`;
+      
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Verticality Radar Comparison",
+        mediaUrl: `verticality-radar-comparison:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, verticality_comparison: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, verticality_comparison: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Verticality Radar comparison error:", error);
+      res.status(500).json({ error: "Failed to compare texts for Verticality Radar" });
+    }
+  });
+
   // EVO Psych (Evolutionary Psychology) Analysis - Image
   app.post("/api/analyze/image/evo", async (req, res) => {
     try {

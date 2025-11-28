@@ -1855,6 +1855,100 @@ export async function analyzeVerticalHorizontalText(
   return data;
 }
 
+// Verticality Radar - Single Text Analysis
+export async function analyzeVerticalityRadar(
+  content: string,
+  sessionId: string,
+  selectedModel: ModelType = "grok",
+  title?: string
+) {
+  console.log(`Analyzing text for Verticality Radar with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/text/verticality-radar", {
+    textContent: content,
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("Verticality Radar analysis response:", data);
+  
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from Verticality Radar analysis insights");
+      let analysisContent = '';
+      
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
+// Verticality Radar - Two Text Comparison
+export async function analyzeVerticalityRadarComparison(
+  textA: string,
+  textB: string,
+  sessionId: string,
+  selectedModel: ModelType = "grok",
+  title?: string
+) {
+  console.log(`Comparing two texts for Verticality Radar with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/text/verticality-radar-comparison", {
+    textA,
+    textB,
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("Verticality Radar comparison response:", data);
+  
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from Verticality Radar comparison insights");
+      let analysisContent = '';
+      
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
 // API status check
 export async function checkAPIStatus() {
   const res = await apiRequest("GET", "/api/status", null);
