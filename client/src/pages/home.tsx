@@ -3675,7 +3675,21 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             {!uploadedMedia && !documentName && (
               <form onSubmit={handleTextSubmit} className="space-y-4">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium">Text Input</label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium">Text Input</label>
+                    {textInput.trim() && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setTextInput("")}
+                        className="h-6 px-2 text-xs text-muted-foreground hover:text-destructive"
+                        data-testid="button-clear-text"
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                   <Button
                     type="button"
                     variant="outline"
