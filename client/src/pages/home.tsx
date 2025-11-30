@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, analyzeVerticalHorizontalVideo, analyzeVerticalityRadar, analyzeVerticalityRadarComparison, ModelType, MediaType } from "@/lib/api";
+import { uploadMedia, sendMessage, shareAnalysis, getSharedAnalysis, analyzeText, analyzeDocument, downloadAnalysis, clearSession, analyzeMBTIText, analyzeMBTIImage, analyzeMBTIVideo, analyzeMBTIDocument, analyzeBigFiveText, analyzeBigFiveImage, analyzeBigFiveVideo, analyzeEnneagramText, analyzeEnneagramImage, analyzeEnneagramVideo, analyzeDarkTraitsText, analyzeDarkTraitsImage, analyzeDarkTraitsVideo, analyzeStanfordBinetText, analyzeStanfordBinetImage, analyzeStanfordBinetVideo, analyzeVocationalText, analyzeVocationalImage, analyzeVocationalVideo, analyzePersonalityStructureText, analyzePersonalityStructureImage, analyzePersonalityStructureVideo, analyzeClinicalText, analyzeClinicalImage, analyzeClinicalVideo, analyzeAnxietyText, analyzeAnxietyImage, analyzeAnxietyVideo, analyzeEvoText, analyzeEvoImage, analyzeEvoVideo, analyzeVerticalHorizontalText, analyzeVerticalHorizontalImage, analyzeVerticalHorizontalVideo, analyzeVerticalityRadar, analyzeVerticalityRadarComparison, analyzeDeepDive, ModelType, MediaType } from "@/lib/api";
 import { Upload, Send, FileImage, Film, Share2, AlertCircle, FileText, File, Download, Copy, Check } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -2193,6 +2193,63 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       {/* Left Sidebar - Additional Assessments */}
       <div className="w-56 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
         <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
+        
+        {/* Deep Dive - Comprehensive Multi-Framework Analysis */}
+        <Button
+          variant={selectedAnalysisType === "deep-dive" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white hover:from-amber-500/90 hover:via-orange-500/90 hover:to-red-500/90 border-none font-bold"
+          onClick={async () => {
+            setSelectedAnalysisType("deep-dive");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text (min 100 characters) in the Input Preview section below",
+              });
+              return;
+            }
+            
+            if (textInput.trim().length < 100) {
+              toast({
+                variant: "destructive",
+                title: "Text Too Short",
+                description: "Deep Dive requires at least 100 characters for comprehensive analysis",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(10);
+            
+            try {
+              const data = await analyzeDeepDive(textInput, sessionId, selectedModel, `Deep Dive Analysis - ${new Date().toLocaleDateString()}`);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(prev => [...prev, ...data.messages]);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Deep Dive Complete",
+                  description: "Your comprehensive multi-framework analysis is ready",
+                });
+              }
+            } catch (error: any) {
+              console.error("Deep Dive analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: error.message || "Failed to perform Deep Dive analysis. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-deep-dive"
+        >
+          🔬 DEEP DIVE (Text)
+        </Button>
         
         {/* Personality Structure */}
         <Button

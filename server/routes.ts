@@ -11811,6 +11811,622 @@ Return your comparative analysis in this JSON format:
     }
   });
 
+  // Deep Dive Text Analysis - Comprehensive Multi-Framework Assessment
+  app.post("/api/analyze/text/deep-dive", async (req, res) => {
+    try {
+      const { content, sessionId, selectedModel = "grok", title } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Text content is required" });
+      }
+      
+      if (content.trim().length < 100) {
+        return res.status(400).json({ error: "Text must be at least 100 characters for Deep Dive analysis" });
+      }
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+      
+      console.log(`Processing Deep Dive text analysis with model: ${selectedModel}`);
+      
+      const deepDivePrompt = `You are an elite psychologist conducting a COMPREHENSIVE DEEP DIVE ANALYSIS across multiple psychological frameworks. This is a thorough, multi-dimensional assessment that synthesizes insights from various theoretical perspectives.
+
+IMPORTANT DISCLAIMER: This analysis is for entertainment, educational, and self-reflection purposes only. It does NOT constitute clinical diagnosis, professional psychological assessment, or medical advice.
+
+Analyze the following text across FIVE major psychological frameworks and provide an integrated synthesis:
+
+TEXT TO ANALYZE:
+${content}
+
+Provide your comprehensive analysis in the following JSON format:
+
+{
+  "executive_summary": {
+    "overview": "A 3-4 paragraph executive summary synthesizing insights across all frameworks",
+    "key_themes": ["theme1", "theme2", "theme3", "theme4", "theme5"],
+    "notable_patterns": ["pattern1", "pattern2", "pattern3"],
+    "psychological_signature": "One-sentence distillation of the individual's psychological fingerprint"
+  },
+  
+  "big_five_ocean": {
+    "openness": {
+      "score": "High/Moderate-High/Moderate/Moderate-Low/Low",
+      "percentile_estimate": "XX-XXth percentile",
+      "evidence": ["evidence1", "evidence2", "evidence3"],
+      "facets": {
+        "fantasy": "High/Moderate/Low with brief explanation",
+        "aesthetics": "High/Moderate/Low with brief explanation",
+        "feelings": "High/Moderate/Low with brief explanation",
+        "actions": "High/Moderate/Low with brief explanation",
+        "ideas": "High/Moderate/Low with brief explanation",
+        "values": "High/Moderate/Low with brief explanation"
+      }
+    },
+    "conscientiousness": {
+      "score": "High/Moderate-High/Moderate/Moderate-Low/Low",
+      "percentile_estimate": "XX-XXth percentile",
+      "evidence": ["evidence1", "evidence2", "evidence3"],
+      "facets": {
+        "competence": "High/Moderate/Low with brief explanation",
+        "order": "High/Moderate/Low with brief explanation",
+        "dutifulness": "High/Moderate/Low with brief explanation",
+        "achievement_striving": "High/Moderate/Low with brief explanation",
+        "self_discipline": "High/Moderate/Low with brief explanation",
+        "deliberation": "High/Moderate/Low with brief explanation"
+      }
+    },
+    "extraversion": {
+      "score": "High/Moderate-High/Moderate/Moderate-Low/Low",
+      "percentile_estimate": "XX-XXth percentile",
+      "evidence": ["evidence1", "evidence2", "evidence3"],
+      "facets": {
+        "warmth": "High/Moderate/Low with brief explanation",
+        "gregariousness": "High/Moderate/Low with brief explanation",
+        "assertiveness": "High/Moderate/Low with brief explanation",
+        "activity": "High/Moderate/Low with brief explanation",
+        "excitement_seeking": "High/Moderate/Low with brief explanation",
+        "positive_emotions": "High/Moderate/Low with brief explanation"
+      }
+    },
+    "agreeableness": {
+      "score": "High/Moderate-High/Moderate/Moderate-Low/Low",
+      "percentile_estimate": "XX-XXth percentile",
+      "evidence": ["evidence1", "evidence2", "evidence3"],
+      "facets": {
+        "trust": "High/Moderate/Low with brief explanation",
+        "straightforwardness": "High/Moderate/Low with brief explanation",
+        "altruism": "High/Moderate/Low with brief explanation",
+        "compliance": "High/Moderate/Low with brief explanation",
+        "modesty": "High/Moderate/Low with brief explanation",
+        "tender_mindedness": "High/Moderate/Low with brief explanation"
+      }
+    },
+    "neuroticism": {
+      "score": "High/Moderate-High/Moderate/Moderate-Low/Low",
+      "percentile_estimate": "XX-XXth percentile",
+      "evidence": ["evidence1", "evidence2", "evidence3"],
+      "facets": {
+        "anxiety": "High/Moderate/Low with brief explanation",
+        "angry_hostility": "High/Moderate/Low with brief explanation",
+        "depression": "High/Moderate/Low with brief explanation",
+        "self_consciousness": "High/Moderate/Low with brief explanation",
+        "impulsiveness": "High/Moderate/Low with brief explanation",
+        "vulnerability": "High/Moderate/Low with brief explanation"
+      }
+    },
+    "profile_summary": "Narrative summary of Big Five profile and what it suggests"
+  },
+  
+  "dark_traits_assessment": {
+    "overall_risk_level": "Minimal/Low/Moderate/Elevated/High",
+    "dark_tetrad": {
+      "narcissism": {
+        "level": "Minimal/Low/Moderate/Elevated/High",
+        "subtype": "Grandiose/Vulnerable/Communal/N/A",
+        "indicators": ["indicator1", "indicator2"],
+        "evidence": "Textual evidence supporting assessment"
+      },
+      "machiavellianism": {
+        "level": "Minimal/Low/Moderate/Elevated/High",
+        "indicators": ["indicator1", "indicator2"],
+        "evidence": "Textual evidence supporting assessment"
+      },
+      "psychopathy": {
+        "level": "Minimal/Low/Moderate/Elevated/High",
+        "subtype": "Primary/Secondary/N/A",
+        "indicators": ["indicator1", "indicator2"],
+        "evidence": "Textual evidence supporting assessment"
+      },
+      "sadism": {
+        "level": "Minimal/Low/Moderate/Elevated/High",
+        "indicators": ["indicator1", "indicator2"],
+        "evidence": "Textual evidence supporting assessment"
+      }
+    },
+    "interpersonal_exploitation_risk": "Assessment of tendency to exploit others",
+    "empathy_assessment": "Analysis of empathic capacity based on text",
+    "moral_disengagement_patterns": ["pattern1", "pattern2"]
+  },
+  
+  "clinical_indicators": {
+    "disclaimer": "This is NOT a clinical diagnosis. Seek professional help for any mental health concerns.",
+    "mood_patterns": {
+      "depression_indicators": "None/Minimal/Some/Notable/Significant",
+      "anxiety_indicators": "None/Minimal/Some/Notable/Significant",
+      "mood_stability": "Stable/Mostly Stable/Variable/Unstable",
+      "evidence": ["evidence1", "evidence2"]
+    },
+    "cognitive_patterns": {
+      "rumination": "Low/Moderate/High",
+      "catastrophizing": "Low/Moderate/High",
+      "black_white_thinking": "Low/Moderate/High",
+      "personalization": "Low/Moderate/High"
+    },
+    "behavioral_patterns": {
+      "avoidance_tendencies": "Low/Moderate/High",
+      "impulsivity_indicators": "Low/Moderate/High",
+      "compulsive_patterns": "None/Minimal/Some/Notable"
+    },
+    "attachment_style_indicators": "Secure/Anxious/Avoidant/Disorganized with explanation",
+    "coping_mechanisms": ["mechanism1", "mechanism2", "mechanism3"],
+    "resilience_indicators": ["indicator1", "indicator2"]
+  },
+  
+  "emotional_wellbeing": {
+    "overall_emotional_tone": "Positive/Mixed-Positive/Neutral/Mixed-Negative/Negative",
+    "anxiety_scale": {
+      "level": "Minimal/Mild/Moderate/Moderately-Severe/Severe",
+      "manifestations": ["manifestation1", "manifestation2"],
+      "triggers_identified": ["trigger1", "trigger2"]
+    },
+    "depression_indicators": {
+      "level": "Minimal/Mild/Moderate/Moderately-Severe/Severe",
+      "cognitive_symptoms": ["symptom1", "symptom2"],
+      "affective_symptoms": ["symptom1", "symptom2"]
+    },
+    "emotional_regulation": {
+      "capacity": "Strong/Adequate/Developing/Limited",
+      "strategies_used": ["strategy1", "strategy2"],
+      "areas_for_growth": ["area1", "area2"]
+    },
+    "stress_response_pattern": "Adaptive/Mixed/Maladaptive with explanation",
+    "emotional_intelligence_indicators": "High/Moderate/Low with evidence"
+  },
+  
+  "evolutionary_psychology": {
+    "dominant_poles": ["pole1", "pole2", "pole3"],
+    "pole_scores": {
+      "enforcer": 0.00,
+      "explorer": 0.00,
+      "healer": 0.00,
+      "strategist": 0.00,
+      "signaler": 0.00,
+      "caretaker": 0.00,
+      "aggressor": 0.00,
+      "broker": 0.00,
+      "seer": 0.00,
+      "mimic": 0.00
+    },
+    "adaptive_strategy": "Description of primary evolutionary adaptive strategy",
+    "social_niche": "Description of the social niche this person tends to occupy",
+    "mate_value_signals": ["signal1", "signal2"],
+    "coalition_style": "Description of how they form and maintain alliances",
+    "resource_acquisition_strategy": "How they acquire and manage resources"
+  },
+  
+  "integrated_synthesis": {
+    "core_identity_themes": ["theme1", "theme2", "theme3"],
+    "central_tensions": ["tension1", "tension2"],
+    "growth_edges": ["edge1", "edge2", "edge3"],
+    "hidden_strengths": ["strength1", "strength2"],
+    "blind_spots": ["blindspot1", "blindspot2"],
+    "life_narrative_themes": "Analysis of dominant life story patterns",
+    "values_hierarchy": ["value1", "value2", "value3", "value4", "value5"],
+    "worldview_orientation": "Description of how they see and interpret the world"
+  },
+  
+  "recommendations": {
+    "personal_development": ["recommendation1", "recommendation2", "recommendation3"],
+    "relationship_insights": ["insight1", "insight2"],
+    "career_alignment": "Areas where psychological profile aligns with professional success",
+    "wellbeing_strategies": ["strategy1", "strategy2", "strategy3"],
+    "areas_for_professional_support": "Any areas where professional consultation might be beneficial"
+  }
+}`;
+
+      let analysisResult: any;
+      
+      if (selectedModel === "openai" && openai) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are an elite psychologist providing comprehensive multi-framework analysis. Respond only with valid JSON." },
+            { role: "user", content: deepDivePrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 8000,
+        });
+        
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("OpenAI Deep Dive raw response:", rawResponse.substring(0, 500));
+        
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse OpenAI Deep Dive response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+      } else if (selectedModel === "anthropic" && anthropic) {
+        const response = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          messages: [{
+            role: "user",
+            content: deepDivePrompt + "\n\nRespond with valid JSON only, no markdown code blocks."
+          }],
+        });
+        
+        const rawResponse = response.content[0].type === 'text' ? response.content[0].text : "";
+        console.log("Anthropic Deep Dive raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Anthropic Deep Dive response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an elite psychologist providing comprehensive multi-framework analysis. Respond only with valid JSON." },
+            { role: "user", content: deepDivePrompt }
+          ],
+          max_tokens: 8000,
+        });
+        
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Grok Deep Dive raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok Deep Dive response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+      } else if (selectedModel === "perplexity" && process.env.PERPLEXITY_API_KEY) {
+        const response = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "llama-3.1-sonar-huge-128k-online",
+            messages: [
+              { role: "system", content: "You are an elite psychologist providing comprehensive multi-framework analysis. Respond only with valid JSON." },
+              { role: "user", content: deepDivePrompt }
+            ]
+          })
+        });
+        
+        const data = await response.json();
+        const rawResponse = data.choices?.[0]?.message?.content || "";
+        console.log("Perplexity Deep Dive raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Perplexity Deep Dive response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+      } else if (selectedModel === "deepseek") {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+              { role: "system", content: "You are an elite psychologist providing comprehensive multi-framework analysis. Respond only with valid JSON." },
+              { role: "user", content: deepDivePrompt }
+            ],
+            response_format: { type: "json_object" }
+          })
+        });
+
+        const data = await response.json();
+        const rawResponse = data.choices?.[0]?.message?.content || "";
+        console.log("DeepSeek Deep Dive raw response:", rawResponse.substring(0, 500));
+
+        try {
+          analysisResult = JSON.parse(rawResponse);
+        } catch (parseError) {
+          console.error("Failed to parse DeepSeek Deep Dive response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Deep Dive analysis requires OpenAI, Anthropic, Grok, Perplexity, or DeepSeek." 
+        });
+      }
+      
+      console.log("Deep Dive text analysis complete");
+      
+      // Format the comprehensive analysis for display
+      let formattedContent = `═══════════════════════════════════════════════════════════════════
+                    DEEP DIVE PSYCHOLOGICAL ANALYSIS
+                    Multi-Framework Comprehensive Assessment
+═══════════════════════════════════════════════════════════════════
+
+DISCLAIMER: This analysis is for entertainment, educational, and self-reflection purposes only. It does NOT constitute clinical diagnosis, professional psychological assessment, or medical advice.
+
+`;
+
+      // Executive Summary
+      if (analysisResult.executive_summary) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         EXECUTIVE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${analysisResult.executive_summary.overview || "N/A"}
+
+PSYCHOLOGICAL SIGNATURE:
+${analysisResult.executive_summary.psychological_signature || "N/A"}
+
+KEY THEMES:
+${(analysisResult.executive_summary.key_themes || []).map((t: string, i: number) => `  ${i + 1}. ${t}`).join('\n')}
+
+NOTABLE PATTERNS:
+${(analysisResult.executive_summary.notable_patterns || []).map((p: string, i: number) => `  ${i + 1}. ${p}`).join('\n')}
+
+`;
+      }
+
+      // Big Five OCEAN
+      if (analysisResult.big_five_ocean) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    BIG FIVE / OCEAN PERSONALITY MODEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+        const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
+        const traitLabels: Record<string, string> = {
+          openness: 'OPENNESS TO EXPERIENCE',
+          conscientiousness: 'CONSCIENTIOUSNESS', 
+          extraversion: 'EXTRAVERSION',
+          agreeableness: 'AGREEABLENESS',
+          neuroticism: 'NEUROTICISM'
+        };
+        
+        for (const trait of traits) {
+          const t = analysisResult.big_five_ocean[trait];
+          if (t) {
+            formattedContent += `▸ ${traitLabels[trait]}: ${t.score || 'N/A'} (${t.percentile_estimate || 'N/A'})\n`;
+            if (t.evidence && t.evidence.length > 0) {
+              formattedContent += `  Evidence: ${t.evidence.join('; ')}\n`;
+            }
+            formattedContent += `\n`;
+          }
+        }
+        
+        if (analysisResult.big_five_ocean.profile_summary) {
+          formattedContent += `PROFILE SUMMARY:\n${analysisResult.big_five_ocean.profile_summary}\n\n`;
+        }
+      }
+
+      // Dark Traits
+      if (analysisResult.dark_traits_assessment) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                      DARK TRAITS ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OVERALL RISK LEVEL: ${analysisResult.dark_traits_assessment.overall_risk_level || 'N/A'}
+
+DARK TETRAD ANALYSIS:
+`;
+        const tetrad = analysisResult.dark_traits_assessment.dark_tetrad;
+        if (tetrad) {
+          if (tetrad.narcissism) {
+            formattedContent += `▸ Narcissism: ${tetrad.narcissism.level || 'N/A'}${tetrad.narcissism.subtype && tetrad.narcissism.subtype !== 'N/A' ? ` (${tetrad.narcissism.subtype})` : ''}\n`;
+            if (tetrad.narcissism.evidence) formattedContent += `  ${tetrad.narcissism.evidence}\n`;
+          }
+          if (tetrad.machiavellianism) {
+            formattedContent += `▸ Machiavellianism: ${tetrad.machiavellianism.level || 'N/A'}\n`;
+            if (tetrad.machiavellianism.evidence) formattedContent += `  ${tetrad.machiavellianism.evidence}\n`;
+          }
+          if (tetrad.psychopathy) {
+            formattedContent += `▸ Psychopathy: ${tetrad.psychopathy.level || 'N/A'}${tetrad.psychopathy.subtype && tetrad.psychopathy.subtype !== 'N/A' ? ` (${tetrad.psychopathy.subtype})` : ''}\n`;
+            if (tetrad.psychopathy.evidence) formattedContent += `  ${tetrad.psychopathy.evidence}\n`;
+          }
+          if (tetrad.sadism) {
+            formattedContent += `▸ Sadism: ${tetrad.sadism.level || 'N/A'}\n`;
+            if (tetrad.sadism.evidence) formattedContent += `  ${tetrad.sadism.evidence}\n`;
+          }
+        }
+        formattedContent += `\nEMPATHY ASSESSMENT:\n${analysisResult.dark_traits_assessment.empathy_assessment || 'N/A'}\n\n`;
+      }
+
+      // Clinical Indicators
+      if (analysisResult.clinical_indicators) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                       CLINICAL INDICATORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ ${analysisResult.clinical_indicators.disclaimer || 'This is NOT a clinical diagnosis.'}
+
+MOOD PATTERNS:
+`;
+        const mood = analysisResult.clinical_indicators.mood_patterns;
+        if (mood) {
+          formattedContent += `▸ Depression Indicators: ${mood.depression_indicators || 'N/A'}\n`;
+          formattedContent += `▸ Anxiety Indicators: ${mood.anxiety_indicators || 'N/A'}\n`;
+          formattedContent += `▸ Mood Stability: ${mood.mood_stability || 'N/A'}\n`;
+        }
+        
+        formattedContent += `\nATTACHMENT STYLE: ${analysisResult.clinical_indicators.attachment_style_indicators || 'N/A'}\n`;
+        
+        if (analysisResult.clinical_indicators.coping_mechanisms) {
+          formattedContent += `\nCOPING MECHANISMS:\n${analysisResult.clinical_indicators.coping_mechanisms.map((c: string) => `  • ${c}`).join('\n')}\n`;
+        }
+        formattedContent += `\n`;
+      }
+
+      // Emotional Wellbeing
+      if (analysisResult.emotional_wellbeing) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                      EMOTIONAL WELLBEING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OVERALL EMOTIONAL TONE: ${analysisResult.emotional_wellbeing.overall_emotional_tone || 'N/A'}
+
+`;
+        if (analysisResult.emotional_wellbeing.anxiety_scale) {
+          formattedContent += `ANXIETY: ${analysisResult.emotional_wellbeing.anxiety_scale.level || 'N/A'}\n`;
+        }
+        if (analysisResult.emotional_wellbeing.depression_indicators) {
+          formattedContent += `DEPRESSION INDICATORS: ${analysisResult.emotional_wellbeing.depression_indicators.level || 'N/A'}\n`;
+        }
+        if (analysisResult.emotional_wellbeing.emotional_regulation) {
+          formattedContent += `EMOTIONAL REGULATION CAPACITY: ${analysisResult.emotional_wellbeing.emotional_regulation.capacity || 'N/A'}\n`;
+        }
+        formattedContent += `STRESS RESPONSE: ${analysisResult.emotional_wellbeing.stress_response_pattern || 'N/A'}\n`;
+        formattedContent += `EMOTIONAL INTELLIGENCE: ${analysisResult.emotional_wellbeing.emotional_intelligence_indicators || 'N/A'}\n\n`;
+      }
+
+      // Evolutionary Psychology
+      if (analysisResult.evolutionary_psychology) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                   EVOLUTIONARY PSYCHOLOGY PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DOMINANT POLES: ${(analysisResult.evolutionary_psychology.dominant_poles || []).join(', ')}
+
+`;
+        if (analysisResult.evolutionary_psychology.pole_scores) {
+          formattedContent += `POLE SCORES:\n`;
+          const scores = analysisResult.evolutionary_psychology.pole_scores;
+          const poleNames = ['enforcer', 'explorer', 'healer', 'strategist', 'signaler', 'caretaker', 'aggressor', 'broker', 'seer', 'mimic'];
+          for (const pole of poleNames) {
+            if (scores[pole] !== undefined) {
+              const score = typeof scores[pole] === 'number' ? scores[pole].toFixed(2) : scores[pole];
+              const bar = '█'.repeat(Math.round(parseFloat(score) * 10)) + '░'.repeat(10 - Math.round(parseFloat(score) * 10));
+              formattedContent += `  ${pole.charAt(0).toUpperCase() + pole.slice(1).padEnd(12)} ${bar} ${score}\n`;
+            }
+          }
+        }
+        formattedContent += `\nADAPTIVE STRATEGY: ${analysisResult.evolutionary_psychology.adaptive_strategy || 'N/A'}\n`;
+        formattedContent += `SOCIAL NICHE: ${analysisResult.evolutionary_psychology.social_niche || 'N/A'}\n`;
+        formattedContent += `COALITION STYLE: ${analysisResult.evolutionary_psychology.coalition_style || 'N/A'}\n\n`;
+      }
+
+      // Integrated Synthesis
+      if (analysisResult.integrated_synthesis) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                      INTEGRATED SYNTHESIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CORE IDENTITY THEMES:
+${(analysisResult.integrated_synthesis.core_identity_themes || []).map((t: string) => `  • ${t}`).join('\n')}
+
+CENTRAL TENSIONS:
+${(analysisResult.integrated_synthesis.central_tensions || []).map((t: string) => `  • ${t}`).join('\n')}
+
+GROWTH EDGES:
+${(analysisResult.integrated_synthesis.growth_edges || []).map((e: string) => `  • ${e}`).join('\n')}
+
+HIDDEN STRENGTHS:
+${(analysisResult.integrated_synthesis.hidden_strengths || []).map((s: string) => `  • ${s}`).join('\n')}
+
+BLIND SPOTS:
+${(analysisResult.integrated_synthesis.blind_spots || []).map((b: string) => `  • ${b}`).join('\n')}
+
+VALUES HIERARCHY:
+${(analysisResult.integrated_synthesis.values_hierarchy || []).map((v: string, i: number) => `  ${i + 1}. ${v}`).join('\n')}
+
+WORLDVIEW ORIENTATION:
+${analysisResult.integrated_synthesis.worldview_orientation || 'N/A'}
+
+LIFE NARRATIVE THEMES:
+${analysisResult.integrated_synthesis.life_narrative_themes || 'N/A'}
+
+`;
+      }
+
+      // Recommendations
+      if (analysisResult.recommendations) {
+        formattedContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                       RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PERSONAL DEVELOPMENT:
+${(analysisResult.recommendations.personal_development || []).map((r: string) => `  • ${r}`).join('\n')}
+
+RELATIONSHIP INSIGHTS:
+${(analysisResult.recommendations.relationship_insights || []).map((r: string) => `  • ${r}`).join('\n')}
+
+CAREER ALIGNMENT:
+${analysisResult.recommendations.career_alignment || 'N/A'}
+
+WELLBEING STRATEGIES:
+${(analysisResult.recommendations.wellbeing_strategies || []).map((s: string) => `  • ${s}`).join('\n')}
+
+${analysisResult.recommendations.areas_for_professional_support ? `\nAREAS FOR PROFESSIONAL SUPPORT:\n${analysisResult.recommendations.areas_for_professional_support}` : ''}
+
+═══════════════════════════════════════════════════════════════════
+                    END OF DEEP DIVE ANALYSIS
+═══════════════════════════════════════════════════════════════════
+`;
+      }
+
+      const analysis = await storage.createAnalysis({
+        sessionId,
+        title: title || "Deep Dive Text Analysis",
+        mediaUrl: `deep-dive-text:${Date.now()}`,
+        mediaType: "text",
+        personalityInsights: { analysis: formattedContent, deep_dive: analysisResult },
+        modelUsed: selectedModel,
+      });
+      
+      const message = await storage.createMessage({
+        sessionId,
+        analysisId: analysis.id,
+        content: formattedContent,
+        role: "assistant",
+      });
+      
+      res.json({
+        analysisId: analysis.id,
+        personalityInsights: { analysis: formattedContent, deep_dive: analysisResult },
+        messages: [message],
+      });
+    } catch (error) {
+      console.error("Deep Dive text analysis error:", error);
+      res.status(500).json({ error: "Failed to perform Deep Dive analysis" });
+    }
+  });
+
   // EVO Psych (Evolutionary Psychology) Analysis - Image
   app.post("/api/analyze/image/evo", async (req, res) => {
     try {

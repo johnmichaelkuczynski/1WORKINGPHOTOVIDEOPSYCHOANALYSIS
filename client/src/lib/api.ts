@@ -1949,6 +1949,52 @@ export async function analyzeVerticalityRadarComparison(
   return data;
 }
 
+// Deep Dive Text Analysis - Comprehensive Multi-Framework Assessment
+export async function analyzeDeepDive(
+  content: string,
+  sessionId: string,
+  selectedModel: ModelType = "grok",
+  title?: string
+) {
+  console.log(`Performing Deep Dive analysis with model: ${selectedModel}, sessionId: ${sessionId}`);
+  
+  const res = await apiRequest("POST", "/api/analyze/text/deep-dive", {
+    content,
+    sessionId,
+    selectedModel,
+    title
+  });
+  
+  const data = await res.json();
+  console.log("Deep Dive analysis response:", data);
+  
+  if (data.analysisId && (!data.messages || data.messages.length === 0)) {
+    if (data.personalityInsights) {
+      console.log("Creating message from Deep Dive analysis insights");
+      let analysisContent = '';
+      
+      if (typeof data.personalityInsights === 'string') {
+        analysisContent = data.personalityInsights;
+      } else if (data.personalityInsights.analysis) {
+        analysisContent = data.personalityInsights.analysis;
+      }
+
+      if (analysisContent) {
+        data.messages = [{
+          id: Date.now(),
+          analysisId: data.analysisId,
+          sessionId,
+          role: "assistant",
+          content: analysisContent,
+          createdAt: new Date().toISOString()
+        }];
+      }
+    }
+  }
+  
+  return data;
+}
+
 // API status check
 export async function checkAPIStatus() {
   const res = await apiRequest("GET", "/api/status", null);
