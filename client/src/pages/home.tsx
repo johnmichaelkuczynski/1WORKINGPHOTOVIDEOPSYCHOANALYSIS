@@ -2203,9 +2203,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2318,9 +2317,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text (min 100 characters) in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below (min 100 characters) and hit this button again! 😊",
               });
               return;
             }
@@ -2389,9 +2387,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2486,9 +2483,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2584,9 +2580,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2681,9 +2676,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2778,9 +2772,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -2875,9 +2868,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text (min 100 words) in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below (min 100 words) and hit this button again! 😊",
               });
               return;
             }
@@ -2944,9 +2936,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -3017,9 +3008,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -3090,9 +3080,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -3163,9 +3152,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
@@ -3236,9 +3224,8 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
             
             if (!textInput.trim()) {
               toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text in the Input Preview section below",
+                title: "✨ Almost there!",
+                description: "Please pop your text in the input box below and hit this button again! 😊",
               });
               return;
             }
