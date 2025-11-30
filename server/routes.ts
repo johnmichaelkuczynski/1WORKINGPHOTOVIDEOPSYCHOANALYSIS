@@ -2592,9 +2592,63 @@ Provide your analysis in JSON format:
             confidence: "Low (formatting error occurred)"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        // Grok vision support for video frames
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: mbtiVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...frames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 8000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok MBTI Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the MBTI analysis. Please try again with a different video showing clear behavioral patterns.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              introversion_extraversion: "Unable to analyze due to formatting error. Please retry with a clearer video.",
+              sensing_intuition: "Unable to analyze due to formatting error. Please retry with a clearer video.",
+              thinking_feeling: "Unable to analyze due to formatting error. Please retry with a clearer video.",
+              judging_perceiving: "Unable to analyze due to formatting error. Please retry with a clearer video.",
+              cognitive_function_signals: "Unable to analyze due to formatting error. Please retry with a clearer video."
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low (formatting error occurred)"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "MBTI video analysis currently only supports OpenAI and Anthropic models with vision capabilities." 
+          error: "MBTI video analysis currently only supports OpenAI, Anthropic, and Grok models with vision capabilities." 
         });
       }
       
@@ -2846,9 +2900,54 @@ Provide detailed analysis in JSON format:
             growth_areas: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok for Big Five text analysis');
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{ role: "user", content: bigFivePrompt }],
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Big Five raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        // Extract JSON from code fence if present
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Big Five analysis. Please try again with different text.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              openness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              conscientiousness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              extraversion: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              agreeableness: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] },
+              neuroticism: { score: "Unable to determine", description: "Formatting error occurred", indicators: [] }
+            },
+            personality_profile: "Unable to generate profile due to formatting error",
+            strengths: [],
+            growth_areas: []
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Big Five text analysis currently only supports OpenAI and Anthropic models." 
+          error: "Big Five text analysis currently only supports OpenAI, Anthropic, and Grok models." 
         });
       }
       
@@ -3518,9 +3617,51 @@ Provide a comprehensive vocational and motivational assessment in JSON format:
             error: "Formatting error occurred"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok for Vocational text analysis');
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{ role: "user", content: vocationalPrompt }],
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Vocational raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Vocational analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            holland_code: { primary_type: "Unable to determine", secondary_type: "", tertiary_type: "", code_description: "Formatting error" },
+            career_interests: { primary_interests: [], potential_career_paths: [], work_environment_preferences: "" },
+            work_values: { top_values: [], value_conflicts: "", value_based_recommendations: [] },
+            motivational_drivers: { intrinsic_motivators: [], extrinsic_motivators: [], achievement_indicators: "", autonomy_indicators: "" },
+            work_style_analysis: { collaboration_preference: "", structure_preference: "", detail_orientation: "", pace_preference: "" },
+            recommended_careers: [],
+            development_areas: [],
+            career_action_plan: "Unable to generate due to formatting error"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Vocational text analysis currently only supports OpenAI, Anthropic, and Perplexity models." 
+          error: "Vocational text analysis currently only supports OpenAI, Anthropic, Perplexity, and Grok models." 
         });
       }
       
@@ -3814,9 +3955,57 @@ Provide a detailed vocational assessment in JSON format:
             career_action_plan: "Unable to generate due to formatting error"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: vocationalImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("Grok Vocational Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Vocational analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            holland_code: { primary_type: "Unable to determine", secondary_type: "", tertiary_type: "", code_description: "Formatting error", visual_evidence: "" },
+            career_interests: { primary_interests: [], potential_career_paths: [], work_environment_preferences: "" },
+            work_values: { top_values: [], value_conflicts: "", value_based_recommendations: [] },
+            motivational_drivers: { intrinsic_motivators: [], extrinsic_motivators: [], achievement_indicators: "", autonomy_indicators: "" },
+            work_style_analysis: { collaboration_preference: "", structure_preference: "", detail_orientation: "", pace_preference: "" },
+            recommended_careers: [],
+            development_areas: [],
+            career_action_plan: "Unable to generate due to formatting error"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Vocational/Motivation image analysis currently only supports OpenAI GPT-4o Vision model." 
+          error: "Vocational/Motivation image analysis currently only supports OpenAI and Grok models with vision capabilities." 
         });
       }
       
@@ -4141,9 +4330,56 @@ Provide a detailed vocational assessment in JSON format:
             video_timeline_analysis: "Unable to generate"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: vocationalVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Vocational Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            holland_code: { primary_type: "Unable to determine", secondary_type: "", tertiary_type: "", code_description: "Formatting error", visual_evidence: "", temporal_patterns: "" },
+            career_interests: { primary_interests: [], potential_career_paths: [], work_environment_preferences: "", behavioral_patterns: "" },
+            work_values: { top_values: [], value_conflicts: "", value_based_recommendations: [], temporal_demonstration: "" },
+            motivational_drivers: { intrinsic_motivators: [], extrinsic_motivators: [], achievement_indicators: "", autonomy_indicators: "", behavioral_patterns: "" },
+            work_style_analysis: { collaboration_preference: "", structure_preference: "", detail_orientation: "", pace_preference: "", temporal_consistency: "" },
+            recommended_careers: [],
+            development_areas: [],
+            career_action_plan: "Unable to generate",
+            video_timeline_analysis: "Unable to generate"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Vocational/Motivation video analysis currently only supports OpenAI GPT-4o Vision model." 
+          error: "Vocational/Motivation video analysis currently only supports OpenAI and Grok models with vision capabilities." 
         });
       }
       
@@ -4448,9 +4684,62 @@ Provide a detailed cognitive assessment in JSON format:
             recommendations: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: stanfordBinetImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("Grok Stanford-Binet Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Stanford-Binet analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", visual_indicators: [] },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", visual_indicators: [] },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", visual_indicators: [] },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", visual_indicators: [] },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", visual_indicators: [] }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate due to formatting error",
+            intellectual_profile: "Unable to generate profile due to formatting error",
+            recommendations: []
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Stanford-Binet image analysis currently only supports OpenAI GPT-4o Vision model." 
+          error: "Stanford-Binet image analysis currently only supports OpenAI and Grok models with vision capabilities." 
         });
       }
       
@@ -4774,9 +5063,61 @@ Provide a detailed cognitive assessment in JSON format:
             video_timeline_analysis: "Unable to generate"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: stanfordBinetVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Stanford-Binet Video raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error", visual_indicators: [], temporal_patterns: "N/A" }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate",
+            intellectual_profile: "Unable to generate",
+            recommendations: [],
+            video_timeline_analysis: "Unable to generate"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Stanford-Binet video analysis currently only supports OpenAI GPT-4o Vision model." 
+          error: "Stanford-Binet video analysis currently only supports OpenAI and Grok models with vision capabilities." 
         });
       }
       
@@ -5065,9 +5406,59 @@ Provide detailed analysis in JSON format:
             growth_areas: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const completion = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: bigFiveImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = completion.choices[0]?.message.content || "";
+        console.log("Grok Big Five Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          console.error("Raw response:", rawResponse);
+          
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Big Five analysis. Please try again.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              openness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              conscientiousness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              extraversion: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              agreeableness: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] },
+              neuroticism: { score: "Unable to determine", description: "Formatting error occurred", visual_indicators: [] }
+            },
+            personality_profile: "Unable to generate profile due to formatting error",
+            strengths: [],
+            growth_areas: []
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "Big Five image analysis currently only supports OpenAI GPT-4o Vision model." 
+          error: "Big Five image analysis currently only supports OpenAI and Grok models with vision capabilities." 
         });
       }
       
@@ -6705,12 +7096,50 @@ Provide your SPECULATIVE HYPOTHESIS in JSON format:
         }
       } else if (selectedModel === "deepseek") {
         return res.status(400).json({ 
-          error: "DeepSeek does not support image analysis. Please use OpenAI or Anthropic for image-based dark traits analysis." 
+          error: "DeepSeek does not support image analysis. Please use OpenAI, Anthropic, or Grok for image-based dark traits analysis." 
         });
       } else if (selectedModel === "perplexity") {
         return res.status(400).json({ 
-          error: "Perplexity does not support image analysis. Please use OpenAI or Anthropic for image-based dark traits analysis." 
+          error: "Perplexity does not support image analysis. Please use OpenAI, Anthropic, or Grok for image-based dark traits analysis." 
         });
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: darkTraitsImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Dark Traits Image raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {},
+            personality_pathology_visual_indicators: {},
+            visual_presentation_analysis: {},
+            interpersonal_visual_cues: {},
+            risk_visual_assessment: { concerning_visual_patterns: [], severity_level: "Unknown", protective_visual_factors: [] },
+            clinical_visual_impressions: "Unable to format analysis",
+            limitations: "Formatting error",
+            recommendations: []
+          };
+        }
       }
       
       console.log("Dark Traits image analysis complete");
@@ -7237,12 +7666,51 @@ Provide your hypothetical case study analysis in JSON format:
         }
       } else if (selectedModel === "deepseek") {
         return res.status(400).json({ 
-          error: "DeepSeek does not support video analysis. Please use OpenAI or Anthropic for video-based dark traits analysis." 
+          error: "DeepSeek does not support video analysis. Please use OpenAI, Anthropic, or Grok for video-based dark traits analysis." 
         });
       } else if (selectedModel === "perplexity") {
         return res.status(400).json({ 
-          error: "Perplexity does not support video analysis. Please use OpenAI or Anthropic for video-based dark traits analysis." 
+          error: "Perplexity does not support video analysis. Please use OpenAI, Anthropic, or Grok for video-based dark traits analysis." 
         });
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: darkTraitsVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 8000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Dark Traits Video raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_visual_assessment: {
+              narcissism: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              machiavellianism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              psychopathy: { level: "Unable to determine", subtype: "N/A", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" },
+              sadism: { level: "Unable to determine", visual_evidence_timeline: [], speculative_hypothesis: "Formatting error" }
+            }
+          };
+        }
       }
       
       console.log("Dark Traits video analysis complete");
@@ -7670,12 +8138,52 @@ Provide your analysis in JSON format:
         }
       } else if (selectedModel === "deepseek") {
         return res.status(400).json({ 
-          error: "DeepSeek does not support image analysis. Please use OpenAI or Anthropic for image-based Enneagram analysis." 
+          error: "DeepSeek does not support image analysis. Please use OpenAI, Anthropic, or Grok for image-based Enneagram analysis." 
         });
       } else if (selectedModel === "perplexity") {
         return res.status(400).json({ 
-          error: "Perplexity does not support image analysis. Please use OpenAI or Anthropic for image-based Enneagram analysis." 
+          error: "Perplexity does not support image analysis. Please use OpenAI, Anthropic, or Grok for image-based Enneagram analysis." 
         });
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: enneagramImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+          max_tokens: 4000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Enneagram Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response.");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[0].replace(/```json\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            visual_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
       }
       
       console.log("Enneagram image analysis complete");
@@ -8037,12 +8545,52 @@ Provide your analysis in JSON format:
         }
       } else if (selectedModel === "deepseek") {
         return res.status(400).json({ 
-          error: "DeepSeek does not support video analysis. Please use OpenAI or Anthropic for video-based Enneagram analysis." 
+          error: "DeepSeek does not support video analysis. Please use OpenAI, Anthropic, or Grok for video-based Enneagram analysis." 
         });
       } else if (selectedModel === "perplexity") {
         return res.status(400).json({ 
-          error: "Perplexity does not support video analysis. Please use OpenAI or Anthropic for video-based Enneagram analysis." 
+          error: "Perplexity does not support video analysis. Please use OpenAI, Anthropic, or Grok for video-based Enneagram analysis." 
         });
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: enneagramVideoPrompt + "\n\nFrames extracted at 0%, 25%, 50%, and 75% of video:" },
+              ...extractedFrames.map((frame) => ({
+                type: "image_url" as const,
+                image_url: { url: frame }
+              }))
+            ]
+          }],
+          max_tokens: 8000,
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok Enneagram Video raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", behavioral_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            temporal_patterns: { consistency: "Unknown", energy_changes: "Unknown", defensive_patterns: "Unknown" },
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            behavioral_style_markers: [],
+            personality_summary: "Unable to format analysis"
+          };
+        }
       }
       
       console.log("Enneagram video analysis complete");
@@ -9728,7 +10276,7 @@ ${textContent}`;
         analysisResult = JSON.parse(rawResponse);
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis for display
@@ -9943,7 +10491,7 @@ ${textContent}`;
         analysisResult = JSON.parse(rawResponse);
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis for display
@@ -10178,7 +10726,7 @@ Never explain. Return only JSON.`;
         analysisResult = JSON.parse(rawResponse);
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis for display
@@ -11430,7 +11978,7 @@ Provide thorough EVO Psych visual analysis with rich evidence from the image.`;
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis for display
@@ -11804,7 +12352,7 @@ Return ONLY valid JSON:
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis for display with QUOTATIONS emphasized
@@ -12100,7 +12648,7 @@ Provide thorough visual analysis framed as hypothetical educational interpretati
         analysisResult = JSON.parse(rawResponse);
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
@@ -12340,7 +12888,7 @@ Provide thorough visual affective analysis framed as hypothetical educational in
         analysisResult = JSON.parse(rawResponse);
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
@@ -12646,7 +13194,7 @@ Provide thorough behavioral analysis across timeline framed as hypothetical educ
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
@@ -12951,7 +13499,7 @@ Provide thorough temporal affective/anxiety analysis framed as hypothetical educ
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       // Format analysis - skip disclaimer and executive_summary, go straight to the analysis
@@ -13293,7 +13841,7 @@ Provide exceptionally thorough visual analysis with rich detail and specific evi
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for image analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       const formattedContent = JSON.stringify(analysisResult);
@@ -13627,7 +14175,7 @@ Provide exceptionally thorough video analysis with rich detail and specific evid
         }
         
       } else {
-        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI or Anthropic." });
+        return res.status(400).json({ error: "Selected AI model is not available for video analysis. Please use OpenAI, Anthropic, or Grok." });
       }
       
       const formattedContent = JSON.stringify(analysisResult);
