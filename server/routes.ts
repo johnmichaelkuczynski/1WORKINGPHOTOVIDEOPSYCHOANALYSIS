@@ -2211,9 +2211,55 @@ Provide your analysis in JSON format:
             confidence: "Low (formatting error occurred)"
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: mbtiImagePrompt },
+              { type: "image_url", image_url: { url: mediaData } }
+            ]
+          }],
+        });
+        
+        const rawResponse = response.choices[0]?.message.content || "";
+        console.log("Grok MBTI Image raw response:", rawResponse.substring(0, 500));
+        
+        if (!rawResponse || rawResponse.trim().length === 0) {
+          throw new Error("Grok returned an empty response");
+        }
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the MBTI analysis.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            detailed_analysis: {
+              introversion_extraversion: "Unable to analyze due to formatting error.",
+              sensing_intuition: "Unable to analyze due to formatting error.",
+              thinking_feeling: "Unable to analyze due to formatting error.",
+              judging_perceiving: "Unable to analyze due to formatting error.",
+              cognitive_indicators: "Unable to analyze due to formatting error."
+            },
+            predicted_type: "Unable to determine",
+            confidence: "Low (formatting error occurred)"
+          };
+        }
       } else {
         return res.status(400).json({ 
-          error: "MBTI image analysis currently only supports OpenAI and Anthropic models with vision capabilities." 
+          error: "MBTI image analysis currently only supports OpenAI, Anthropic, and Grok models with vision capabilities." 
         });
       }
       
