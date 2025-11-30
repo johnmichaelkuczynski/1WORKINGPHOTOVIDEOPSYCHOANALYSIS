@@ -3215,63 +3215,22 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           {/* Upload Options */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Step 2: Choose Input Type</h2>
+            {/* Hidden file inputs for file upload functionality */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*"
+              style={{ display: 'none' }}
+              onChange={(e) => handleFileInputChange(e, 'media')}
+            />
+            <input
+              ref={documentInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.txt"
+              style={{ display: 'none' }}
+              onChange={(e) => handleFileInputChange(e, 'document')}
+            />
             <div className="grid grid-cols-3 gap-3">
-              <Button 
-                variant={selectedAnalysisType === "image" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-500/90 hover:to-cyan-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("image");
-                  handleImageVideoClick();
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-image"
-              >
-                <FileImage className="h-6 w-6 mb-1" />
-                <span>Image</span>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => handleFileInputChange(e, 'media')}
-                />
-              </Button>
-              
-              <Button 
-                variant={selectedAnalysisType === "document" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-500/90 hover:to-orange-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("document");
-                  handleDocumentClick();
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-document"
-              >
-                <FileText className="h-6 w-6 mb-1" />
-                <span>Document</span>
-                <input
-                  ref={documentInputRef}
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  style={{ display: 'none' }}
-                  onChange={(e) => handleFileInputChange(e, 'document')}
-                />
-              </Button>
-              
-              <Button 
-                variant={selectedAnalysisType === "video" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-500/90 hover:to-pink-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("video");
-                  handleImageVideoClick();
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-video"
-              >
-                <Film className="h-6 w-6 mb-1" />
-                <span>Video</span>
-              </Button>
-
               <Button 
                 variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
                 className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
