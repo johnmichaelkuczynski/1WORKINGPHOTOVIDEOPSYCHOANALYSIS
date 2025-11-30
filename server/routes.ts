@@ -6648,6 +6648,44 @@ Provide your analysis in JSON format:
             recommendations: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [{
+            role: "user",
+            content: darkTraitsPrompt + "\n\nText to analyze:\n" + content
+          }],
+        });
+        
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Grok Dark Traits text raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            dark_tetrad_assessment: {},
+            personality_pathology_indicators: {},
+            interpersonal_patterns: {},
+            cognitive_patterns: {},
+            emotional_regulation: {},
+            risk_assessment: { concerning_patterns: [], severity_level: "Unknown", protective_factors: [] },
+            clinical_impressions: "Unable to format analysis",
+            recommendations: []
+          };
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Dark Traits text analysis requires OpenAI, Anthropic, DeepSeek, Perplexity, or Grok." 
+        });
       }
       
       console.log("Dark Traits text analysis complete");
