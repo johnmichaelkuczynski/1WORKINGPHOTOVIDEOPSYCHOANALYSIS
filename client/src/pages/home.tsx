@@ -3789,7 +3789,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
                   onChange={(e) => setTextInput(e.target.value)}
                   onKeyDown={(e) => handleKeyPress(e, handleTextSubmit)}
                   placeholder="Type, paste, or upload a document to analyze..."
-                  className="min-h-[250px] resize-y"
+                  className="min-h-[450px] resize-y"
                   disabled={isAnalyzing}
                 />
                 <p className="text-xs text-amber-600 mt-1">For best results, texts should be under 2,000 words.</p>
