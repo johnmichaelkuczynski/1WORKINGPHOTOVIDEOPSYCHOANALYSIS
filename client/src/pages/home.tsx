@@ -2251,6 +2251,149 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           🔬 DEEP DIVE (Text)
         </Button>
         
+        {/* MBTI Text Analysis */}
+        <Button
+          variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none"
+          onClick={async () => {
+            setSelectedAnalysisType("text-mbti");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text in the Input Preview section below",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(0);
+            
+            try {
+              const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(prev => [...prev, ...data.messages]);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "MBTI Analysis Complete",
+                  description: "Your text has been analyzed using the MBTI framework",
+                });
+                setTextInput("");
+              }
+            } catch (error) {
+              console.error("MBTI text analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: "Failed to analyze text for MBTI. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-text-mbti"
+        >
+          🧠 MBTI (Text)
+        </Button>
+        
+        {/* MBTI Image Analysis */}
+        <Button
+          variant={selectedAnalysisType === "image-mbti" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("image-mbti");
+            imageMBTIInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-image-mbti"
+        >
+          🧠 MBTI (Image)
+          <input
+            ref={imageMBTIInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleImageMBTIAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        {/* MBTI Video Analysis */}
+        <Button
+          variant={selectedAnalysisType === "video-mbti" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("video-mbti");
+            videoMBTIInputRef.current?.click();
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-video-mbti"
+        >
+          🧠 MBTI (Video)
+          <input
+            ref={videoMBTIInputRef}
+            type="file"
+            accept="video/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                handleVideoMBTIAnalysis.mutate(files[0]);
+              }
+            }}
+          />
+        </Button>
+        
+        {/* Image Deep Dive - Coming Soon */}
+        <Button
+          variant={selectedAnalysisType === "image-deepdive" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("image-deepdive");
+            toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." });
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-image-deepdive"
+        >
+          🔬 Deep Dive (Image)
+        </Button>
+        
+        {/* Text Deep Dive - Coming Soon */}
+        <Button
+          variant={selectedAnalysisType === "text-deepdive" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("text-deepdive");
+            toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." });
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-text-deepdive"
+        >
+          🔬 Deep Dive+ (Text)
+        </Button>
+        
+        {/* Video Deep Dive - Coming Soon */}
+        <Button
+          variant={selectedAnalysisType === "video-deepdive" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none"
+          onClick={() => {
+            setSelectedAnalysisType("video-deepdive");
+            toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." });
+          }}
+          disabled={isAnalyzing}
+          data-testid="button-video-deepdive"
+        >
+          🔬 Deep Dive (Video)
+        </Button>
+        
         {/* Personality Structure */}
         <Button
           variant={selectedAnalysisType === "personality-structure-text" ? "default" : "outline"}
@@ -3214,7 +3357,7 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           
           {/* Upload Options */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Step 2: Choose Input Type</h2>
+            <h2 className="text-xl font-semibold mb-4">Step 2: Upload Files</h2>
             {/* Hidden file inputs for file upload functionality */}
             <input
               ref={fileInputRef}
@@ -3230,153 +3373,12 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
               style={{ display: 'none' }}
               onChange={(e) => handleFileInputChange(e, 'document')}
             />
-            <div className="grid grid-cols-3 gap-3">
-              <Button 
-                variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
-                onClick={async () => {
-                  setSelectedAnalysisType("text-mbti");
-                  
-                  if (!textInput.trim()) {
-                    toast({
-                      variant: "destructive",
-                      title: "No Text",
-                      description: "Please enter text in the Input Preview section below",
-                    });
-                    return;
-                  }
-                  
-                  setIsAnalyzing(true);
-                  setAnalysisProgress(0);
-                  // Messages now append instead of clear
-                  
-                  try {
-                    const data = await analyzeMBTIText(textInput, sessionId, selectedModel);
-                    
-                    if (data.messages && data.messages.length > 0) {
-                      setMessages(prev => [...prev, ...data.messages]);
-                      setAnalysisId(data.analysisId);
-                      setAnalysisProgress(100);
-                      toast({
-                        title: "MBTI Analysis Complete",
-                        description: "Your text has been analyzed using the MBTI framework",
-                      });
-                      setTextInput("");
-                    }
-                  } catch (error) {
-                    console.error("MBTI text analysis error:", error);
-                    toast({
-                      variant: "destructive",
-                      title: "Analysis Failed",
-                      description: "Failed to analyze text for MBTI. Please try again.",
-                    });
-                  } finally {
-                    setIsAnalyzing(false);
-                  }
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-text-mbti"
-              >
-                <FileText className="h-6 w-6 mb-1" />
-                <span>Text MBTI</span>
-              </Button>
-
-              <Button 
-                variant={selectedAnalysisType === "image-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("image-mbti");
-                  imageMBTIInputRef.current?.click();
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-image-mbti"
-              >
-                <FileImage className="h-6 w-6 mb-1" />
-                <span>Image MBTI</span>
-                <input
-                  ref={imageMBTIInputRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files && files.length > 0) {
-                      handleImageMBTIAnalysis.mutate(files[0]);
-                    }
-                  }}
-                />
-              </Button>
-
-              <Button 
-                variant={selectedAnalysisType === "video-mbti" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-500/90 hover:to-emerald-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("video-mbti");
-                  videoMBTIInputRef.current?.click();
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-video-mbti"
-              >
-                <Film className="h-6 w-6 mb-1" />
-                <span>Video MBTI</span>
-                <input
-                  ref={videoMBTIInputRef}
-                  type="file"
-                  accept="video/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files && files.length > 0) {
-                      handleVideoMBTIAnalysis.mutate(files[0]);
-                    }
-                  }}
-                />
-              </Button>
-
-              <Button 
-                variant={selectedAnalysisType === "image-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("image-deepdive");
-                  toast({ title: "Coming Soon", description: "Image Deep Dive functionality will be added soon." });
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-image-deepdive"
-              >
-                <FileImage className="h-6 w-6 mb-1" />
-                <span>Image Deep Dive</span>
-              </Button>
-
-              <Button 
-                variant={selectedAnalysisType === "text-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("text-deepdive");
-                  toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." });
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-text-deepdive"
-              >
-                <FileText className="h-6 w-6 mb-1" />
-                <span>Text Deep Dive</span>
-              </Button>
-
-              <Button 
-                variant={selectedAnalysisType === "video-deepdive" ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center text-xs bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none" 
-                onClick={() => {
-                  setSelectedAnalysisType("video-deepdive");
-                  toast({ title: "Coming Soon", description: "Video Deep Dive functionality will be added soon." });
-                }}
-                disabled={isAnalyzing}
-                data-testid="button-video-deepdive"
-              >
-                <Film className="h-6 w-6 mb-1" />
-                <span>Video Deep Dive</span>
-              </Button>
-            </div>
             
-            <p className="text-xs text-amber-600 mt-2">For best results, videos should be under 15 seconds.</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Use the sidebar buttons to select an analysis type, or drag & drop files below.
+            </p>
+            
+            <p className="text-xs text-amber-600 mb-2">For best results, videos should be under 15 seconds.</p>
             
             {isAnalyzing && (
               <div className="mt-4 space-y-2">
