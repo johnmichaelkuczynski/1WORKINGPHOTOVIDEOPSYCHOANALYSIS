@@ -3275,6 +3275,49 @@ Provide a detailed cognitive assessment in JSON format:
             recommendations: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an expert psychologist specializing in cognitive assessment. Always respond with valid JSON." },
+            { role: "user", content: stanfordBinetPrompt }
+          ],
+        });
+        
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Grok Stanford-Binet raw response:", rawResponse.substring(0, 500));
+        
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+        
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          const fallbackSummary = rawResponse.length > 0 
+            ? rawResponse.substring(0, 1000) 
+            : "The AI was unable to properly format the Stanford-Binet analysis.";
+          
+          analysisResult = {
+            summary: fallbackSummary,
+            full_scale_iq_estimate: "Unable to determine",
+            factor_analysis: {
+              fluid_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              knowledge: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              quantitative_reasoning: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              visual_spatial_processing: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] },
+              working_memory: { level: "Unable to determine", score_estimate: "N/A", evidence: "Formatting error occurred", indicators: [] }
+            },
+            cognitive_strengths: [],
+            areas_for_development: [],
+            learning_style_assessment: "Unable to generate due to formatting error",
+            intellectual_profile: "Unable to generate profile due to formatting error",
+            recommendations: []
+          };
+        }
       } else {
         throw new Error(`Model ${selectedModel} is not available or not configured`);
       }
