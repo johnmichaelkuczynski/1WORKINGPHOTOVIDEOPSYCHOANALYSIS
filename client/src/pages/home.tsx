@@ -2194,63 +2194,6 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
       <div className="w-56 bg-muted/30 min-h-screen p-4 space-y-2 border-r">
         <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Additional Assessments</h3>
         
-        {/* Deep Dive - Comprehensive Multi-Framework Analysis */}
-        <Button
-          variant={selectedAnalysisType === "deep-dive" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white hover:from-amber-500/90 hover:via-orange-500/90 hover:to-red-500/90 border-none font-bold"
-          onClick={async () => {
-            setSelectedAnalysisType("deep-dive");
-            
-            if (!textInput.trim()) {
-              toast({
-                variant: "destructive",
-                title: "No Text",
-                description: "Please enter text (min 100 characters) in the Input Preview section below",
-              });
-              return;
-            }
-            
-            if (textInput.trim().length < 100) {
-              toast({
-                variant: "destructive",
-                title: "Text Too Short",
-                description: "Deep Dive requires at least 100 characters for comprehensive analysis",
-              });
-              return;
-            }
-            
-            setIsAnalyzing(true);
-            setAnalysisProgress(10);
-            
-            try {
-              const data = await analyzeDeepDive(textInput, sessionId, selectedModel, `Deep Dive Analysis - ${new Date().toLocaleDateString()}`);
-              
-              if (data.messages && data.messages.length > 0) {
-                setMessages(prev => [...prev, ...data.messages]);
-                setAnalysisId(data.analysisId);
-                setAnalysisProgress(100);
-                toast({
-                  title: "Deep Dive Complete",
-                  description: "Your comprehensive multi-framework analysis is ready",
-                });
-              }
-            } catch (error: any) {
-              console.error("Deep Dive analysis error:", error);
-              toast({
-                variant: "destructive",
-                title: "Analysis Failed",
-                description: error.message || "Failed to perform Deep Dive analysis. Please try again.",
-              });
-            } finally {
-              setIsAnalyzing(false);
-            }
-          }}
-          disabled={isAnalyzing}
-          data-testid="button-deep-dive"
-        >
-          🔬 DEEP DIVE (Text)
-        </Button>
-        
         {/* MBTI Text Analysis */}
         <Button
           variant={selectedAnalysisType === "text-mbti" ? "default" : "outline"}
@@ -2366,18 +2309,61 @@ export default function Home({ isShareMode = false, shareId }: { isShareMode?: b
           🔬 Deep Dive (Image)
         </Button>
         
-        {/* Text Deep Dive - Coming Soon */}
+        {/* Deep Dive - Comprehensive Multi-Framework Analysis */}
         <Button
-          variant={selectedAnalysisType === "text-deepdive" ? "default" : "outline"}
-          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none"
-          onClick={() => {
-            setSelectedAnalysisType("text-deepdive");
-            toast({ title: "Coming Soon", description: "Text Deep Dive functionality will be added soon." });
+          variant={selectedAnalysisType === "deep-dive" ? "default" : "outline"}
+          className="w-full justify-start text-xs h-auto py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white hover:from-rose-500/90 hover:to-red-500/90 border-none font-bold"
+          onClick={async () => {
+            setSelectedAnalysisType("deep-dive");
+            
+            if (!textInput.trim()) {
+              toast({
+                variant: "destructive",
+                title: "No Text",
+                description: "Please enter text (min 100 characters) in the Input Preview section below",
+              });
+              return;
+            }
+            
+            if (textInput.trim().length < 100) {
+              toast({
+                variant: "destructive",
+                title: "Text Too Short",
+                description: "Deep Dive requires at least 100 characters for comprehensive analysis",
+              });
+              return;
+            }
+            
+            setIsAnalyzing(true);
+            setAnalysisProgress(10);
+            
+            try {
+              const data = await analyzeDeepDive(textInput, sessionId, selectedModel, `Deep Dive Analysis - ${new Date().toLocaleDateString()}`);
+              
+              if (data.messages && data.messages.length > 0) {
+                setMessages(prev => [...prev, ...data.messages]);
+                setAnalysisId(data.analysisId);
+                setAnalysisProgress(100);
+                toast({
+                  title: "Deep Dive Complete",
+                  description: "Your comprehensive multi-framework analysis is ready",
+                });
+              }
+            } catch (error: any) {
+              console.error("Deep Dive analysis error:", error);
+              toast({
+                variant: "destructive",
+                title: "Analysis Failed",
+                description: error.message || "Failed to perform Deep Dive analysis. Please try again.",
+              });
+            } finally {
+              setIsAnalyzing(false);
+            }
           }}
           disabled={isAnalyzing}
-          data-testid="button-text-deepdive"
+          data-testid="button-deep-dive"
         >
-          🔬 Deep Dive+ (Text)
+          🔬 DEEP DIVE (Text)
         </Button>
         
         {/* Video Deep Dive - Coming Soon */}
