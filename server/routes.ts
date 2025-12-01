@@ -3091,61 +3091,98 @@ Provide detailed analysis in JSON format:
       
       console.log(`Processing Stanford-Binet text analysis with model: ${selectedModel}`);
       
-      // Stanford-Binet Intelligence Scale comprehensive prompt
-      const stanfordBinetPrompt = `You are an expert psychologist specializing in cognitive assessment using the Stanford-Binet Intelligence Scale framework. Analyze the following text to assess cognitive abilities across the five factor indexes.
+      // Stanford-Binet Intelligence Scale comprehensive prompt - TEXT-APPROPRIATE version
+      const stanfordBinetPrompt = `You are an expert psychologist specializing in cognitive assessment. Analyze the following text using an ADAPTED Stanford-Binet framework appropriate for written content analysis.
 
-The Stanford-Binet Intelligence Scale evaluates five core cognitive domains:
+CRITICAL INSTRUCTIONS:
+- You are analyzing WRITTEN TEXT, not administering an IQ test
+- Assess cognitive indicators AS THEY APPEAR IN WRITING STYLE AND CONTENT
+- Do NOT expect math formulas in non-mathematical texts - that would be absurd
+- Do NOT penalize domain-specific texts (psychology papers, creative writing, etc.) for lacking irrelevant content
+- Focus on WHAT THE TEXT REVEALS about the author's cognitive capabilities
 
-1. **Fluid Reasoning (FR)** - ability to solve novel problems, identify patterns, think logically and abstractly
-2. **Knowledge (KN)** - accumulated knowledge, vocabulary, general information, verbal comprehension
-3. **Quantitative Reasoning (QR)** - numerical problem-solving, mathematical concepts, quantitative thinking
-4. **Visual-Spatial Processing (VS)** - spatial reasoning, mental imagery, visual pattern recognition
-5. **Working Memory (WM)** - attention, concentration, mental manipulation of information, recall
+Adapted Five-Factor Assessment for Text Analysis:
+
+1. **Fluid Reasoning (FR)** - Assess through:
+   - Quality of logical argumentation and reasoning chains
+   - Ability to make novel connections between concepts
+   - Sophistication of cause-and-effect analysis
+   - Pattern recognition in abstract ideas
+   - Handling of complex, multi-layered problems
+
+2. **Knowledge (KN)** - Assess through:
+   - Vocabulary sophistication and precision
+   - Breadth and depth of domain expertise shown
+   - Appropriate use of specialized terminology
+   - Integration of diverse knowledge sources
+   - Verbal comprehension and expression quality
+
+3. **Quantitative Reasoning (QR)** - Assess through:
+   - Precision and systematic structure of arguments (NOT literal math unless relevant to topic)
+   - Proportional thinking (e.g., "most," "significant majority," comparative reasoning)
+   - Logical sequencing and ordered analysis
+   - Evidence-based reasoning with appropriate weight to factors
+   - Structured categorization and classification
+   - NOTE: A psychology paper should NOT contain gratuitous math formulas - assess logical precision instead
+
+4. **Visual-Spatial Processing (VS)** - Assess through:
+   - Organizational structure of the text itself
+   - Use of spatial/structural metaphors
+   - Ability to describe complex systems or relationships
+   - Hierarchical thinking and conceptual mapping
+   - Clarity of structural presentation
+
+5. **Working Memory (WM)** - Assess through:
+   - Coherent threading of multiple ideas throughout text
+   - Callback references to earlier points
+   - Ability to hold and manipulate complex arguments
+   - Attention to detail and consistency
+   - Integration of multiple sources/concepts simultaneously
 
 TEXT TO ANALYZE:
 ${content}
 
 Provide a detailed cognitive assessment in JSON format:
 {
-  "summary": "Overall cognitive profile with key findings about intellectual capabilities",
+  "summary": "Overall cognitive profile emphasizing demonstrated intellectual strengths in this writing",
   "full_scale_iq_estimate": "Estimated range: Below Average / Average / High Average / Superior / Very Superior",
   "factor_analysis": {
     "fluid_reasoning": {
       "level": "Below Average / Average / High Average / Superior / Very Superior",
-      "score_estimate": "Estimated standard score range (e.g., 90-100)",
-      "evidence": "Detailed analysis with specific examples from text showing logical reasoning, pattern recognition, problem-solving approach",
-      "indicators": ["List of specific cognitive indicators observed in the text"]
+      "score_estimate": "Estimated standard score range (e.g., 110-120)",
+      "evidence": "Specific examples from text showing logical reasoning quality, novel connections, pattern recognition",
+      "indicators": ["Specific cognitive indicators with QUOTES from text"]
     },
     "knowledge": {
       "level": "Below Average / Average / High Average / Superior / Very Superior",
       "score_estimate": "Estimated standard score range",
-      "evidence": "Analysis of vocabulary sophistication, breadth of knowledge, verbal comprehension demonstrated",
-      "indicators": ["Specific knowledge indicators from text"]
+      "evidence": "Analysis of vocabulary, domain expertise, knowledge integration demonstrated",
+      "indicators": ["Specific knowledge indicators with QUOTES"]
     },
     "quantitative_reasoning": {
       "level": "Below Average / Average / High Average / Superior / Very Superior",
       "score_estimate": "Estimated standard score range",
-      "evidence": "Assessment of numerical reasoning, mathematical concepts, quantitative logic",
-      "indicators": ["Quantitative reasoning indicators from text"]
+      "evidence": "Assessment of logical precision, systematic reasoning, evidence-based analysis (NOT expecting literal math in non-math texts)",
+      "indicators": ["Precision/systematic thinking indicators with QUOTES"]
     },
     "visual_spatial_processing": {
       "level": "Below Average / Average / High Average / Superior / Very Superior",
       "score_estimate": "Estimated standard score range",
-      "evidence": "Evaluation of spatial descriptions, mental imagery, visual thinking patterns",
-      "indicators": ["Visual-spatial indicators from text"]
+      "evidence": "Evaluation of text organization, structural thinking, conceptual mapping ability",
+      "indicators": ["Organizational/structural indicators with QUOTES"]
     },
     "working_memory": {
       "level": "Below Average / Average / High Average / Superior / Very Superior",
       "score_estimate": "Estimated standard score range",
-      "evidence": "Analysis of attention to detail, information retention, mental organization",
-      "indicators": ["Working memory indicators from text"]
+      "evidence": "Analysis of idea threading, multi-concept integration, consistency and detail",
+      "indicators": ["Working memory indicators with QUOTES"]
     }
   },
-  "cognitive_strengths": ["List of identified cognitive strengths with detailed explanations"],
-  "areas_for_development": ["Areas where cognitive development could be enhanced with specific recommendations"],
-  "learning_style_assessment": "Detailed analysis of preferred learning modalities and cognitive processing style",
-  "intellectual_profile": "Comprehensive narrative describing the individual's cognitive pattern and intellectual capabilities",
-  "recommendations": ["Specific suggestions for leveraging strengths and developing areas for growth"]
+  "cognitive_strengths": ["List of demonstrated cognitive strengths with detailed explanations and text evidence"],
+  "areas_for_development": ["Constructive observations about potential growth areas - be fair and contextual"],
+  "learning_style_assessment": "Analysis of cognitive processing style evident in the writing",
+  "intellectual_profile": "Comprehensive narrative describing the author's cognitive pattern as demonstrated in this text",
+  "recommendations": ["Suggestions for leveraging demonstrated strengths"]
 }`;
 
       let analysisResult: any;
