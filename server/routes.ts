@@ -6276,6 +6276,41 @@ Provide your analysis in JSON format:
             growth_recommendations: []
           };
         }
+      } else if (selectedModel === "grok" && grokClient) {
+        console.log('Using Grok for Enneagram text analysis');
+        const response = await grokClient.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: "You are an expert Enneagram analyst. Always respond with valid JSON only, no markdown." },
+            { role: "user", content: enneagramTextPrompt + "\n\nText to analyze:\n" + content }
+          ],
+        });
+
+        const rawResponse = response.choices[0]?.message?.content || "";
+        console.log("Grok Enneagram text raw response:", rawResponse.substring(0, 500));
+
+        let jsonText = rawResponse;
+        const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || rawResponse.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          jsonText = jsonMatch[1];
+        }
+
+        try {
+          analysisResult = JSON.parse(jsonText);
+        } catch (parseError) {
+          console.error("Failed to parse Grok response:", parseError);
+          analysisResult = {
+            summary: rawResponse.substring(0, 1000) || "Unable to format analysis",
+            primary_type: { type: "Unable to determine", confidence: "Low", core_motivation: "Formatting error", key_indicators: [] },
+            secondary_possibilities: [],
+            wing_analysis: "Unable to analyze due to formatting error",
+            stress_growth_patterns: "Unable to analyze",
+            triadic_analysis: { center: "Unknown", stance: "Unknown" },
+            writing_style_markers: [],
+            personality_summary: "Unable to format analysis",
+            growth_recommendations: []
+          };
+        }
       }
       
       console.log("Enneagram text analysis complete");
